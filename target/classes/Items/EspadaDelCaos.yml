@@ -1,0 +1,9 @@
+EspadaDelCaos:
+  id: NETHERITE_SWORD
+  display-name: '&cEspada del Caos'
+  lore:
+    - '&7Forjada en el vacío, corrompe'
+    - '&7todo lo que toca.'
+  enchantments:
+    - 'DAMAGE_ALL:5'
+    - 'FIRE_ASPECT:2'

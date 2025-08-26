@@ -1,0 +1,14 @@
+package com.infinity3113.infinixmob.mechanics.impl;
+import com.infinity3113.infinixmob.mechanics.Mechanic;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import java.util.Map;
+public class DamageMechanic implements Mechanic {
+    @Override
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
+        if (target instanceof LivingEntity) {
+            double amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
+            ((LivingEntity) target).damage(amount, caster);
+        }
+    }
+}

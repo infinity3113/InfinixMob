@@ -1,0 +1,17 @@
+# Esta es la skill "GolpeBasico"
+Mechanics:
+  # Primera mecánica: hacer daño extra
+  - type: 'DAMAGE'
+    parameters:
+      amount: 15
+      ignoreArmor: false
+  # Segunda mecánica: aplicar un efecto de poción
+  - type: 'POTION'
+    parameters:
+      effect: 'WEAKNESS'
+      duration: 3 # en segundos
+      amplifier: 1
+  # Tercera mecánica: reproducir un sonido
+  - type: 'SOUND'
+    parameters:
+      sound: 'ENTITY_IRON_GOLEM_ATTACK'

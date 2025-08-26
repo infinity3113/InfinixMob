@@ -1,0 +1,5 @@
+GritoDeGuerra:
+  Mechanics:
+    - type: 'MESSAGE'
+      parameters:
+        message: '&b<caster.name>&f chilla: &e<target.name>, sentirás el abrazo helado de la tumba!'

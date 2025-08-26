@@ -1,0 +1,14 @@
+TeleportStrike:
+  Mechanics:
+    - type: 'TELEPORT'
+      targeter: '@target' # El'@target' es opcional, ya que es el selector por defecto
+    - type: 'DAMAGE'
+      parameters:
+        amount: 20.0
+    - type: 'PARTICLE'
+      parameters:
+        particle: 'CRIT'
+        amount: 50
+    - type: 'SOUND'
+      parameters:
+        sound: 'ENTITY_ENDERMAN_TELEPORT'

@@ -1,0 +1,7 @@
+SpawnerCore:
+  id: BEACON
+  display-name: '&b&lNúcleo de Spawner de InfinixMob'
+  lore:
+    - '&7Coloca este bloque en el mundo'
+    - '&7para crear un spawner configurable.'
+  custom-tag: 'infinix_spawner_item'

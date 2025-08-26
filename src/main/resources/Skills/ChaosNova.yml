@@ -1,0 +1,20 @@
+ChaosNova:
+  Mechanics:
+    - type: 'AREA_DAMAGE'
+      targeter: '@ENTITIESINRADIUS{R=8}' # Ataca a todas las entidades en un radio de 8 bloques
+      parameters:
+        damage: 30.0
+    - type: 'PARTICLE'
+      targeter: '@SELF' # El '@SELF' hace que la particula se genere en el caster
+      parameters:
+        particle: 'EXPLOSION_HUGE'
+        amount: 1
+    - type: 'SOUND'
+      parameters:
+        sound: 'ENTITY_GENERIC_EXPLODE'
+    - type: 'POTION_AREA'
+      targeter: '@ENTITIESINRADIUS{R=8}'
+      parameters:
+        effect: 'WITHER'
+        duration: 5 # en segundos
+        amplifier: 2
