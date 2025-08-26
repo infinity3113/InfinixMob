@@ -13,6 +13,8 @@ import org.bukkit.util.Vector;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * Gestiona la IA proactiva (Behaviours) de los mobs.
@@ -53,10 +55,11 @@ public class BehaviourManager {
                 return;
             }
 
-            // CORRECCIÓN DEFINITIVA: Se usa una implementación de Comparator más explícita.
             behaviours.sort((map1, map2) -> {
-                Number priority1 = (Number) map1.getOrDefault("priority", 99);
-                Number priority2 = (Number) map2.getOrDefault("priority", 99);
+                Number priority1 = (Number) map1.get("priority");
+                Number priority2 = (Number) map2.get("priority");
+                if (priority1 == null) priority1 = 99;
+                if (priority2 == null) priority2 = 99;
                 return Integer.compare(priority1.intValue(), priority2.intValue());
             });
 
@@ -87,17 +90,15 @@ public class BehaviourManager {
                 }
                 break;
             case "FLEE_ON_LOW_HEALTH":
-                // CORRECCIÓN DEFINITIVA: Se obtiene el valor como Object y luego se convierte.
-                Object rawHealthThreshold = behaviourData.getOrDefault("health-threshold", 0.15);
-                double healthThreshold = ((Number) rawHealthThreshold).doubleValue();
+                Object rawHealthThreshold = behaviourData.get("health-threshold");
+                double healthThreshold = (rawHealthThreshold instanceof Number) ? ((Number) rawHealthThreshold).doubleValue() : 0.15;
                 
                 if (mob.getHealth() / mob.getAttribute(Attribute.GENERIC_MAX_HEALTH).getValue() <= healthThreshold) {
                     if (mob.getTarget() != null) {
                         Vector fleeVector = mob.getLocation().toVector().subtract(mob.getTarget().getLocation().toVector()).normalize();
                         
-                        // CORRECCIÓN DEFINITIVA: Se obtiene el valor como Object y luego se convierte.
-                        Object rawSpeedMultiplier = behaviourData.getOrDefault("speed-multiplier", 1.5);
-                        double speedMultiplier = ((Number) rawSpeedMultiplier).doubleValue();
+                        Object rawSpeedMultiplier = behaviourData.get("speed-multiplier");
+                        double speedMultiplier = (rawSpeedMultiplier instanceof Number) ? ((Number) rawSpeedMultiplier).doubleValue() : 1.5;
                         
                         mob.setVelocity(fleeVector.multiply(0.35 * speedMultiplier).add(new Vector(0, 0.1, 0)));
                         mob.addPotionEffect(new PotionEffect(PotionEffectType.SPEED, 40, 2));
