@@ -23,7 +23,7 @@ import java.util.UUID;
 public class CustomItem {
 
     private final InfinixMob plugin;
-    private final String internalName;
+    private final String id;
     private final ConfigurationSection config;
 
     public static final NamespacedKey CUSTOM_TAG_KEY = new NamespacedKey(InfinixMob.getPlugin(), "infinix_custom_item");
@@ -38,9 +38,9 @@ public class CustomItem {
     public static final NamespacedKey ELEMENTAL_DAMAGE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_elemental_damage");
     public static final NamespacedKey ITEM_TYPE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_type");
 
-    public CustomItem(InfinixMob plugin, String internalName, ConfigurationSection config) {
+    public CustomItem(InfinixMob plugin, String id, ConfigurationSection config) {
         this.plugin = plugin;
-        this.internalName = internalName;
+        this.id = id;
         this.config = config;
     }
 
@@ -55,7 +55,7 @@ public class CustomItem {
         FileConfiguration statsConfig = plugin.getItemManager().getStatsConfig();
 
         // --- GUARDAR DATOS EN EL ITEM ---
-        meta.getPersistentDataContainer().set(CUSTOM_TAG_KEY, PersistentDataType.STRING, internalName);
+        meta.getPersistentDataContainer().set(CUSTOM_TAG_KEY, PersistentDataType.STRING, id);
         meta.getPersistentDataContainer().set(REVISION_ID_KEY, PersistentDataType.INTEGER, config.getInt("revision-id", 1));
         
         String itemType = config.getString("type", "MISC");
@@ -92,33 +92,33 @@ public class CustomItem {
         for (String placeholder : format) {
             switch (placeholder.toLowerCase()) {
                 case "#item-type#":
-                    String itemTypeName = statsConfig.getString("item-types." + itemType.toLowerCase(), itemType);
+                    String itemTypeName = statsConfig.getString("item-types." + itemType.toUpperCase(), itemType);
                     lore.add(format(entries.getString("item-type"), "{value}", itemTypeName));
                     break;
                 case "#damage#":
                     if (config.contains("damage")) {
-                        String name = statsConfig.getString("display-names.damage");
+                        String name = statsConfig.getString("display-names.damage", "Damage");
                         String value = String.format("%.1f", config.getDouble("damage"));
                         lore.add(format(entries.getString("damage"), "{display_name}", name, "{value}", value));
                     }
                     break;
                 case "#attack-speed#":
                      if (config.contains("attack-speed")) {
-                        String name = statsConfig.getString("display-names.attack-speed");
+                        String name = statsConfig.getString("display-names.attack-speed", "Attack Speed");
                         String value = String.format("%.1f", config.getDouble("attack-speed"));
                         lore.add(format(entries.getString("attack-speed"), "{display_name}", name, "{value}", value));
                     }
                     break;
                 case "#crit-chance#":
                     if (config.contains("crit-chance")) {
-                        String name = statsConfig.getString("display-names.crit-chance");
+                        String name = statsConfig.getString("display-names.crit-chance", "Crit Chance");
                         String value = String.format("%.1f", config.getDouble("crit-chance"));
                         lore.add(format(entries.getString("crit-chance"), "{display_name}", name, "{value}", value));
                     }
                     break;
                 case "#crit-damage#":
                     if (config.contains("crit-damage")) {
-                        String name = statsConfig.getString("display-names.crit-damage");
+                        String name = statsConfig.getString("display-names.crit-damage", "Crit Damage");
                         String value = String.format("%.1f", config.getDouble("crit-damage"));
                         lore.add(format(entries.getString("crit-damage"), "{display_name}", name, "{value}", value));
                     }
@@ -127,7 +127,7 @@ public class CustomItem {
                     if (!elementalDamageMap.isEmpty()) {
                         lore.add(format(entries.getString("elements_title")));
                         for (Map.Entry<String, Double> entry : elementalDamageMap.entrySet()) {
-                            String name = elementsConfig.getString(entry.getKey().toLowerCase());
+                            String name = elementsConfig.getString(entry.getKey().toLowerCase(), entry.getKey());
                             String value = String.format("%.1f", entry.getValue());
                             lore.add(format(entries.getString("element_entry"), "{display_name}", name, "{value}", value));
                         }
@@ -138,7 +138,7 @@ public class CustomItem {
                         lore.add(format(entries.getString("base_stats_title")));
                         ConfigurationSection baseStats = config.getConfigurationSection("base-stats");
                         for (String key : baseStats.getKeys(false)) {
-                            String name = statsConfig.getString("display-names." + key.toLowerCase());
+                            String name = statsConfig.getString("display-names." + key.toLowerCase(), key);
                             String value = String.valueOf(baseStats.getDouble(key));
                             lore.add(format(entries.getString("base_stat_entry"), "{display_name}", name, "{value}", value));
                         }
@@ -188,7 +188,12 @@ public class CustomItem {
     private String format(String text, String... replacements) {
         if (text == null) return "";
         for (int i = 0; i < replacements.length; i += 2) {
-            text = text.replace(replacements[i], replacements[i+1]);
+            String key = replacements[i];
+            String value = replacements[i+1];
+            if (value == null) {
+                value = ""; 
+            }
+            text = text.replace(key, value);
         }
         return ChatColor.translateAlternateColorCodes('&', text);
     }
@@ -215,6 +220,10 @@ public class CustomItem {
             if (materialName.endsWith("_BOOTS")) return EquipmentSlot.FEET;
         }
         return EquipmentSlot.HAND;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public ConfigurationSection getConfig() {

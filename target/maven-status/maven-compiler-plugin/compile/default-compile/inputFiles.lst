@@ -6,6 +6,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\Mechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\SilentRemoveMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\SpawnerListener.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\GeneralPropertiesGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\VampirismMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\spawners\SpawnerManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\ThreatManager.java
@@ -21,10 +22,14 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\LaunchMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\TeleportMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\SwapMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\BaseStatsGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\AreaDamageMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\LightningMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\ItemBuilder.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\ActionBarMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\ItemEditorGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\PullMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\EditorMainMenuGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\utils\PlaceholderParser.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\WeakPointManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\SummonStructureMechanic.java
@@ -39,6 +44,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\SoundMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\TitleMessageMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetLine.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\ItemListGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\HealMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetSelf.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\PlaceTrapMechanic.java
@@ -46,9 +52,12 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\DynamicArenaMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\PotionMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\Targeter.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\CombatStatsGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\SpawnerGUI.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\ElementalDamageGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\ChatListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetEntitiesInRadius.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\LoreEditorGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\ApplyShieldMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\CommandMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\SpawnWebMechanic.java
@@ -65,6 +74,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\ItemListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\PotionAreaMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\SoulLinkManager.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editors\AnvilInputGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\DisarmMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\BehaviourManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\MessageMechanic.java

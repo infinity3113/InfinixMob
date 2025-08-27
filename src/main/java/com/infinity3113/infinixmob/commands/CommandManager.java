@@ -2,6 +2,10 @@ package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.gui.SpawnerListGui;
+import com.infinity3113.infinixmob.gui.editors.EditorMainMenuGUI;
+import com.infinity3113.infinixmob.gui.editors.ItemBuilder;
+import com.infinity3113.infinixmob.gui.editors.ItemEditorGUI;
+import com.infinity3113.infinixmob.items.CustomItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -24,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
@@ -69,6 +74,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             sender.sendMessage(getRawMsg("help-getspawner"));
             sender.sendMessage(getRawMsg("help-spawners"));
             if (sender.hasPermission("infinixmob.admin")) {
+                sender.sendMessage(ChatColor.YELLOW + "/im editor - Abre el editor de ítems.");
                 sender.sendMessage(getRawMsg("help-reload"));
             }
             return true;
@@ -77,6 +83,18 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
+            case "editor":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(getMsg("player-only"));
+                    return true;
+                }
+                if (!sender.hasPermission("infinixmob.admin")) {
+                    sender.sendMessage(getMsg("no-permission"));
+                    return true;
+                }
+                new EditorMainMenuGUI(plugin, (Player) sender).open();
+                break;
+            
             case "meta":
                 if (!sender.hasPermission("infinixmob.admin")) {
                     sender.sendMessage(getMsg("no-permission"));
@@ -131,6 +149,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     sender.sendMessage(ChatColor.RED + "El UUID proporcionado no es válido.");
                 }
                 break;
+
             case "reload":
                 if (!sender.hasPermission("infinixmob.admin")) {
                     sender.sendMessage(getMsg("no-permission"));
@@ -185,7 +204,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                         () -> pItem.sendMessage(getMsg("item-not-found").replace("%item%", itemId))
                 );
                 break;
-                
+
             case "skills":
                 if (!sender.hasPermission("infinixmob.skills")) {
                     sender.sendMessage(getMsg("no-permission"));
@@ -249,23 +268,23 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     sender.sendMessage(getMsg("no-permission"));
                     return true;
                 }
-                Player player = (Player) sender;
+                Player playerSpawners = (Player) sender;
                 if (args.length > 1 && args[1].equalsIgnoreCase("list")) {
-                    new SpawnerListGui(plugin, player).open();
+                    new SpawnerListGui(plugin, playerSpawners).open();
                 } else if (args.length > 2 && args[1].equalsIgnoreCase("tp")) {
                     String spawnerName = args[2];
                     Map<Location, Map<String, String>> spawners = plugin.getSpawnerManager().getAllSpawners();
                     for (Map.Entry<Location, Map<String, String>> entry : spawners.entrySet()) {
                         String currentSpawnerName = ChatColor.stripColor(entry.getValue().getOrDefault("name", ""));
                         if (currentSpawnerName.equalsIgnoreCase(spawnerName)) {
-                            player.teleport(entry.getKey().add(0.5, 1, 0.5));
-                            player.sendMessage(getMsg("spawner-tp-success").replace("%name%", spawnerName));
+                            playerSpawners.teleport(entry.getKey().add(0.5, 1, 0.5));
+                            playerSpawners.sendMessage(getMsg("spawner-tp-success").replace("%name%", spawnerName));
                             return true;
                         }
                     }
-                    player.sendMessage(getMsg("spawner-not-found"));
+                    playerSpawners.sendMessage(getMsg("spawner-not-found"));
                 } else {
-                    player.sendMessage(getMsg("usage-spawners"));
+                    playerSpawners.sendMessage(getMsg("usage-spawners"));
                 }
                 break;
 
@@ -281,26 +300,19 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         final List<String> completions = new ArrayList<>();
         
         if (args.length == 1) {
-            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload", "meta"));
+            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload", "editor"));
             StringUtil.copyPartialMatches(args[0], subCommands, completions);
-            return completions;
         }
         
         if (args.length == 2) {
             if (args[0].equalsIgnoreCase("spawn")) {
-                List<String> mobNames = new ArrayList<>(plugin.getMobManager().getLoadedMobIds());
-                StringUtil.copyPartialMatches(args[1], mobNames, completions);
-                return completions;
+                StringUtil.copyPartialMatches(args[1], plugin.getMobManager().getLoadedMobIds(), completions);
             }
              if (args[0].equalsIgnoreCase("item")) {
-                List<String> itemNames = new ArrayList<>(plugin.getItemManager().getLoadedItemIds());
-                StringUtil.copyPartialMatches(args[1], itemNames, completions);
-                return completions;
+                StringUtil.copyPartialMatches(args[1], plugin.getItemManager().getLoadedItemIds(), completions);
             }
             if (args[0].equalsIgnoreCase("cast")) {
-                List<String> skillNames = new ArrayList<>(plugin.getSkillManager().getLoadedSkillNames());
-                StringUtil.copyPartialMatches(args[1], skillNames, completions);
-                return completions;
+                StringUtil.copyPartialMatches(args[1], plugin.getSkillManager().getLoadedSkillNames(), completions);
             }
         }
         
