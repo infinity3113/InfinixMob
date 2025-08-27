@@ -6,6 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -34,6 +35,7 @@ public class ElementalDamageGUI implements InventoryHolder {
     }
 
     private void initializeItems() {
+        inventory.clear();
         Map<String, Double> elementalDamage = builder.getElementalDamage();
         FileConfiguration elementsConfig = plugin.getItemManager().getElementsConfig();
         int slot = 0;
@@ -59,14 +61,63 @@ public class ElementalDamageGUI implements InventoryHolder {
             new ItemEditorGUI(plugin, player, builder).open();
             return;
         }
-        player.closeInventory();
-        player.sendMessage(ChatColor.YELLOW + "La edición detallada de daño elemental aún no está implementada.");
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                new ItemEditorGUI(plugin, player, builder).open();
+
+        if (slot == 45) { // Añadir
+            player.closeInventory();
+            player.sendMessage(ChatColor.GOLD + "Escribe el ID del elemento a añadir (ej: fire):");
+            plugin.getChatInputManager().requestInput(player, elementKey -> {
+                player.sendMessage(ChatColor.GOLD + "Ahora escribe el valor numérico del daño:");
+                plugin.getChatInputManager().requestInput(player, elementValue -> {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                double value = Double.parseDouble(elementValue);
+                                builder.set("elemental-damage." + elementKey, value);
+                            } catch (NumberFormatException e) {
+                                player.sendMessage(ChatColor.RED + "Valor inválido.");
+                            }
+                            new ElementalDamageGUI(plugin, player, builder).open();
+                        }
+                    }.runTask(plugin);
+                });
+            });
+        } else if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.BLAZE_POWDER) {
+            String elementName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
+            String elementKey = getKeyFromName(elementName);
+
+            if (event.getClick() == ClickType.RIGHT) { // Eliminar
+                builder.set("elemental-damage." + elementKey, null);
+                new ElementalDamageGUI(plugin, player, builder).open();
+            } else { // Editar
+                player.closeInventory();
+                player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor para '" + elementName + "':");
+                plugin.getChatInputManager().requestInput(player, input -> {
+                     new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                double value = Double.parseDouble(input);
+                                builder.set("elemental-damage." + elementKey, value);
+                            } catch (NumberFormatException e) {
+                                player.sendMessage(ChatColor.RED + "Valor inválido.");
+                            }
+                            new ElementalDamageGUI(plugin, player, builder).open();
+                        }
+                    }.runTask(plugin);
+                });
             }
-        }.runTask(plugin);
+        }
+    }
+
+    private String getKeyFromName(String name) {
+        FileConfiguration elementsConfig = plugin.getItemManager().getElementsConfig();
+        for (String key : elementsConfig.getKeys(false)) {
+            if (ChatColor.stripColor(elementsConfig.getString(key)).equalsIgnoreCase(name)) {
+                return key;
+            }
+        }
+        return name.toLowerCase().replace(" ", "-");
     }
 
     private ItemStack createButton(Material material, String name, String... lore) {

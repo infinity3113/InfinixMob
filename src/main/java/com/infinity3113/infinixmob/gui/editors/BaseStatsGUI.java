@@ -4,8 +4,10 @@ import com.infinity3113.infinixmob.InfinixMob;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryHolder;
@@ -34,6 +36,7 @@ public class BaseStatsGUI implements InventoryHolder {
     }
 
     private void initializeItems() {
+        inventory.clear();
         Map<String, Double> baseStats = builder.getBaseStats();
         FileConfiguration statsConfig = plugin.getItemManager().getStatsConfig();
         int slot = 0;
@@ -59,15 +62,65 @@ public class BaseStatsGUI implements InventoryHolder {
             new ItemEditorGUI(plugin, player, builder).open();
             return;
         }
-        
-        player.closeInventory();
-        player.sendMessage(ChatColor.YELLOW + "La edición detallada de stats base aún no está implementada.");
-        new BukkitRunnable() {
-            @Override
-            public void run() {
-                new ItemEditorGUI(plugin, player, builder).open();
+
+        if (slot == 45) { // Añadir
+            player.closeInventory();
+            player.sendMessage(ChatColor.GOLD + "Escribe el ID de la estadística a añadir (ej: max-health):");
+            plugin.getChatInputManager().requestInput(player, statKey -> {
+                player.sendMessage(ChatColor.GOLD + "Ahora escribe el valor numérico:");
+                plugin.getChatInputManager().requestInput(player, statValue -> {
+                    new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                double value = Double.parseDouble(statValue);
+                                builder.set("base-stats." + statKey, value);
+                            } catch (NumberFormatException e) {
+                                player.sendMessage(ChatColor.RED + "Valor inválido.");
+                            }
+                            new BaseStatsGUI(plugin, player, builder).open();
+                        }
+                    }.runTask(plugin);
+                });
+            });
+        } else if (event.getCurrentItem() != null && event.getCurrentItem().getType() == Material.GOLD_INGOT) {
+            String statName = ChatColor.stripColor(event.getCurrentItem().getItemMeta().getDisplayName());
+            String statKey = getKeyFromName(statName);
+
+            if (event.getClick() == ClickType.RIGHT) { // Eliminar
+                builder.set("base-stats." + statKey, null);
+                new BaseStatsGUI(plugin, player, builder).open();
+            } else { // Editar
+                player.closeInventory();
+                player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor para '" + statName + "':");
+                plugin.getChatInputManager().requestInput(player, input -> {
+                     new BukkitRunnable() {
+                        @Override
+                        public void run() {
+                            try {
+                                double value = Double.parseDouble(input);
+                                builder.set("base-stats." + statKey, value);
+                            } catch (NumberFormatException e) {
+                                player.sendMessage(ChatColor.RED + "Valor inválido.");
+                            }
+                            new BaseStatsGUI(plugin, player, builder).open();
+                        }
+                    }.runTask(plugin);
+                });
             }
-        }.runTask(plugin);
+        }
+    }
+
+    private String getKeyFromName(String name) {
+        FileConfiguration statsConfig = plugin.getItemManager().getStatsConfig();
+        ConfigurationSection section = statsConfig.getConfigurationSection("display-names");
+        if (section == null) return name;
+        for (String key : section.getKeys(false)) {
+            if (ChatColor.stripColor(statsConfig.getString("display-names." + key)).equalsIgnoreCase(name)) {
+                return key;
+            }
+        }
+        return name.toLowerCase().replace(" ", "-");
     }
 
     private ItemStack createButton(Material material, String name, String... lore) {

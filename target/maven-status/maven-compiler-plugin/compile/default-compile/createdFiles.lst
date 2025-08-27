@@ -1,5 +1,6 @@
 com\infinity3113\infinixmob\listeners\ItemUpdaterListener.class
 com\infinity3113\infinixmob\mechanics\impl\BlockReplaceMechanic$1.class
+com\infinity3113\infinixmob\gui\editors\LoreEditorGUI$2.class
 com\infinity3113\infinixmob\mechanics\impl\TitleMessageMechanic.class
 com\infinity3113\infinixmob\targeters\impl\TargetEntitiesInRadius.class
 com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.class
@@ -61,6 +62,7 @@ com\infinity3113\infinixmob\InfinixMob$1.class
 com\infinity3113\infinixmob\gui\MobSelectionGUI.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\CommandMechanic.class
+com\infinity3113\infinixmob\gui\editors\ElementalDamageGUI$2.class
 com\infinity3113\infinixmob\core\WeakPointManager.class
 com\infinity3113\infinixmob\mechanics\impl\FreezeMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\VampirismMechanic.class
@@ -71,6 +73,7 @@ com\infinity3113\infinixmob\core\BlockManager$Trap.class
 com\infinity3113\infinixmob\gui\editors\GeneralPropertiesGUI.class
 com\infinity3113\infinixmob\gui\SpawnerGUI$1$1.class
 com\infinity3113\infinixmob\mechanics\impl\CustomStatusEffectMechanic.class
+com\infinity3113\infinixmob\gui\editors\BaseStatsGUI$2.class
 com\infinity3113\infinixmob\mechanics\impl\PotionMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\ThreatMechanic.class
 com\infinity3113\infinixmob\mobs\CustomMob.class
