@@ -1,9 +1,9 @@
+com\infinity3113\infinixmob\listeners\ItemUpdaterListener.class
 com\infinity3113\infinixmob\mechanics\impl\BlockReplaceMechanic$1.class
 com\infinity3113\infinixmob\mechanics\impl\TitleMessageMechanic.class
 com\infinity3113\infinixmob\targeters\impl\TargetEntitiesInRadius.class
 com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic$1$1.class
-com\infinity3113\infinixmob\items\CustomItem$1.class
 com\infinity3113\infinixmob\mechanics\impl\PushMechanic.class
 com\infinity3113\infinixmob\listeners\ChatListener.class
 com\infinity3113\infinixmob\core\BlockManager$TemporaryBlock.class
@@ -18,6 +18,7 @@ com\infinity3113\infinixmob\core\MobManager.class
 com\infinity3113\infinixmob\core\TargeterManager.class
 com\infinity3113\infinixmob\mechanics\impl\ActionBarMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\SpawnFallingBlockMechanic.class
+com\infinity3113\infinixmob\listeners\ItemListener.class
 com\infinity3113\infinixmob\items\CustomItem.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\HungerMechanic.class
@@ -26,6 +27,7 @@ com\infinity3113\infinixmob\targeters\Targeter.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportRandomMechanic.class
 com\infinity3113\infinixmob\core\MobManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\SilentRemoveMechanic.class
+com\infinity3113\infinixmob\listeners\ItemListener$1.class
 com\infinity3113\infinixmob\targeters\impl\TargetTarget.class
 com\infinity3113\infinixmob\core\SpawnerManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\ExplosionMechanic.class
@@ -54,7 +56,6 @@ com\infinity3113\infinixmob\mechanics\impl\CommandMechanic.class
 com\infinity3113\infinixmob\core\WeakPointManager.class
 com\infinity3113\infinixmob\mechanics\impl\FreezeMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\VampirismMechanic.class
-com\infinity3113\infinixmob\listeners\MobListener$1.class
 com\infinity3113\infinixmob\mechanics\impl\ArrowRainMechanic$1.class
 com\infinity3113\infinixmob\mechanics\impl\DynamicArenaMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\SummonStructureMechanic.class

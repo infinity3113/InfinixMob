@@ -1,0 +1,13 @@
+ArcoElfico:
+  id: BOW
+  display-name: '&aArco Élfico'
+  type: 'BOW'
+  rarity: 'RARE'
+  revision-id: 1
+  lore:
+    - '&7Ligero y preciso, hecho de madera ancestral.'
+  damage: 18.0
+  crit-chance: 30.0
+  crit-damage: 60.0
+  elemental-damage:
+    nature: 25.0

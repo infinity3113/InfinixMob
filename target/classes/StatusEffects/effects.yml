@@ -1,0 +1,16 @@
+bleeding:
+  type: 'REPEATING_DAMAGE'
+  options:
+    base-damage: 1.5
+    period: 20 # Ticks (20 ticks = 1 segundo)
+    particle-on-tick: 'DAMAGE_INDICATOR'
+fracture:
+  type: 'ATTRIBUTE_MODIFIER'
+  options:
+    attribute: 'GENERIC_MOVEMENT_SPEED'
+    operation: 'MULTIPLY_SCALAR_1'
+    amount: -0.3 # Reduce la velocidad en un 30%
+corruption:
+  type: 'HEALING_MODIFIER'
+  options:
+    multiplier: -0.5 # Reduce la curación recibida en un 50%

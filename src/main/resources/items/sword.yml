@@ -1,0 +1,13 @@
+EspadaDeFuego:
+  id: NETHERITE_SWORD
+  display-name: '&cEspada de Fuego'
+  type: 'SWORD'
+  rarity: 'EPIC'
+  revision-id: 1
+  lore:
+    - '&7Una hoja que arde con furia.'
+  damage: 22.0
+  crit-chance: 10.0
+  crit-damage: 40.0
+  elemental-damage:
+    fire: 35.0

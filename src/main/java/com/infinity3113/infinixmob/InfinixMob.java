@@ -48,27 +48,18 @@ public final class InfinixMob extends JavaPlugin {
         saveResource("lang/en.yml", false);
         saveResource("lang/es.yml", false);
         
-        // Crear la estructura de carpetas
-        File itemsFolder = new File(getDataFolder(), "items");
-        if (!itemsFolder.exists()) itemsFolder.mkdirs();
+        saveResource("items/configurations/elements.yml", false);
+        saveResource("items/configurations/rarities.yml", false);
+        saveResource("items/configurations/lore-formats.yml", false);
+        saveResource("items/configurations/stats.yml", false);
+        saveResource("items/misc/SpawnerCore.yml", false);
+        
+        saveResource("items/sword.yml", false); 
+        saveResource("items/axe.yml", false);
+        saveResource("items/bow.yml", false);
+        saveResource("items/armor.yml", false);
 
-        // Guardar archivos de configuración modulares
-        saveResource("items/elements.yml", false);
-        saveResource("items/rarities.yml", false);
-        saveResource("items/lore-formats.yml", false);
-        saveResource("items/stats.yml", false);
-        
-        // Crear carpeta de ítems de ejemplo y guardar un ítem
-        File itemSwordsFolder = new File(itemsFolder, "SWORD");
-        if (!itemSwordsFolder.exists()) {
-            itemSwordsFolder.mkdirs();
-        }
-        File defaultSword = new File(itemSwordsFolder, "EspadaDeFuego.yml");
-        if (!defaultSword.exists()) {
-            saveResource("items/SWORD/EspadaDeFuego.yml", false);
-        }
-        
-        saveResource("items/SpawnerCore.yml", false);
+        saveResource("StatusEffects/effects.yml", false);
         
         // Inicializar todos los managers
         this.chatInputManager = new ChatInputManager();
@@ -94,6 +85,8 @@ public final class InfinixMob extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SpawnerListener(this), this);
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
         getServer().getPluginManager().registerEvents(this.mobListener, this);
+        getServer().getPluginManager().registerEvents(new ItemListener(this), this);
+        getServer().getPluginManager().registerEvents(new ItemUpdaterListener(this), this); // REGISTRAR EL NUEVO LISTENER
 
         reload();
 

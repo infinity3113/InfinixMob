@@ -1,0 +1,12 @@
+item-revision:
+  # Define qué datos se deben conservar cuando un ítem se actualiza a una nueva versión.
+  keep-data:
+    # Si es 'true', el nombre personalizado que un jugador le ponga en un yunque se mantendrá.
+    display-name: true
+    # Si es 'true', los encantamientos añadidos en un yunque se mantendrán.
+    enchantments: true
+    # Si es 'true', el lore añadido por otros plugins o comandos se mantendrá.
+    # El lore original del ítem SIEMPRE se actualizará.
+    lore: false
+    # Un prefijo para identificar las líneas de lore que se deben conservar.
+    kept-lore-prefix: '&7'

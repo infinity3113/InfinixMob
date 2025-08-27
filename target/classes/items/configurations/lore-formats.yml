@@ -1,0 +1,38 @@
+# src/main/resources/items/configurations/lore-formats.yml
+# Define el orden y la apariencia del lore de tus ítems.
+# Usa los placeholders de la sección 'format' para construir tu lore.
+# El plugin reemplazará cada placeholder con la estadística correspondiente si el ítem la tiene.
+format:
+  - '#item-type#'
+  - '{bar}'
+  - '#damage#'
+  - '#attack-speed#'
+  - '#crit-chance#'
+  - '#crit-damage#'
+  - '{bar}'
+  - '#elements#'
+  - '{bar}'
+  - '#base-stats#'
+  - '{bar}'
+  - '#lore#'
+  - '{bar}'
+  - '#rarity#'
+
+# Define cómo se verá cada estadística individualmente.
+# Puedes usar variables como {value}, {display_name}, {color}, etc.
+entries:
+  item-type: '&7Tipo: {value}'
+  damage: '&7{display_name}: &c{value}'
+  attack-speed: '&7{display_name}: &c{value}'
+  crit-chance: '&7{display_name}: &c{value}%'
+  crit-damage: '&7{display_name}: &c+{value}%'
+  
+  elements_title: '&7Daño Elemental:'
+  element_entry: '&7{value} {display_name}'
+
+  base_stats_title: '&7Estadísticas:'
+  base_stat_entry: '&a+ {value} {display_name}'
+
+  lore_entry: '&7{value}'
+  rarity: '{color}&l{value}'
+  bar: '&8&m------------------'

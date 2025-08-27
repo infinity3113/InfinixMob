@@ -1,0 +1,12 @@
+PetoDeTitan:
+  id: NETHERITE_CHESTPLATE
+  display-name: '&8Peto de Titán'
+  type: 'ARMOR'
+  rarity: 'EPIC'
+  revision-id: 1
+  lore:
+    - '&7Forjado para resistir el fin del mundo.'
+  base-stats:
+    max-health: 40.0 # +20 corazones
+    armor: 15.0
+    knockback-resistance: 0.5 # 50% de resistencia al empuje

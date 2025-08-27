@@ -1,0 +1,15 @@
+HachaDelVerdugo:
+  id: NETHERITE_AXE
+  display-name: '&4Hacha del Verdugo'
+  type: 'AXE'
+  rarity: 'LEGENDARY'
+  revision-id: 1
+  lore:
+    - '&7Imbuida con el poder de la oscuridad.'
+  damage: 35.0
+  crit-chance: 25.0
+  crit-damage: 100.0
+  elemental-damage:
+    dark: 50.0
+  base-stats:
+    movement-speed: -0.05 # Lenta pero poderosa

@@ -1,6 +1,7 @@
 package com.infinity3113.infinixmob.mobs;
 
 import com.infinity3113.infinixmob.InfinixMob;
+import com.infinity3113.infinixmob.items.CustomItem;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.attribute.Attribute;
@@ -22,8 +23,6 @@ public class CustomMob {
     private final InfinixMob plugin;
     private final String internalName;
     private final ConfigurationSection config;
-
-    public static final org.bukkit.NamespacedKey WEAKNESSES_KEY = new org.bukkit.NamespacedKey(InfinixMob.getPlugin(), "elemental_weaknesses");
 
     public CustomMob(InfinixMob plugin, String internalName, ConfigurationSection config) {
         this.plugin = plugin;
@@ -93,15 +92,14 @@ public class CustomMob {
             }
         }
 
-        // Guardar debilidades elementales del mob en el PersistentDataContainer
         if (config.isConfigurationSection("weaknesses")) {
             Map<String, Double> weaknesses = new HashMap<>();
             ConfigurationSection weaknessesSection = config.getConfigurationSection("weaknesses");
             for (String element : weaknessesSection.getKeys(false)) {
-                weaknesses.put(element.toUpperCase(), weaknessesSection.getDouble(element));
+                weaknesses.put(element.toLowerCase(), weaknessesSection.getDouble(element));
             }
             String weaknessesJson = plugin.getGson().toJson(weaknesses);
-            entity.getPersistentDataContainer().set(WEAKNESSES_KEY, PersistentDataType.STRING, weaknessesJson);
+            entity.getPersistentDataContainer().set(CustomItem.WEAKNESSES_KEY, PersistentDataType.STRING, weaknessesJson);
         }
 
         entity.setMetadata("InfinixMobID", new FixedMetadataValue(plugin, internalName));

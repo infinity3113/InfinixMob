@@ -3,44 +3,11 @@ GuardianAnciano:
   display-name: '&aGuardián Anciano &c[Lv. 50]'
   health: 2000.0
   damage: 25.0
-  faction: 'ANCIENT_GUARDIANS'
-  equipment:
-    main-hand: 'EspadaDelCaos'
-    off-hand: 'SHIELD'
-    helmet: 'DIAMOND_HELMET'
-    chestplate: 'NETHERITE_CHESTPLATE'
-    leggings: 'DIAMOND_LEGGINGS'
-    boots: 'IRON_BOOTS'
-  drops:
-    - item: 'SpawnerCore'
-      chance: 0.5
-      amount: 1
-    - item: 'DIAMOND'
-      chance: 1.0
-      amount: [3, 8]
-    - item: 'EMERALD'
-      chance: 0.75
-      amount: [1, 5]
-  Options:
-    MovementSpeed: 0.25
-    KnockbackResistance: 1.0
-    FollowRange: 40
-    Glowing: false
-    PreventOtherDrops: true
+  faction: 'GUARDIANES'
   weaknesses:
-    fire: 1.5   # Recibe 50% más de daño de fuego
-    water: 0.5  # Recibe 50% menos de daño de agua
-    dark: 1.2   # Recibe 20% más de daño de oscuridad
+    fire: 1.5   # Recibe 50% MÁS de daño de fuego
+    water: 0.5  # Recibe 50% MENOS de daño de agua
   Skills:
     - trigger: '~onAttack'
       skill: 'GolpeBasico'
       chance: 1.0
-    - trigger: '~onDamaged'
-      skill: 'RepresaliaExplosiva'
-      conditions: 
-        - 'health < 1000'
-      chance: 1.0
-    - trigger: '~onDeath'
-      skill: 'UltimoAliento'
-    - trigger: '~onInteract'
-      skill: 'SaludoDelGuardian'

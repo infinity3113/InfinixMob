@@ -1,0 +1,13 @@
+display-names:
+  damage: 'Daño de Ataque'
+  crit-chance: 'Prob. de Crítico'
+  crit-damage: 'Daño Crítico'
+  max-health: 'Vida Extra'
+  movement-speed: 'Velocidad'
+  armor: 'Armadura'
+item-types:
+  SWORD: 'Espada'
+  BOW: 'Arco'
+  ARMOR: 'Armadura'
+  WAND: 'Varita'
+  MISC: 'Material'

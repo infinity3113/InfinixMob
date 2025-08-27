@@ -39,7 +39,6 @@ public class MobListener implements Listener {
     private static final Pattern NUMERIC_CONDITION_PATTERN = Pattern.compile("([a-zA-Z_]+)\\s*([<>=!]+)\\s*([0-9.]+)");
     private static final Pattern GENERIC_PATTERN = Pattern.compile("([a-zA-Z_]+)\\{(.+)\\}");
     private final Set<UUID> combatCooldown = new HashSet<>();
-    private final Set<UUID> processingDamage = Collections.newSetFromMap(new HashMap<>()); // CORRECCIÓN: Set para evitar la recursión
 
     public MobListener(InfinixMob plugin) {
         this.plugin = plugin;
@@ -204,72 +203,6 @@ public class MobListener implements Listener {
             EntityDamageByEntityEvent damageByEntityEvent = (EntityDamageByEntityEvent) event;
             Entity damager = damageByEntityEvent.getDamager();
 
-            if (damager instanceof Player) {
-                Player player = (Player) damager;
-                ItemStack itemInHand = player.getInventory().getItemInMainHand();
-                Map<String, Object> itemData = CustomItem.getCustomItemData(itemInHand);
-
-                // --- CORRECCIÓN: Evita el bucle infinito ---
-                // Si ya estamos procesando un daño para este jugador, salimos para evitar la recursión.
-                if (processingDamage.contains(player.getUniqueId())) {
-                    return;
-                }
-
-                if (!itemData.isEmpty()) {
-                    // Si el ítem es personalizado, cancelamos el evento original para tomar control del daño.
-                    event.setCancelled(true);
-                    
-                    // Añadimos al jugador a la lista de "procesamiento" para evitar la recursión.
-                    processingDamage.add(player.getUniqueId());
-                    
-                    try {
-                        double baseDamage = (double) itemData.getOrDefault("damage", 1.0);
-                        double critChance = (double) itemData.getOrDefault("crit-chance", 0.0);
-                        double finalDamage = baseDamage;
-                        
-                        boolean isCritical = Math.random() < critChance;
-                        if (isCritical) {
-                            finalDamage *= 1.5;
-                            player.sendMessage(ChatColor.YELLOW + "¡Golpe Crítico!");
-                        }
-
-                        if (itemData.containsKey("elemental-damage")) {
-                            Map<String, Double> elementalDamage = (Map<String, Double>) itemData.get("elemental-damage");
-                            if (victim.getPersistentDataContainer().has(CustomMob.WEAKNESSES_KEY, PersistentDataType.STRING)) {
-                                String weaknessesJson = victim.getPersistentDataContainer().get(CustomMob.WEAKNESSES_KEY, PersistentDataType.STRING);
-                                Type type = new TypeToken<Map<String, Double>>(){}.getType();
-                                Map<String, Double> weaknesses = gson.fromJson(weaknessesJson, type);
-                                
-                                for (Map.Entry<String, Double> entry : elementalDamage.entrySet()) {
-                                    String element = entry.getKey().toLowerCase();
-                                    double damageAmount = entry.getValue();
-                                    double multiplier = weaknesses.getOrDefault(element, 1.0);
-                                    finalDamage += (damageAmount * multiplier);
-                                }
-                            } else {
-                                for (double damageAmount : elementalDamage.values()) {
-                                    finalDamage += damageAmount;
-                                }
-                            }
-                        }
-
-                        String rarity = (String) itemData.getOrDefault("rarity", "common");
-                        FileConfiguration raritiesConfig = plugin.getItemManager().getRaritiesConfig();
-                        double rarityMultiplier = raritiesConfig.getDouble(rarity.toLowerCase() + ".stat-multiplier", 1.0);
-                        finalDamage *= rarityMultiplier;
-                        
-                        // Aplicamos el daño final calculado, sin que esto provoque un nuevo ciclo de nuestra lógica
-                        victim.damage(finalDamage, player);
-                        
-                    } finally {
-                        // Es CRÍTICO eliminar al jugador de la lista de "procesamiento" al final.
-                        processingDamage.remove(player.getUniqueId());
-                    }
-
-                }
-            }
-
-            // Lógica de triggers y amenaza
             if (victim.hasMetadata("InfinixMobID") && damager instanceof Player) {
                 plugin.getThreatManager().addThreat(victim, (Player) damager, damageByEntityEvent.getFinalDamage());
             }
