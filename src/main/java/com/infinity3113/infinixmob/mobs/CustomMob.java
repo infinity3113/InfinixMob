@@ -10,13 +10,20 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.inventory.EntityEquipment;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.persistence.PersistentDataType;
+
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 
 public class CustomMob {
 
     private final InfinixMob plugin;
     private final String internalName;
     private final ConfigurationSection config;
+
+    public static final org.bukkit.NamespacedKey WEAKNESSES_KEY = new org.bukkit.NamespacedKey(InfinixMob.getPlugin(), "elemental_weaknesses");
 
     public CustomMob(InfinixMob plugin, String internalName, ConfigurationSection config) {
         this.plugin = plugin;
@@ -70,8 +77,6 @@ public class CustomMob {
             entity.setCanPickupItems(!options.getBoolean("PreventItemPickup", false));
             entity.setRemoveWhenFarAway(options.getBoolean("Despawn", true));
 
-            // --- LÓGICA DE INMUNIDAD A LAVA AÑADIDA ---
-            // Añadimos una etiqueta especial si el mob es inmune a la lava.
             if (options.getBoolean("LavaImmunity", false)) {
                 entity.setMetadata("InfinixMob_LavaImmunity", new FixedMetadataValue(plugin, true));
             }
@@ -80,13 +85,23 @@ public class CustomMob {
                 entity.setMetadata("InfinixMob_PreventDrops", new FixedMetadataValue(plugin, true));
             }
 
-            // --- ¡LÓGICA CRÍTICA PARA ARMOR STANDS! ---
             if (entity instanceof ArmorStand) {
                 ArmorStand as = (ArmorStand) entity;
                 as.setVisible(!options.getBoolean("Invisible", false));
                 as.setGravity(!options.getBoolean("NoGravity", false));
-                as.setMarker(options.getBoolean("IsMarker", false)); // Esto le quita la hitbox
+                as.setMarker(options.getBoolean("IsMarker", false));
             }
+        }
+
+        // Guardar debilidades elementales del mob en el PersistentDataContainer
+        if (config.isConfigurationSection("weaknesses")) {
+            Map<String, Double> weaknesses = new HashMap<>();
+            ConfigurationSection weaknessesSection = config.getConfigurationSection("weaknesses");
+            for (String element : weaknessesSection.getKeys(false)) {
+                weaknesses.put(element.toUpperCase(), weaknessesSection.getDouble(element));
+            }
+            String weaknessesJson = plugin.getGson().toJson(weaknesses);
+            entity.getPersistentDataContainer().set(WEAKNESSES_KEY, PersistentDataType.STRING, weaknessesJson);
         }
 
         entity.setMetadata("InfinixMobID", new FixedMetadataValue(plugin, internalName));

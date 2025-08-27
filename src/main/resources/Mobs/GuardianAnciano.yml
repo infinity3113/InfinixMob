@@ -27,6 +27,10 @@ GuardianAnciano:
     FollowRange: 40
     Glowing: false
     PreventOtherDrops: true
+  weaknesses:
+    fire: 1.5   # Recibe 50% más de daño de fuego
+    water: 0.5  # Recibe 50% menos de daño de agua
+    dark: 1.2   # Recibe 20% más de daño de oscuridad
   Skills:
     - trigger: '~onAttack'
       skill: 'GolpeBasico'

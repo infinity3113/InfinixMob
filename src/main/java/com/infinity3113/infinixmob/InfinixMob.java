@@ -1,5 +1,6 @@
 package com.infinity3113.infinixmob;
 
+import com.google.gson.Gson;
 import com.infinity3113.infinixmob.commands.CommandManager;
 import com.infinity3113.infinixmob.core.*;
 import com.infinity3113.infinixmob.listeners.*;
@@ -8,6 +9,8 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
+
+import java.io.File;
 
 public final class InfinixMob extends JavaPlugin {
 
@@ -29,19 +32,44 @@ public final class InfinixMob extends JavaPlugin {
     
     private MobListener mobListener;
     private BukkitTask timerSkillTask;
+    private Gson gson;
 
     public NamespacedKey TIMER_KEY;
 
     @Override
     public void onEnable() {
         plugin = this;
-        
+        this.gson = new Gson();
+
         this.TIMER_KEY = new NamespacedKey(this, "infinix_timer_skill_count");
 
+        // Guardar archivos de configuración por defecto
         saveDefaultConfig();
         saveResource("lang/en.yml", false);
         saveResource("lang/es.yml", false);
+        
+        // Crear la estructura de carpetas
+        File itemsFolder = new File(getDataFolder(), "items");
+        if (!itemsFolder.exists()) itemsFolder.mkdirs();
 
+        // Guardar archivos de configuración modulares
+        saveResource("items/elements.yml", false);
+        saveResource("items/rarities.yml", false);
+        saveResource("items/lore-formats.yml", false);
+        saveResource("items/stats.yml", false);
+        
+        // Crear carpeta de ítems de ejemplo y guardar un ítem
+        File itemSwordsFolder = new File(itemsFolder, "SWORD");
+        if (!itemSwordsFolder.exists()) {
+            itemSwordsFolder.mkdirs();
+        }
+        File defaultSword = new File(itemSwordsFolder, "EspadaDeFuego.yml");
+        if (!defaultSword.exists()) {
+            saveResource("items/SWORD/EspadaDeFuego.yml", false);
+        }
+        
+        saveResource("items/SpawnerCore.yml", false);
+        
         // Inicializar todos los managers
         this.chatInputManager = new ChatInputManager();
         this.threatManager = new ThreatManager();
@@ -66,8 +94,6 @@ public final class InfinixMob extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new SpawnerListener(this), this);
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
         getServer().getPluginManager().registerEvents(this.mobListener, this);
-        // ZoneEnterListener no fue proporcionado, lo comento para evitar errores
-        // getServer().getPluginManager().registerEvents(new ZoneEnterListener(this), this);
 
         reload();
 
@@ -134,4 +160,8 @@ public final class InfinixMob extends JavaPlugin {
     public WeakPointManager getWeakPointManager() { return weakPointManager; }
     public BlockManager getBlockManager() { return blockManager; }
     public MobListener getMobListener() { return mobListener; }
+    
+    public Gson getGson() {
+        return gson;
+    }
 }

@@ -1,6 +1,7 @@
 package com.infinity3113.infinixmob.listeners;
 
 import com.infinity3113.infinixmob.InfinixMob;
+import com.infinity3113.infinixmob.gui.ItemCreatorGUI;
 import com.infinity3113.infinixmob.gui.MobSelectionGUI;
 import com.infinity3113.infinixmob.gui.SpawnerGUI;
 import com.infinity3113.infinixmob.gui.SpawnerListGui; // <-- CORRECCIÓN: Nombre de la clase corregido
@@ -29,6 +30,9 @@ public class GUIListener implements Listener {
         } else if (holder instanceof SpawnerListGui) { // <-- CORRECCIÓN: Nombre de la clase corregido
             event.setCancelled(true);
             ((SpawnerListGui) holder).handleClick(event); // <-- CORRECCIÓN: Nombre de la clase corregido
+        } else if (holder instanceof ItemCreatorGUI) {
+            event.setCancelled(true);
+            ((ItemCreatorGUI) holder).handleClick(event);
         }
     }
 }

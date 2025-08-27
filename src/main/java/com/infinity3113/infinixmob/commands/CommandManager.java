@@ -1,7 +1,8 @@
 package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
-import com.infinity3113.infinixmob.gui.SpawnerListGui; // <-- CORRECCIÓN: Nombre de la clase corregido
+import com.infinity3113.infinixmob.gui.ItemCreatorGUI;
+import com.infinity3113.infinixmob.gui.SpawnerListGui;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -40,6 +41,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         
         if (!langFile.exists()) {
             plugin.getLogger().warning("¡No se encontró el archivo de idioma '" + langCode + ".yml'! Usando 'en.yml' por defecto.");
+            plugin.saveResource("lang/en.yml", false);
             langFile = new File(plugin.getDataFolder(), "lang/en.yml");
         }
         
@@ -68,6 +70,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             sender.sendMessage(getRawMsg("help-getspawner"));
             sender.sendMessage(getRawMsg("help-spawners"));
             if (sender.hasPermission("infinixmob.admin")) {
+                sender.sendMessage(ChatColor.YELLOW + "/im creator &7- Abre la GUI de creación de ítems.");
                 sender.sendMessage(getRawMsg("help-reload"));
             }
             return true;
@@ -250,7 +253,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 }
                 Player player = (Player) sender;
                 if (args.length > 1 && args[1].equalsIgnoreCase("list")) {
-                    new SpawnerListGui(plugin, player).open(); // <-- CORRECCIÓN: Nombre de la clase corregido
+                    new SpawnerListGui(plugin, player).open();
                 } else if (args.length > 2 && args[1].equalsIgnoreCase("tp")) {
                     String spawnerName = args[2];
                     Map<Location, Map<String, String>> spawners = plugin.getSpawnerManager().getAllSpawners();
@@ -268,6 +271,19 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 }
                 break;
 
+            case "creator":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(getMsg("player-only"));
+                    return true;
+                }
+                if (!sender.hasPermission("infinixmob.creator")) {
+                    sender.sendMessage(getMsg("no-permission"));
+                    return true;
+                }
+                Player pCreator = (Player) sender;
+                new ItemCreatorGUI(plugin, pCreator).open();
+                break;
+
             default:
                 sender.sendMessage(getRawMsg("help-header"));
                 break;
@@ -280,7 +296,10 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         final List<String> completions = new ArrayList<>();
         
         if (args.length == 1) {
-            List<String> subCommands = Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload", "meta");
+            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload", "meta"));
+            if (sender.hasPermission("infinixmob.creator")) {
+                 subCommands.add("creator");
+            }
             StringUtil.copyPartialMatches(args[0], subCommands, completions);
             return completions;
         }
