@@ -70,6 +70,7 @@ com\infinity3113\infinixmob\mechanics\impl\PotionMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\ThreatMechanic.class
 com\infinity3113\infinixmob\mobs\CustomMob.class
 com\infinity3113\infinixmob\gui\editor\ItemBrowserGUI.class
+com\infinity3113\infinixmob\gui\editor\ItemLoreEditorGUI$1.class
 com\infinity3113\infinixmob\core\ChatInputManager.class
 com\infinity3113\infinixmob\listeners\GUIListener.class
 com\infinity3113\infinixmob\commands\CommandManager.class
@@ -79,6 +80,7 @@ com\infinity3113\infinixmob\core\StatusEffectManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\IgniteMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\ScrambleInventoryMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\CreateWeakPointMechanic.class
+com\infinity3113\infinixmob\gui\editor\ItemLoreEditorGUI.class
 com\infinity3113\infinixmob\mechanics\impl\DisarmMechanic.class
 com\infinity3113\infinixmob\core\StatusEffectManager$ActiveEffect.class
 com\infinity3113\infinixmob\core\BlockManager$2.class

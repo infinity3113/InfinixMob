@@ -7,12 +7,14 @@ import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class ItemEditorGUI extends MenuGUI {
 
@@ -44,9 +46,7 @@ public class ItemEditorGUI extends MenuGUI {
         }
 
         String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
-        List<String> lore = clickedItem.getItemMeta().getLore();
 
-        // Manejar botones de acción que no tienen la clave en el lore
         if (displayName.equals("Guardar Cambios")) {
             plugin.getItemManager().saveItem(customItem);
             player.sendMessage(ChatColor.GREEN + "¡Ítem guardado exitosamente!");
@@ -59,13 +59,18 @@ public class ItemEditorGUI extends MenuGUI {
             return;
         }
         
-        if (lore == null || lore.isEmpty()) return;
-        String key = lore.get(0); // Usamos la primera línea del lore para guardar la clave YML
+        if (displayName.equals("Editar Lore")) {
+            new ItemLoreEditorGUI(plugin, player, customItem, this).open();
+            return;
+        }
 
-        // Lógica de edición dinámica
+        String key = clickedItem.getItemMeta().getPersistentDataContainer().get(GUI_ITEM_KEY, PersistentDataType.STRING);
+        if (key == null) return;
+
         Object currentValue = customItem.getConfig().get(key);
-        if (currentValue instanceof Number) {
-            editDoubleValue(key, displayName);
+
+        if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.")))) {
+             editDoubleValue(key, displayName);
         } else {
             editStringValue(key, displayName);
         }
@@ -73,26 +78,35 @@ public class ItemEditorGUI extends MenuGUI {
 
     @Override
     public void setItems() {
-        inventory.setItem(4, customItem.buildItemStack()); // Previsualización
+        ItemStack previewItem = customItem.buildItemStack();
+        ItemMeta previewMeta = previewItem.getItemMeta();
+        if (previewMeta != null) {
+            previewMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+            previewItem.setItemMeta(previewMeta);
+        }
+        inventory.setItem(4, previewItem);
 
         int slot = 9;
         List<String> keysToShow = new ArrayList<>();
         
-        // Añadir claves del nivel principal
         for (String key : customItem.getConfig().getKeys(false)) {
             if (!customItem.getConfig().isConfigurationSection(key) && !key.equalsIgnoreCase("lore")) {
                 keysToShow.add(key);
             }
         }
-        // Añadir claves de la sección 'stats'
+        
         if (customItem.getConfig().isConfigurationSection("stats")) {
             for (String key : customItem.getConfig().getConfigurationSection("stats").getKeys(false)) {
                 keysToShow.add("stats." + key);
             }
         }
-        // Añadir claves de la sección 'elemental-damage'
-        if (customItem.getConfig().isConfigurationSection("elemental-damage")) {
-            for (String key : customItem.getConfig().getConfigurationSection("elemental-damage").getKeys(false)) {
+        
+        if (!customItem.getConfig().isConfigurationSection("elemental-damage")) {
+            customItem.getConfig().createSection("elemental-damage");
+        }
+        ConfigurationSection elementsConfig = plugin.getItemManager().getElementsConfig();
+        if (elementsConfig != null) {
+            for (String key : elementsConfig.getKeys(false)) {
                 keysToShow.add("elemental-damage." + key);
             }
         }
@@ -102,20 +116,19 @@ public class ItemEditorGUI extends MenuGUI {
 
             Material icon = getIconForKey(key);
             String friendlyName = getFriendlyNameForKey(key);
-            Object value = customItem.getConfig().get(key, "N/A");
+            Object value = customItem.getConfig().get(key, 0.0);
 
             List<String> lore = new ArrayList<>();
-            lore.add(key); // Clave oculta para la lógica
             lore.add(ChatColor.GRAY + "Valor: " + ChatColor.YELLOW + value.toString());
             lore.add("");
             lore.add(ChatColor.AQUA + "Click para editar.");
             
-            inventory.setItem(slot++, createGuiItem(icon, ChatColor.GREEN + friendlyName, lore.toArray(new String[0])));
+            // --- CORRECCIÓN: USAR EL NUEVO MÉTODO CON CLAVE ---
+            inventory.setItem(slot++, createGuiItemWithKey(icon, ChatColor.GREEN + friendlyName, key, lore.toArray(new String[0])));
         }
         
-        inventory.setItem(22, createGuiItem(Material.BOOK, ChatColor.GREEN + "Editar Lore", ChatColor.GRAY + "Click para añadir/quitar lore."));
+        inventory.setItem(22, createGuiItem(Material.BOOK, ChatColor.AQUA + "Editar Lore", ChatColor.GRAY + "Click para añadir/quitar lore."));
 
-        // Botones de acción
         inventory.setItem(45, createGuiItem(Material.BARRIER, ChatColor.RED + "Volver a la Lista"));
         inventory.setItem(53, createGuiItem(Material.LIME_DYE, ChatColor.GREEN + "Guardar Cambios"));
 
@@ -147,8 +160,13 @@ public class ItemEditorGUI extends MenuGUI {
                 if (isNumeric) {
                     try {
                         double newValue = Double.parseDouble(input);
-                        customItem.getConfig().set(key, newValue);
-                        player.sendMessage(ChatColor.GREEN + "¡" + friendlyName + " actualizado! No olvides guardar.");
+                        if (newValue == 0.0) {
+                            customItem.getConfig().set(key, null);
+                            player.sendMessage(ChatColor.YELLOW + "¡" + friendlyName + " eliminado! No olvides guardar.");
+                        } else {
+                            customItem.getConfig().set(key, newValue);
+                            player.sendMessage(ChatColor.GREEN + "¡" + friendlyName + " actualizado! No olvides guardar.");
+                        }
                     } catch (NumberFormatException e) {
                         player.sendMessage(ChatColor.RED + "Entrada inválida. Por favor, introduce un número.");
                     }
@@ -168,23 +186,31 @@ public class ItemEditorGUI extends MenuGUI {
     }
 
     private Material getIconForKey(String key) {
-        if (key.contains("display-name")) return Material.NAME_TAG;
-        if (key.contains("type")) return Material.CRAFTING_TABLE;
-        if (key.contains("lore")) return Material.BOOK;
-        if (key.contains("rarity")) return Material.EMERALD;
-        if (key.contains("revision-id")) return Material.COMPASS;
-        if (key.contains("damage")) return Material.DIAMOND_SWORD;
-        if (key.contains("crit-chance")) return Material.SPYGLASS;
-        if (key.contains("crit-damage")) return Material.ANVIL;
-        if (key.contains("max-health")) return Material.GOLDEN_APPLE;
-        if (key.contains("armor")) return Material.DIAMOND_CHESTPLATE;
-        if (key.contains("movement-speed")) return Material.SUGAR;
-        if (key.contains("fire")) return Material.BLAZE_POWDER;
-        if (key.contains("water")) return Material.WATER_BUCKET;
-        if (key.contains("earth")) return Material.DIRT;
-        if (key.contains("wind")) return Material.FEATHER;
-        if (key.contains("light") || key.contains("holy")) return Material.GLOWSTONE_DUST;
-        if (key.contains("dark") || key.contains("shadow")) return Material.COAL;
-        return Material.PAPER; // Icono por defecto
+        String simpleKey = key.contains(".") ? key.substring(key.lastIndexOf('.') + 1) : key;
+        switch (simpleKey.toLowerCase()) {
+            case "display-name": return Material.NAME_TAG;
+            case "type": return Material.CRAFTING_TABLE;
+            case "lore": return Material.BOOK;
+            case "rarity": return Material.EMERALD;
+            case "revision-id": return Material.COMPASS;
+            case "damage": return Material.DIAMOND_SWORD;
+            case "crit-chance": return Material.SPYGLASS;
+            case "crit-damage": return Material.ANVIL;
+            case "max-health": return Material.GOLDEN_APPLE;
+            case "armor": return Material.DIAMOND_CHESTPLATE;
+            case "movement-speed": return Material.SUGAR;
+            case "fire": return Material.BLAZE_POWDER;
+            case "water": return Material.WATER_BUCKET;
+            case "earth": return Material.DIRT;
+            case "wind": return Material.FEATHER;
+            case "light": case "holy": return Material.GLOWSTONE_DUST;
+            case "dark": case "shadow": return Material.COAL;
+            case "poison": return Material.SPIDER_EYE;
+            case "lightning": return Material.LIGHTNING_ROD;
+            case "ice": return Material.ICE;
+            case "nature": return Material.OAK_SAPLING;
+            case "arcane": return Material.ENCHANTING_TABLE;
+            default: return Material.PAPER;
+        }
     }
 }
