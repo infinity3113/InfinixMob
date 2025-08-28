@@ -2,9 +2,6 @@ package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.gui.SpawnerListGui;
-import com.infinity3113.infinixmob.gui.editors.EditorMainMenuGUI;
-import com.infinity3113.infinixmob.gui.editors.ItemBuilder;
-import com.infinity3113.infinixmob.gui.editors.ItemEditorGUI;
 import com.infinity3113.infinixmob.items.CustomItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -74,7 +71,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             sender.sendMessage(getRawMsg("help-getspawner"));
             sender.sendMessage(getRawMsg("help-spawners"));
             if (sender.hasPermission("infinixmob.admin")) {
-                sender.sendMessage(ChatColor.YELLOW + "/im editor - Abre el editor de ítems.");
                 sender.sendMessage(getRawMsg("help-reload"));
             }
             return true;
@@ -83,18 +79,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
-            case "editor":
-                if (!(sender instanceof Player)) {
-                    sender.sendMessage(getMsg("player-only"));
-                    return true;
-                }
-                if (!sender.hasPermission("infinixmob.admin")) {
-                    sender.sendMessage(getMsg("no-permission"));
-                    return true;
-                }
-                new EditorMainMenuGUI(plugin, (Player) sender).open();
-                break;
-            
             case "meta":
                 if (!sender.hasPermission("infinixmob.admin")) {
                     sender.sendMessage(getMsg("no-permission"));
@@ -300,7 +284,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         final List<String> completions = new ArrayList<>();
         
         if (args.length == 1) {
-            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload", "editor"));
+            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload"));
             StringUtil.copyPartialMatches(args[0], subCommands, completions);
         }
         
