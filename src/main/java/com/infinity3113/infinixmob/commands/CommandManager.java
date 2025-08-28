@@ -2,6 +2,7 @@ package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.gui.SpawnerListGui;
+import com.infinity3113.infinixmob.gui.editor.ItemTypeSelectorGUI; // NUEVA IMPORTACIÓN
 import com.infinity3113.infinixmob.items.CustomItem;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -66,6 +67,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             sender.sendMessage(getRawMsg("help-header"));
             sender.sendMessage(getRawMsg("help-spawn"));
             sender.sendMessage(getRawMsg("help-item"));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e/im edit &7- Abre la GUI para editar ítems."));
             sender.sendMessage(getRawMsg("help-skills"));
             sender.sendMessage(getRawMsg("help-cast"));
             sender.sendMessage(getRawMsg("help-getspawner"));
@@ -79,6 +81,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         String subCommand = args[0].toLowerCase();
 
         switch (subCommand) {
+            // ... (el resto de tus cases como meta, reload, spawn, etc. se quedan igual) ...
             case "meta":
                 if (!sender.hasPermission("infinixmob.admin")) {
                     sender.sendMessage(getMsg("no-permission"));
@@ -189,6 +192,21 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 );
                 break;
 
+            // --- SUBCOMANDO EDIT ACTUALIZADO ---
+            case "edit":
+                if (!(sender instanceof Player)) {
+                    sender.sendMessage(getMsg("player-only"));
+                    return true;
+                }
+                if (!sender.hasPermission("infinixmob.admin")) {
+                    sender.sendMessage(getMsg("no-permission"));
+                    return true;
+                }
+                // Ya no se necesita un ID de ítem aquí
+                new ItemTypeSelectorGUI(plugin, (Player) sender).open();
+                break;
+            // --- FIN DEL SUBCOMANDO EDIT ---
+
             case "skills":
                 if (!sender.hasPermission("infinixmob.skills")) {
                     sender.sendMessage(getMsg("no-permission"));
@@ -284,7 +302,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         final List<String> completions = new ArrayList<>();
         
         if (args.length == 1) {
-            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "skills", "cast", "getspawner", "spawners", "reload"));
+            List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "edit", "skills", "cast", "getspawner", "spawners", "reload"));
             StringUtil.copyPartialMatches(args[0], subCommands, completions);
         }
         
@@ -292,7 +310,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             if (args[0].equalsIgnoreCase("spawn")) {
                 StringUtil.copyPartialMatches(args[1], plugin.getMobManager().getLoadedMobIds(), completions);
             }
-             if (args[0].equalsIgnoreCase("item")) {
+             if (args[0].equalsIgnoreCase("item")) { 
                 StringUtil.copyPartialMatches(args[1], plugin.getItemManager().getLoadedItemIds(), completions);
             }
             if (args[0].equalsIgnoreCase("cast")) {

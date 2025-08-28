@@ -1,37 +1,34 @@
 # src/main/resources/items/configurations/lore-formats.yml
 # Define el orden y la apariencia del lore de tus ítems.
-# Usa los placeholders de la sección 'format' para construir tu lore.
-# El plugin reemplazará cada placeholder con la estadística correspondiente si el ítem la tiene.
+# El placeholder #stats# ahora mostrará dinámicamente todas las estadísticas
+# que se encuentren en la sección "stats:" del YML de un ítem.
 format:
-  - '#item-type#'
   - '{bar}'
-  - '#damage#'
-  - '#attack-speed#'
-  - '#crit-chance#'
-  - '#crit-damage#'
+  # NUEVO: Un único placeholder para todas las estadísticas base y de combate.
+  - '#stats#'
   - '{bar}'
   - '#elements#'
-  - '{bar}'
-  - '#base-stats#'
   - '{bar}'
   - '#lore#'
   - '{bar}'
   - '#rarity#'
 
-# Define cómo se verá cada estadística individualmente.
-# Puedes usar variables como {value}, {display_name}, {color}, etc.
+# Define cómo se verá cada sección y entrada individualmente.
 entries:
-  item-type: '&7Tipo: {value}'
-  damage: '&7{display_name}: &c{value}'
-  attack-speed: '&7{display_name}: &c{value}'
-  crit-chance: '&7{display_name}: &c{value}%'
-  crit-damage: '&7{display_name}: &c+{value}%'
+  # NUEVO: Título para la sección de estadísticas y formato para cada línea de estadística.
+  # El stat_entry.default se usará si no hay un formato específico para esa estadística.
+  # Puedes añadir formatos específicos como "stat_entry.crit-chance" si quieres que se vea diferente.
+  stats_title: '&7Estadísticas:'
+  stat_entry:
+    default: '&7{display_name}: &c{value}'
+    crit-chance: '&7{display_name}: &c{value}%'
+    crit-damage: '&7{display_name}: &c+{value}%'
+    max-health: '&7{display_name}: &a+{value}'
+    movement-speed: '&7{display_name}: &e{value}'
+    armor: '&7{display_name}: &9{value}'
   
   elements_title: '&7Daño Elemental:'
-  element_entry: '&7{value} {display_name}'
-
-  base_stats_title: '&7Estadísticas:'
-  base_stat_entry: '&a+ {value} {display_name}'
+  element_entry: '&7- {display_name}: &e{value}'
 
   lore_entry: '&7{value}'
   rarity: '{color}&l{value}'

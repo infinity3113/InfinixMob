@@ -1,5 +1,6 @@
 package com.infinity3113.infinixmob.items;
 
+import com.google.gson.Gson;
 import com.infinity3113.infinixmob.InfinixMob;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -25,18 +26,16 @@ public class CustomItem {
     private final InfinixMob plugin;
     private final String id;
     private final ConfigurationSection config;
+    private final Gson gson = new Gson();
 
     public static final NamespacedKey CUSTOM_TAG_KEY = new NamespacedKey(InfinixMob.getPlugin(), "infinix_custom_item");
     public static final NamespacedKey REVISION_ID_KEY = new NamespacedKey(InfinixMob.getPlugin(), "revision_id");
-    public static final NamespacedKey WEAKNESSES_KEY = new NamespacedKey(InfinixMob.getPlugin(), "elemental_weaknesses");
-    
-    public static final NamespacedKey RARITY_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_rarity");
-    public static final NamespacedKey DAMAGE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_damage");
-    public static final NamespacedKey ATTACK_SPEED_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_attack_speed");
-    public static final NamespacedKey CRIT_CHANCE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_crit_chance");
-    public static final NamespacedKey CRIT_DAMAGE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_crit_damage");
-    public static final NamespacedKey ELEMENTAL_DAMAGE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_elemental_damage");
     public static final NamespacedKey ITEM_TYPE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_type");
+    public static final NamespacedKey RARITY_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_rarity");
+    public static final NamespacedKey STATS_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_stats");
+    public static final NamespacedKey ELEMENTAL_DAMAGE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_elemental_damage");
+    public static final NamespacedKey WEAKNESSES_KEY = new NamespacedKey(InfinixMob.getPlugin(), "elemental_weaknesses");
+
 
     public CustomItem(InfinixMob plugin, String id, ConfigurationSection config) {
         this.plugin = plugin;
@@ -64,20 +63,23 @@ public class CustomItem {
         String rarityKey = config.getString("rarity", "COMMON");
         meta.getPersistentDataContainer().set(RARITY_KEY, PersistentDataType.STRING, rarityKey.toLowerCase());
         
-        if (config.contains("damage")) meta.getPersistentDataContainer().set(DAMAGE_KEY, PersistentDataType.DOUBLE, config.getDouble("damage"));
-        if (config.contains("attack-speed")) meta.getPersistentDataContainer().set(ATTACK_SPEED_KEY, PersistentDataType.DOUBLE, config.getDouble("attack-speed"));
-        if (config.contains("crit-chance")) meta.getPersistentDataContainer().set(CRIT_CHANCE_KEY, PersistentDataType.DOUBLE, config.getDouble("crit-chance"));
-        if (config.contains("crit-damage")) meta.getPersistentDataContainer().set(CRIT_DAMAGE_KEY, PersistentDataType.DOUBLE, config.getDouble("crit-damage"));
+        Map<String, Double> allStats = new HashMap<>();
+        if (config.isConfigurationSection("stats")) {
+            ConfigurationSection statsSection = config.getConfigurationSection("stats");
+            for (String key : statsSection.getKeys(false)) {
+                allStats.put(key.toLowerCase(), statsSection.getDouble(key));
+            }
+        }
+        meta.getPersistentDataContainer().set(STATS_KEY, PersistentDataType.STRING, gson.toJson(allStats));
 
         Map<String, Double> elementalDamageMap = new HashMap<>();
         if (config.isConfigurationSection("elemental-damage")) {
             ConfigurationSection elementalSection = config.getConfigurationSection("elemental-damage");
             for (String element : elementalSection.getKeys(false)) {
-                elementalDamageMap.put(element, elementalSection.getDouble(element));
+                elementalDamageMap.put(element.toLowerCase(), elementalSection.getDouble(element));
             }
         }
-        String elementalJson = plugin.getGson().toJson(elementalDamageMap);
-        meta.getPersistentDataContainer().set(ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING, elementalJson);
+        meta.getPersistentDataContainer().set(ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING, gson.toJson(elementalDamageMap));
 
         // --- CONSTRUIR LORE DINÁMICO ---
         List<String> lore = new ArrayList<>();
@@ -88,96 +90,68 @@ public class CustomItem {
 
         List<String> format = loreFormatsConfig.getStringList("format");
         ConfigurationSection entries = loreFormatsConfig.getConfigurationSection("entries");
-
+        
         for (String placeholder : format) {
-            switch (placeholder.toLowerCase()) {
-                case "#item-type#":
-                    String itemTypeName = statsConfig.getString("item-types." + itemType.toUpperCase(), itemType);
-                    lore.add(format(entries.getString("item-type"), "{value}", itemTypeName));
-                    break;
-                case "#damage#":
-                    if (config.contains("damage")) {
-                        String name = statsConfig.getString("display-names.damage", "Damage");
-                        String value = String.format("%.1f", config.getDouble("damage"));
-                        lore.add(format(entries.getString("damage"), "{display_name}", name, "{value}", value));
+            if (placeholder.equalsIgnoreCase("#stats#")) {
+                if (!allStats.isEmpty()) {
+                    lore.add(format(entries.getString("stats_title")));
+                    for (Map.Entry<String, Double> entry : allStats.entrySet()) {
+                        String statKey = entry.getKey();
+                        String statName = statsConfig.getString("display-names." + statKey, statKey);
+                        String value = String.format("%.2f", entry.getValue()); // Usar .2f para más precisión
+                        String statFormat = entries.getString("stat_entry." + statKey, entries.getString("stat_entry.default"));
+                        lore.add(format(statFormat, "{display_name}", statName, "{value}", value));
                     }
-                    break;
-                case "#attack-speed#":
-                     if (config.contains("attack-speed")) {
-                        String name = statsConfig.getString("display-names.attack-speed", "Attack Speed");
-                        String value = String.format("%.1f", config.getDouble("attack-speed"));
-                        lore.add(format(entries.getString("attack-speed"), "{display_name}", name, "{value}", value));
+                }
+            } else if (placeholder.equalsIgnoreCase("#elements#")) {
+                 if (!elementalDamageMap.isEmpty()) {
+                    lore.add(format(entries.getString("elements_title")));
+                    for (Map.Entry<String, Double> entry : elementalDamageMap.entrySet()) {
+                        String name = elementsConfig.getString(entry.getKey().toLowerCase(), entry.getKey());
+                        String value = String.format("%.1f", entry.getValue());
+                        lore.add(format(entries.getString("element_entry"), "{display_name}", name, "{value}", value));
                     }
-                    break;
-                case "#crit-chance#":
-                    if (config.contains("crit-chance")) {
-                        String name = statsConfig.getString("display-names.crit-chance", "Crit Chance");
-                        String value = String.format("%.1f", config.getDouble("crit-chance"));
-                        lore.add(format(entries.getString("crit-chance"), "{display_name}", name, "{value}", value));
+                }
+            } else if (placeholder.equalsIgnoreCase("#lore#")) {
+                if (config.isList("lore")) {
+                    for (String line : config.getStringList("lore")) {
+                        lore.add(format(entries.getString("lore_entry"), "{value}", line));
                     }
-                    break;
-                case "#crit-damage#":
-                    if (config.contains("crit-damage")) {
-                        String name = statsConfig.getString("display-names.crit-damage", "Crit Damage");
-                        String value = String.format("%.1f", config.getDouble("crit-damage"));
-                        lore.add(format(entries.getString("crit-damage"), "{display_name}", name, "{value}", value));
-                    }
-                    break;
-                case "#elements#":
-                    if (!elementalDamageMap.isEmpty()) {
-                        lore.add(format(entries.getString("elements_title")));
-                        for (Map.Entry<String, Double> entry : elementalDamageMap.entrySet()) {
-                            String name = elementsConfig.getString(entry.getKey().toLowerCase(), entry.getKey());
-                            String value = String.format("%.1f", entry.getValue());
-                            lore.add(format(entries.getString("element_entry"), "{display_name}", name, "{value}", value));
-                        }
-                    }
-                    break;
-                case "#base-stats#":
-                    if (config.isConfigurationSection("base-stats")) {
-                        lore.add(format(entries.getString("base_stats_title")));
-                        ConfigurationSection baseStats = config.getConfigurationSection("base-stats");
-                        for (String key : baseStats.getKeys(false)) {
-                            String name = statsConfig.getString("display-names." + key.toLowerCase(), key);
-                            String value = String.valueOf(baseStats.getDouble(key));
-                            lore.add(format(entries.getString("base_stat_entry"), "{display_name}", name, "{value}", value));
-                        }
-                    }
-                    break;
-                case "#lore#":
-                    if (config.isList("lore")) {
-                        for (String line : config.getStringList("lore")) {
-                            lore.add(format(entries.getString("lore_entry"), "{value}", line));
-                        }
-                    }
-                    break;
-                case "#rarity#":
-                    lore.add(format(entries.getString("rarity"), "{color}", rarityColor, "{value}", rarityName));
-                    break;
-                case "{bar}":
-                    lore.add(format(entries.getString("bar")));
-                    break;
+                }
+            } else if (placeholder.equalsIgnoreCase("#rarity#")) {
+                lore.add(format(entries.getString("rarity"), "{color}", rarityColor, "{value}", rarityName));
+            } else if (placeholder.equalsIgnoreCase("{bar}")) {
+                lore.add(format(entries.getString("bar")));
             }
         }
 
         meta.setLore(lore);
 
         // --- APLICAR ATRIBUTOS Y FLAGS ---
-        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS);
-        
-        double attackSpeed = config.getDouble("attack-speed", 0);
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_DAMAGE, new AttributeModifier(UUID.randomUUID(), "infinix.damage", -0.99, AttributeModifier.Operation.MULTIPLY_SCALAR_1, EquipmentSlot.HAND));
-        meta.addAttributeModifier(Attribute.GENERIC_ATTACK_SPEED, new AttributeModifier(UUID.randomUUID(), "infinix.attackspeed", attackSpeed > 0 ? attackSpeed - 4 : -3.9, AttributeModifier.Operation.ADD_NUMBER, EquipmentSlot.HAND));
+        meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
-        if (config.isConfigurationSection("base-stats")) {
-            ConfigurationSection baseStatsSection = config.getConfigurationSection("base-stats");
-            for (String statKey : baseStatsSection.getKeys(false)) {
-                Attribute attribute = getAttributeFromString(statKey);
-                if (attribute != null) {
-                    double statValue = baseStatsSection.getDouble(statKey);
-                    AttributeModifier modifier = new AttributeModifier(UUID.randomUUID(), "infinix." + statKey, statValue, AttributeModifier.Operation.ADD_NUMBER, getEquipmentSlot(itemType, material));
-                    meta.addAttributeModifier(attribute, modifier);
+        for(Map.Entry<String, Double> stat : allStats.entrySet()){
+            Attribute attribute = getAttributeFromString(stat.getKey());
+            if (attribute != null) {
+                
+                double value = stat.getValue(); // Valor del YML
+
+                // **LA CORRECCIÓN ESTÁ AQUÍ**
+                // 1 Corazón = 2 Puntos de Vida en Minecraft.
+                // Si el usuario pone "max-health: 3", quiere 3 corazones (+6 de vida), no 1.5.
+                // Multiplicamos el valor por 2 solo para este atributo específico.
+                if (attribute == Attribute.GENERIC_MAX_HEALTH) {
+                    value *= 2;
                 }
+
+                AttributeModifier modifier = new AttributeModifier(
+                    UUID.randomUUID(), 
+                    "infinix." + stat.getKey(), 
+                    value, // Usar el valor (potencialmente modificado)
+                    AttributeModifier.Operation.ADD_NUMBER,
+                    getEquipmentSlot(itemType, material)
+                );
+                meta.addAttributeModifier(attribute, modifier);
             }
         }
         
@@ -188,12 +162,7 @@ public class CustomItem {
     private String format(String text, String... replacements) {
         if (text == null) return "";
         for (int i = 0; i < replacements.length; i += 2) {
-            String key = replacements[i];
-            String value = replacements[i+1];
-            if (value == null) {
-                value = ""; 
-            }
-            text = text.replace(key, value);
+            text = text.replace(replacements[i], replacements[i+1]);
         }
         return ChatColor.translateAlternateColorCodes('&', text);
     }
@@ -205,6 +174,8 @@ public class CustomItem {
             case "armor-toughness": return Attribute.GENERIC_ARMOR_TOUGHNESS;
             case "knockback-resistance": return Attribute.GENERIC_KNOCKBACK_RESISTANCE;
             case "movement-speed": return Attribute.GENERIC_MOVEMENT_SPEED;
+            case "damage": return Attribute.GENERIC_ATTACK_DAMAGE;
+            case "attack-speed": return Attribute.GENERIC_ATTACK_SPEED;
             default: return null;
         }
     }

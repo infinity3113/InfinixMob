@@ -20,6 +20,8 @@ com\infinity3113\infinixmob\mechanics\impl\ActionBarMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\SpawnFallingBlockMechanic.class
 com\infinity3113\infinixmob\listeners\ItemListener.class
 com\infinity3113\infinixmob\items\CustomItem.class
+com\infinity3113\infinixmob\gui\editor\ItemEditorGUI$1.class
+com\infinity3113\infinixmob\gui\editor\ItemEditorGUI.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\HungerMechanic.class
 com\infinity3113\infinixmob\listeners\SpawnerListener.class
@@ -43,6 +45,7 @@ com\infinity3113\infinixmob\mechanics\impl\PullMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\ArrowRainMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic$1.class
 com\infinity3113\infinixmob\targeters\impl\TargetLine.class
+com\infinity3113\infinixmob\gui\editor\MenuGUI.class
 com\infinity3113\infinixmob\core\SpawnerManager$2.class
 com\infinity3113\infinixmob\mechanics\impl\BlockReplaceMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\ApplyShieldMechanic.class
@@ -50,6 +53,7 @@ com\infinity3113\infinixmob\mechanics\impl\ExperienceMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\AreaDamageMechanic.class
 com\infinity3113\infinixmob\core\SpawnerManager.class
 com\infinity3113\infinixmob\InfinixMob$1.class
+com\infinity3113\infinixmob\gui\editor\ItemTypeSelectorGUI.class
 com\infinity3113\infinixmob\gui\MobSelectionGUI.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\CommandMechanic.class
@@ -65,6 +69,7 @@ com\infinity3113\infinixmob\mechanics\impl\CustomStatusEffectMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\PotionMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\ThreatMechanic.class
 com\infinity3113\infinixmob\mobs\CustomMob.class
+com\infinity3113\infinixmob\gui\editor\ItemBrowserGUI.class
 com\infinity3113\infinixmob\core\ChatInputManager.class
 com\infinity3113\infinixmob\listeners\GUIListener.class
 com\infinity3113\infinixmob\commands\CommandManager.class

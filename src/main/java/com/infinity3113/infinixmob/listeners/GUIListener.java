@@ -1,9 +1,7 @@
 package com.infinity3113.infinixmob.listeners;
 
 import com.infinity3113.infinixmob.InfinixMob;
-import com.infinity3113.infinixmob.gui.MobSelectionGUI;
-import com.infinity3113.infinixmob.gui.SpawnerGUI;
-import com.infinity3113.infinixmob.gui.SpawnerListGui;
+import com.infinity3113.infinixmob.gui.editor.MenuGUI; // NUEVA IMPORTACIÓN
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -22,15 +20,10 @@ public class GUIListener implements Listener {
         InventoryHolder holder = event.getInventory().getHolder();
         if (holder == null) return;
 
-        if (holder instanceof SpawnerGUI) {
-            event.setCancelled(true);
-            ((SpawnerGUI) holder).handleClick(event);
-        } else if (holder instanceof MobSelectionGUI) {
-            event.setCancelled(true);
-            ((MobSelectionGUI) holder).handleClick(event);
-        } else if (holder instanceof SpawnerListGui) {
-            event.setCancelled(true);
-            ((SpawnerListGui) holder).handleClick(event);
+        // REFACTOR: Ahora detecta cualquier GUI que extienda nuestra clase base MenuGUI.
+        // Esto hace que el listener sea universal para todas las GUIs del editor.
+        if (holder instanceof MenuGUI) {
+            ((MenuGUI) holder).handleClick(event);
         }
     }
 }

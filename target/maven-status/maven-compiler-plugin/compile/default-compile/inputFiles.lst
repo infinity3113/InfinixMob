@@ -7,6 +7,8 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\SilentRemoveMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\SpawnerListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\VampirismMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemEditorGUI.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\MenuGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\spawners\SpawnerManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\ThreatManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\ScrambleInventoryMechanic.java
@@ -36,6 +38,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetPlayersInRadius.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\BlockManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\DamageMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemBrowserGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\SoundMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\TitleMessageMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetLine.java
@@ -75,6 +78,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\MeteorShowerMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\ItemCooldownMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\ItemManager.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemTypeSelectorGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mobs\CustomMob.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\MobSelectionGUI.java

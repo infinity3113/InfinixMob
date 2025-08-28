@@ -7,7 +7,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -85,19 +84,29 @@ public class ItemListener implements Listener {
         return item.getItemMeta().getPersistentDataContainer().has(CustomItem.CUSTOM_TAG_KEY, PersistentDataType.STRING);
     }
     
+    // --- MÉTODO CORREGIDO ---
     private double calculateDamage(PersistentDataContainer container, LivingEntity victim) {
-        double baseDamage = container.getOrDefault(CustomItem.DAMAGE_KEY, PersistentDataType.DOUBLE, 1.0);
-        double critChance = container.getOrDefault(CustomItem.CRIT_CHANCE_KEY, PersistentDataType.DOUBLE, 0.0) / 100.0;
-        double critDamageMultiplier = 1.0 + (container.getOrDefault(CustomItem.CRIT_DAMAGE_KEY, PersistentDataType.DOUBLE, 0.0) / 100.0);
+        // Paso 1: Obtener el JSON de estadísticas
+        String statsJson = container.get(CustomItem.STATS_KEY, PersistentDataType.STRING);
+        if (statsJson == null) return 1.0;
+
+        // Paso 2: Convertir el JSON a un Mapa
+        Type type = new TypeToken<Map<String, Double>>(){}.getType();
+        Map<String, Double> stats = plugin.getGson().fromJson(statsJson, type);
+
+        // Paso 3: Obtener las estadísticas del mapa
+        double baseDamage = stats.getOrDefault("damage", 1.0);
+        double critChance = stats.getOrDefault("crit-chance", 0.0) / 100.0;
+        double critDamageMultiplier = 1.0 + (stats.getOrDefault("crit-damage", 0.0) / 100.0);
 
         double finalDamage = baseDamage;
         if (ThreadLocalRandom.current().nextDouble() < critChance) {
             finalDamage *= critDamageMultiplier;
         }
 
+        // El resto de la lógica para daño elemental y debilidades permanece igual
         if (container.has(CustomItem.ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING)) {
             String elementalJson = container.get(CustomItem.ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING);
-            Type type = new TypeToken<Map<String, Double>>(){}.getType();
             Map<String, Double> elementalDamages = plugin.getGson().fromJson(elementalJson, type);
 
             PersistentDataContainer victimContainer = victim.getPersistentDataContainer();
