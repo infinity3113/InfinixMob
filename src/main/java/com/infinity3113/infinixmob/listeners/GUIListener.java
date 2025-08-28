@@ -22,13 +22,15 @@ public class GUIListener implements Listener {
         InventoryHolder holder = event.getInventory().getHolder();
         if (holder == null) return;
 
-        if (holder instanceof SpawnerGUI || holder instanceof MobSelectionGUI || holder instanceof SpawnerListGui) {
-            
+        if (holder instanceof SpawnerGUI) {
             event.setCancelled(true);
-
-            if (holder instanceof SpawnerGUI) ((SpawnerGUI) holder).handleClick(event);
-            else if (holder instanceof MobSelectionGUI) ((MobSelectionGUI) holder).handleClick(event);
-            else if (holder instanceof SpawnerListGui) ((SpawnerListGui) holder).handleClick(event);
+            ((SpawnerGUI) holder).handleClick(event);
+        } else if (holder instanceof MobSelectionGUI) {
+            event.setCancelled(true);
+            ((MobSelectionGUI) holder).handleClick(event);
+        } else if (holder instanceof SpawnerListGui) {
+            event.setCancelled(true);
+            ((SpawnerListGui) holder).handleClick(event);
         }
     }
 }
