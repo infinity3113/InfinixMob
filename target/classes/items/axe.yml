@@ -1,15 +1,48 @@
-HachaDelVerdugo:
-  id: NETHERITE_AXE
-  display-name: '&4Hacha del Verdugo'
+HACHAMADERA:
+  id: WOODEN_AXE
+  display-name: '&fHacha de Madera'
   type: 'AXE'
-  rarity: 'LEGENDARY'
-  revision-id: 1
-  lore:
-    - '&7Imbuida con el poder de la oscuridad.'
-  damage: 35.0
-  crit-chance: 25.0
-  crit-damage: 100.0
-  elemental-damage:
-    dark: 50.0
-  base-stats:
-    movement-speed: -0.05 # Lenta pero poderosa
+  rarity: 'COMMON'
+  stats:
+    damage: 7.0
+    attack-speed: 0.8
+HACHAPIEDRA:
+  id: STONE_AXE
+  display-name: '&7Hacha de Piedra'
+  type: 'AXE'
+  rarity: 'COMMON'
+  stats:
+    damage: 9.0
+    attack-speed: 0.8
+HACHAORO:
+  id: GOLDEN_AXE
+  display-name: '&eHacha de Oro'
+  type: 'AXE'
+  rarity: 'COMMON'
+  stats:
+    damage: 7.0
+    attack-speed: 1.0
+HACHAHIERRO:
+  id: IRON_AXE
+  display-name: '&fHacha de Hierro'
+  type: 'AXE'
+  rarity: 'COMMON'
+  stats:
+    damage: 9.0
+    attack-speed: 0.9
+HACHADIAMANTE:
+  id: DIAMOND_AXE
+  display-name: '&bHacha de Diamante'
+  type: 'AXE'
+  rarity: 'COMMON'
+  stats:
+    damage: 9.0
+    attack-speed: 1.0
+HACHANETHERITE:
+  id: NETHERITE_AXE
+  display-name: '&8Hacha de Netherite'
+  type: 'AXE'
+  rarity: 'COMMON'
+  stats:
+    damage: 10.0
+    attack-speed: 1.0

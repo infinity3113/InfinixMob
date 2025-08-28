@@ -47,6 +47,12 @@ public class ItemEditorGUI extends MenuGUI {
 
         String displayName = ChatColor.stripColor(clickedItem.getItemMeta().getDisplayName());
 
+        if (displayName.equals("¡Obtén el ítem!")) {
+            player.getInventory().addItem(customItem.buildItemStack());
+            player.sendMessage(ChatColor.GREEN + "Has recibido una copia de " + customItem.getId() + ".");
+            return;
+        }
+        
         if (displayName.equals("Guardar Cambios")) {
             plugin.getItemManager().saveItem(customItem);
             player.sendMessage(ChatColor.GREEN + "¡Ítem guardado exitosamente!");
@@ -61,6 +67,16 @@ public class ItemEditorGUI extends MenuGUI {
         
         if (displayName.equals("Editar Lore")) {
             new ItemLoreEditorGUI(plugin, player, customItem, this).open();
+            return;
+        }
+
+        // --- NUEVA LÓGICA PARA EL ESTILO DE MANO ---
+        if (displayName.equals("Estilo de Mano")) {
+            String currentStyle = customItem.getConfig().getString("hand-style", "ONE_HANDED");
+            String newStyle = currentStyle.equalsIgnoreCase("ONE_HANDED") ? "TWO_HANDED" : "ONE_HANDED";
+            customItem.getConfig().set("hand-style", newStyle);
+            player.sendMessage(ChatColor.YELLOW + "Estilo de mano cambiado a: " + newStyle);
+            open(); // Refrescar la GUI
             return;
         }
 
@@ -84,7 +100,8 @@ public class ItemEditorGUI extends MenuGUI {
             previewMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
             previewItem.setItemMeta(previewMeta);
         }
-        inventory.setItem(4, previewItem);
+        inventory.setItem(6, previewItem);
+        inventory.setItem(2, createGuiItem(Material.CHEST, ChatColor.GREEN + "¡Obtén el ítem!", ChatColor.GRAY + "Click para recibir una copia"));
 
         int slot = 9;
         List<String> keysToShow = new ArrayList<>();
@@ -123,18 +140,22 @@ public class ItemEditorGUI extends MenuGUI {
             lore.add("");
             lore.add(ChatColor.AQUA + "Click para editar.");
             
-            // --- CORRECCIÓN: USAR EL NUEVO MÉTODO CON CLAVE ---
             inventory.setItem(slot++, createGuiItemWithKey(icon, ChatColor.GREEN + friendlyName, key, lore.toArray(new String[0])));
         }
         
-        inventory.setItem(22, createGuiItem(Material.BOOK, ChatColor.AQUA + "Editar Lore", ChatColor.GRAY + "Click para añadir/quitar lore."));
+        // --- AÑADIR NUEVO BOTÓN PARA ESTILO DE MANO ---
+        String handStyle = customItem.getConfig().getString("hand-style", "ONE_HANDED");
+        String handStyleName = handStyle.equalsIgnoreCase("ONE_HANDED") ? "Una Mano" : "Dos Manos";
+        inventory.setItem(23, createGuiItem(Material.LEATHER_HORSE_ARMOR, ChatColor.AQUA + "Estilo de Mano", ChatColor.GRAY + "Valor: " + ChatColor.YELLOW + handStyleName, "", ChatColor.AQUA + "Click para cambiar"));
 
+        inventory.setItem(22, createGuiItem(Material.BOOK, ChatColor.AQUA + "Editar Lore", ChatColor.GRAY + "Click para añadir/quitar lore."));
         inventory.setItem(45, createGuiItem(Material.BARRIER, ChatColor.RED + "Volver a la Lista"));
         inventory.setItem(53, createGuiItem(Material.LIME_DYE, ChatColor.GREEN + "Guardar Cambios"));
 
         fillEmptySlots();
     }
     
+    // ... (El resto de los métodos de la clase permanecen igual) ...
     private void editStringValue(String key, String friendlyName) {
         player.closeInventory();
         player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");

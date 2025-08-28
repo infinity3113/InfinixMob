@@ -17,6 +17,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
+import org.bukkit.scheduler.BukkitRunnable; // AÑADIR IMPORTACIÓN
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -31,27 +32,54 @@ public class ItemListener implements Listener {
 
     public ItemListener(InfinixMob plugin) {
         this.plugin = plugin;
+        startTwoHandedWeaponTask(); // Iniciar la nueva tarea
     }
+
+    // --- NUEVA TAREA PARA ARMAS A DOS MANOS ---
+    private void startTwoHandedWeaponTask() {
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                for (Player player : plugin.getServer().getOnlinePlayers()) {
+                    ItemStack mainHand = player.getInventory().getItemInMainHand();
+                    if (isCustomItem(mainHand)) {
+                        plugin.getItemManager().getItem(mainHand.getItemMeta().getPersistentDataContainer().get(CustomItem.CUSTOM_TAG_KEY, PersistentDataType.STRING))
+                            .ifPresent(customItem -> {
+                                String handStyle = customItem.getConfig().getString("hand-style", "ONE_HANDED");
+                                if (handStyle.equalsIgnoreCase("TWO_HANDED")) {
+                                    ItemStack offHand = player.getInventory().getItemInOffHand();
+                                    if (offHand != null && offHand.getType() != Material.AIR) {
+                                        player.getInventory().setItemInOffHand(null);
+                                        player.getInventory().addItem(offHand).forEach((index, item) -> {
+                                            player.getWorld().dropItemNaturally(player.getLocation(), item);
+                                        });
+                                    }
+                                }
+                            });
+                    }
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 5L); // Revisa cada 5 ticks
+    }
+    // --- FIN DE LA NUEVA TAREA ---
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (event.isCancelled()) return;
 
-        // Caso 1: Daño cuerpo a cuerpo de un jugador
         if (event.getDamager() instanceof Player && event.getEntity() instanceof LivingEntity) {
             Player player = (Player) event.getDamager();
             ItemStack weapon = player.getInventory().getItemInMainHand();
 
             if (isCustomItem(weapon)) {
                 if (weapon.getType() == Material.BOW || weapon.getType() == Material.CROSSBOW) {
-                    event.setDamage(0.1); // Daño mínimo si golpean con el arco en la mano
+                    event.setDamage(0.1);
                 } else {
                     event.setDamage(calculateDamage(weapon.getItemMeta().getPersistentDataContainer(), (LivingEntity) event.getEntity()));
                 }
             }
         }
 
-        // Caso 2: Daño por una flecha disparada por un jugador
         if (event.getDamager() instanceof Arrow && event.getEntity() instanceof LivingEntity) {
             Arrow arrow = (Arrow) event.getDamager();
             if (arrow.hasMetadata(ARROW_ITEM_ID_KEY)) {
@@ -59,7 +87,7 @@ public class ItemListener implements Listener {
                 Optional<CustomItem> customItemOpt = plugin.getItemManager().getItem(itemId);
 
                 if (customItemOpt.isPresent()) {
-                    ItemStack bow = customItemOpt.get().buildItemStack(); // Construimos un item temporal para leer sus datos
+                    ItemStack bow = customItemOpt.get().buildItemStack();
                     event.setDamage(calculateDamage(bow.getItemMeta().getPersistentDataContainer(), (LivingEntity) event.getEntity()));
                 }
             }
@@ -84,17 +112,13 @@ public class ItemListener implements Listener {
         return item.getItemMeta().getPersistentDataContainer().has(CustomItem.CUSTOM_TAG_KEY, PersistentDataType.STRING);
     }
     
-    // --- MÉTODO CORREGIDO ---
     private double calculateDamage(PersistentDataContainer container, LivingEntity victim) {
-        // Paso 1: Obtener el JSON de estadísticas
         String statsJson = container.get(CustomItem.STATS_KEY, PersistentDataType.STRING);
         if (statsJson == null) return 1.0;
 
-        // Paso 2: Convertir el JSON a un Mapa
         Type type = new TypeToken<Map<String, Double>>(){}.getType();
         Map<String, Double> stats = plugin.getGson().fromJson(statsJson, type);
 
-        // Paso 3: Obtener las estadísticas del mapa
         double baseDamage = stats.getOrDefault("damage", 1.0);
         double critChance = stats.getOrDefault("crit-chance", 0.0) / 100.0;
         double critDamageMultiplier = 1.0 + (stats.getOrDefault("crit-damage", 0.0) / 100.0);
@@ -104,7 +128,6 @@ public class ItemListener implements Listener {
             finalDamage *= critDamageMultiplier;
         }
 
-        // El resto de la lógica para daño elemental y debilidades permanece igual
         if (container.has(CustomItem.ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING)) {
             String elementalJson = container.get(CustomItem.ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING);
             Map<String, Double> elementalDamages = plugin.getGson().fromJson(elementalJson, type);

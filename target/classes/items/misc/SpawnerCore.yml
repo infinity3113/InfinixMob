@@ -1,7 +1,8 @@
 SpawnerCore:
-  id: BEACON
+  id: DRAGON_EGG
   display-name: '&b&lNúcleo de Spawner de InfinixMob'
+  type: 'MISC'
+  rarity: 'EPIC' # Puedes ajustar la rareza si quieres
   lore:
     - '&7Coloca este bloque en el mundo'
     - '&7para crear un spawner configurable.'
-  custom-tag: 'infinix_spawner_item'

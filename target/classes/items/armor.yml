@@ -1,12 +1,155 @@
-PetoDeTitan:
-  id: NETHERITE_CHESTPLATE
-  display-name: '&8Peto de Titán'
+# --- CUERO ---
+CASCOCUERO:
+  id: LEATHER_HELMET
+  display-name: '&fCasco de Cuero'
   type: 'ARMOR'
-  rarity: 'EPIC'
-  revision-id: 1
-  lore:
-    - '&7Forjado para resistir el fin del mundo.'
-  base-stats:
-    max-health: 40.0 # +20 corazones
-    armor: 15.0
-    knockback-resistance: 0.5 # 50% de resistencia al empuje
+  rarity: 'COMMON'
+  stats: {armor: 1.0}
+PECHERACUERO:
+  id: LEATHER_CHESTPLATE
+  display-name: '&fPechera de Cuero'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 3.0}
+PANTALONCUERO:
+  id: LEATHER_LEGGINGS
+  display-name: '&fPantalones de Cuero'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 2.0}
+BOTASCUERO:
+  id: LEATHER_BOOTS
+  display-name: '&fBotas de Cuero'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 1.0}
+
+# --- MALLA ---
+CASCOMALLA:
+  id: CHAINMAIL_HELMET
+  display-name: '&fCasco de Malla'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 2.0}
+PECHERAMALLA:
+  id: CHAINMAIL_CHESTPLATE
+  display-name: '&fPechera de Malla'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 5.0}
+PANTALONMALLA:
+  id: CHAINMAIL_LEGGINGS
+  display-name: '&fPantalones de Malla'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 4.0}
+BOTASMALLA:
+  id: CHAINMAIL_BOOTS
+  display-name: '&fBotas de Malla'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 1.0}
+
+# --- HIERRO ---
+CASCOHIERRO:
+  id: IRON_HELMET
+  display-name: '&fCasco de Hierro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 2.0}
+PECHERAHIERRO:
+  id: IRON_CHESTPLATE
+  display-name: '&fPechera de Hierro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 6.0}
+PANTALONHIERRO:
+  id: IRON_LEGGINGS
+  display-name: '&fPantalones de Hierro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 5.0}
+BOTASHIERRO:
+  id: IRON_BOOTS
+  display-name: '&fBotas de Hierro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 2.0}
+
+# --- ORO ---
+CASCOORO:
+  id: GOLDEN_HELMET
+  display-name: '&eCasco de Oro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 2.0}
+PECHERAORO:
+  id: GOLDEN_CHESTPLATE
+  display-name: '&ePechera de Oro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 5.0}
+PANTALONORO:
+  id: GOLDEN_LEGGINGS
+  display-name: '&ePantalones de Oro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 3.0}
+BOTASORO:
+  id: GOLDEN_BOOTS
+  display-name: '&eBotas de Oro'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 1.0}
+
+# --- DIAMANTE ---
+CASCODIAMANTE:
+  id: DIAMOND_HELMET
+  display-name: '&bCasco de Diamante'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 3.0, armor-toughness: 2.0}
+PECHERADIAMANTE:
+  id: DIAMOND_CHESTPLATE
+  display-name: '&bPechera de Diamante'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 8.0, armor-toughness: 2.0}
+PANTALONDIAMANTE:
+  id: DIAMOND_LEGGINGS
+  display-name: '&bPantalones de Diamante'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 6.0, armor-toughness: 2.0}
+BOTASDIAMANTE:
+  id: DIAMOND_BOOTS
+  display-name: '&bBotas de Diamante'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 3.0, armor-toughness: 2.0}
+
+# --- NETHERITE ---
+CASCONETHERITE:
+  id: NETHERITE_HELMET
+  display-name: '&8Casco de Netherite'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 3.0, armor-toughness: 3.0, knockback-resistance: 0.1}
+PECHERANETHERITE:
+  id: NETHERITE_CHESTPLATE
+  display-name: '&8Pechera de Netherite'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 8.0, armor-toughness: 3.0, knockback-resistance: 0.1}
+PANTALONNETHERITE:
+  id: NETHERITE_LEGGINGS
+  display-name: '&8Pantalones de Netherite'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 6.0, armor-toughness: 3.0, knockback-resistance: 0.1}
+BOTASNETHERITE:
+  id: NETHERITE_BOOTS
+  display-name: '&8Botas de Netherite'
+  type: 'ARMOR'
+  rarity: 'COMMON'
+  stats: {armor: 3.0, armor-toughness: 3.0, knockback-resistance: 0.1}

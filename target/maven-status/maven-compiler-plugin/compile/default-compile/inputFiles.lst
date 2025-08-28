@@ -36,6 +36,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemLoreEditorGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\MechanicManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\SpawnerListGui.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\SmithingListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetPlayersInRadius.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\BlockManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\DamageMechanic.java
@@ -65,6 +66,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\spawners\Spawner.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\MobManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\FreezeMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\RecipeManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetOwner.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\ItemListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\PotionAreaMechanic.java

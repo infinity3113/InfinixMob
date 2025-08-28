@@ -1,0 +1,8 @@
+TRIDENTE:
+  id: TRIDENT
+  display-name: '&bTridente'
+  type: 'SWORD' # Se clasifica como arma para stats
+  rarity: 'COMMON'
+  stats:
+    damage: 9.0
+    attack-speed: 1.1

@@ -1,19 +1,48 @@
-EspadaDeFuego:
-  id: NETHERITE_SWORD
-  display-name: '&cEspada de Fuego'
+ESPADAMADERA:
+  id: WOODEN_SWORD
+  display-name: '&fEspada de Madera'
   type: 'SWORD'
-  rarity: 'EPIC'
-  revision-id: 1
-  lore:
-    - '&7Una hoja que arde con furia.'
-  # Todas las estadísticas ahora van dentro de esta sección "stats".
+  rarity: 'COMMON'
   stats:
-    damage: 22.0
-    crit-chance: 10.0
-    crit-damage: 40.0
-    # También puedes poner aquí los atributos base que antes iban en "base-stats"
-    movement-speed: 0.05
-  # El daño elemental se mantiene separado por ahora para mayor claridad,
-  # pero también podría moverse dentro de "stats" en el futuro.
-  elemental-damage:
-    fire: 35.0
+    damage: 4.0
+    attack-speed: 1.6
+ESPADAPIEDRA:
+  id: STONE_SWORD
+  display-name: '&7Espada de Piedra'
+  type: 'SWORD'
+  rarity: 'COMMON'
+  stats:
+    damage: 5.0
+    attack-speed: 1.6
+ESPADAHIERRO:
+  id: IRON_SWORD
+  display-name: '&fEspada de Hierro'
+  type: 'SWORD'
+  rarity: 'COMMON'
+  stats:
+    damage: 6.0
+    attack-speed: 1.6
+ESPADAORO:
+  id: GOLDEN_SWORD
+  display-name: '&eEspada de Oro'
+  type: 'SWORD'
+  rarity: 'COMMON'
+  stats:
+    damage: 4.0
+    attack-speed: 1.6
+ESPADADIAMANTE:
+  id: DIAMOND_SWORD
+  display-name: '&bEspada de Diamante'
+  type: 'SWORD'
+  rarity: 'COMMON'
+  stats:
+    damage: 7.0
+    attack-speed: 1.6
+ESPADANETHERITE:
+  id: NETHERITE_SWORD
+  display-name: '&8Espada de Netherite'
+  type: 'SWORD'
+  rarity: 'COMMON'
+  stats:
+    damage: 8.0
+    attack-speed: 1.6

@@ -29,6 +29,7 @@ public final class InfinixMob extends JavaPlugin {
     private WeakPointManager weakPointManager;
     private BlockManager blockManager;
     private CommandManager commandManager;
+    private RecipeManager recipeManager; // Variable para el RecipeManager
     
     private MobListener mobListener;
     private BukkitTask timerSkillTask;
@@ -75,20 +76,26 @@ public final class InfinixMob extends JavaPlugin {
         this.soulLinkManager = new SoulLinkManager(this);
         this.weakPointManager = new WeakPointManager(this);
         this.blockManager = new BlockManager(this);
+        this.recipeManager = new RecipeManager(this); // Inicializar el RecipeManager
 
         this.commandManager = new CommandManager(this);
         getCommand("infinixmob").setExecutor(commandManager);
         getCommand("infinixmob").setTabCompleter(commandManager);
         
+        // Registrar todos los listeners
         this.mobListener = new MobListener(this);
         getServer().getPluginManager().registerEvents(new ChatListener(this), this);
         getServer().getPluginManager().registerEvents(new SpawnerListener(this), this);
         getServer().getPluginManager().registerEvents(new GUIListener(this), this);
         getServer().getPluginManager().registerEvents(this.mobListener, this);
         getServer().getPluginManager().registerEvents(new ItemListener(this), this);
-        getServer().getPluginManager().registerEvents(new ItemUpdaterListener(this), this); // REGISTRAR EL NUEVO LISTENER
+        getServer().getPluginManager().registerEvents(new ItemUpdaterListener(this), this);
+        getServer().getPluginManager().registerEvents(new SmithingListener(this), this); // Registrar el SmithingListener
 
         reload();
+        
+        // Registrar las recetas personalizadas después de cargar todo
+        this.recipeManager.registerCustomRecipes();
 
         getLogger().info("InfinixMob ha sido activado!");
     }
