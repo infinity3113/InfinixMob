@@ -16,6 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,52 +81,77 @@ public class CustomItem {
             }
         }
         meta.getPersistentDataContainer().set(ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING, gson.toJson(elementalDamageMap));
-
-        // --- CONSTRUIR LORE DINÁMICO ---
-        List<String> lore = new ArrayList<>();
+        
+        // Declaración de variables movida a la parte superior del método
         String rarityColor = raritiesConfig.getString(rarityKey.toLowerCase() + ".color", "&7");
         String rarityName = raritiesConfig.getString(rarityKey.toLowerCase() + ".display-name", "Común");
-        
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', rarityColor + config.getString("display-name")));
-
-        List<String> format = loreFormatsConfig.getStringList("format");
-        ConfigurationSection entries = loreFormatsConfig.getConfigurationSection("entries");
         
-        for (String placeholder : format) {
-            if (placeholder.equalsIgnoreCase("#stats#")) {
-                if (!allStats.isEmpty()) {
-                    lore.add(format(entries.getString("stats_title")));
-                    for (Map.Entry<String, Double> entry : allStats.entrySet()) {
-                        String statKey = entry.getKey();
-                        String statName = statsConfig.getString("display-names." + statKey, statKey);
-                        String value = String.format("%.2f", entry.getValue()); // Usar .2f para más precisión
-                        String statFormat = entries.getString("stat_entry." + statKey, entries.getString("stat_entry.default"));
-                        lore.add(format(statFormat, "{display_name}", statName, "{value}", value));
-                    }
-                }
-            } else if (placeholder.equalsIgnoreCase("#elements#")) {
-                 if (!elementalDamageMap.isEmpty()) {
-                    lore.add(format(entries.getString("elements_title")));
-                    for (Map.Entry<String, Double> entry : elementalDamageMap.entrySet()) {
-                        String name = elementsConfig.getString(entry.getKey().toLowerCase(), entry.getKey());
-                        String value = String.format("%.1f", entry.getValue());
-                        lore.add(format(entries.getString("element_entry"), "{display_name}", name, "{value}", value));
-                    }
-                }
-            } else if (placeholder.equalsIgnoreCase("#lore#")) {
-                if (config.isList("lore")) {
-                    for (String line : config.getStringList("lore")) {
-                        lore.add(format(entries.getString("lore_entry"), "{value}", line));
-                    }
-                }
-            } else if (placeholder.equalsIgnoreCase("#rarity#")) {
-                lore.add(format(entries.getString("rarity"), "{color}", rarityColor, "{value}", rarityName));
-            } else if (placeholder.equalsIgnoreCase("{bar}")) {
-                lore.add(format(entries.getString("bar")));
+        // --- CONSTRUIR LORE DINÁMICO ---
+        List<String> rawLore = new ArrayList<>();
+        List<String> statsLines = new ArrayList<>();
+        List<String> elementsLines = new ArrayList<>();
+        List<String> handStyleLines = new ArrayList<>(); // Nueva lista para el estilo de mano
+        List<String> customLoreLines = new ArrayList<>();
+        String rarityLine = null;
+
+        ConfigurationSection entries = loreFormatsConfig.getConfigurationSection("entries");
+
+        // 1. Recopilar todas las líneas de cada sección si tienen contenido
+        if (!allStats.isEmpty()) {
+            statsLines.add(format(entries.getString("stats_title")));
+            for (Map.Entry<String, Double> entry : allStats.entrySet()) {
+                String statKey = entry.getKey();
+                String statName = statsConfig.getString("display-names." + statKey, statKey);
+                String value = String.format("%.2f", entry.getValue());
+                String statFormat = entries.getString("stat_entry." + statKey, entries.getString("stat_entry.default"));
+                statsLines.add(format(statFormat, "{display_name}", statName, "{value}", value));
             }
         }
 
-        meta.setLore(lore);
+        if (!elementalDamageMap.isEmpty()) {
+            elementsLines.add(format(entries.getString("elements_title")));
+            for (Map.Entry<String, Double> entry : elementalDamageMap.entrySet()) {
+                String name = elementsConfig.getString(entry.getKey().toLowerCase(), entry.getKey());
+                String value = String.format("%.1f", entry.getValue());
+                elementsLines.add(format(entries.getString("element_entry"), "{display_name}", name, "{value}", value));
+            }
+        }
+        
+        // Lógica para el estilo de mano
+        String handStyle = config.getString("hand-style", null);
+        if (handStyle != null) {
+            String handStyleName = handStyle.equalsIgnoreCase("ONE_HANDED") ? "Una Mano" : "Dos Manos";
+            handStyleLines.add(format(entries.getString("hand_style"), "{value}", handStyleName));
+        }
+
+        if (config.isList("lore")) {
+            for (String line : config.getStringList("lore")) {
+                customLoreLines.add(format(entries.getString("lore_entry"), "{value}", line));
+            }
+        }
+
+        if (raritiesConfig != null) {
+            rarityLine = format(entries.getString("rarity"), "{color}", rarityColor, "{value}", rarityName);
+        }
+
+        // 2. Combinar las secciones y añadir las barras condicionalmente
+        List<List<String>> sections = new ArrayList<>();
+        if (!statsLines.isEmpty()) sections.add(statsLines);
+        if (!elementsLines.isEmpty()) sections.add(elementsLines);
+        if (!handStyleLines.isEmpty()) sections.add(handStyleLines); // Añadir sección de estilo de mano
+        if (!customLoreLines.isEmpty()) sections.add(customLoreLines);
+        if (rarityLine != null) sections.add(Collections.singletonList(rarityLine));
+
+        // Si hay más de una sección, procesarlas y añadir las barras entre ellas
+        for (int i = 0; i < sections.size(); i++) {
+            rawLore.addAll(sections.get(i));
+            if (i < sections.size() - 1) { // Si no es la última sección, añade una barra
+                rawLore.add(format(entries.getString("bar")));
+            }
+        }
+
+        meta.setLore(rawLore);
 
         // --- APLICAR ATRIBUTOS Y FLAGS ---
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
@@ -136,10 +162,7 @@ public class CustomItem {
                 
                 double value = stat.getValue(); // Valor del YML
 
-                // **LA CORRECCIÓN ESTÁ AQUÍ**
                 // 1 Corazón = 2 Puntos de Vida en Minecraft.
-                // Si el usuario pone "max-health: 3", quiere 3 corazones (+6 de vida), no 1.5.
-                // Multiplicamos el valor por 2 solo para este atributo específico.
                 if (attribute == Attribute.GENERIC_MAX_HEALTH) {
                     value *= 2;
                 }
@@ -147,7 +170,7 @@ public class CustomItem {
                 AttributeModifier modifier = new AttributeModifier(
                     UUID.randomUUID(), 
                     "infinix." + stat.getKey(), 
-                    value, // Usar el valor (potencialmente modificado)
+                    value, 
                     AttributeModifier.Operation.ADD_NUMBER,
                     getEquipmentSlot(itemType, material)
                 );

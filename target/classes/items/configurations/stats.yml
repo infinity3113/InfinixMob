@@ -5,6 +5,8 @@ display-names:
   max-health: 'Vida Extra'
   movement-speed: 'Velocidad'
   armor: 'Armadura'
+  armor-toughness: 'Dureza de Armadura'
+  knockback-resistance: 'Resistencia al Retroceso'
 item-types:
   SWORD: 'Espada'
   BOW: 'Arco'

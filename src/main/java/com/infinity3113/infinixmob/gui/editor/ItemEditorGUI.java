@@ -15,6 +15,7 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ItemEditorGUI extends MenuGUI {
 
@@ -69,14 +70,13 @@ public class ItemEditorGUI extends MenuGUI {
             new ItemLoreEditorGUI(plugin, player, customItem, this).open();
             return;
         }
-
-        // --- NUEVA LÓGICA PARA EL ESTILO DE MANO ---
+        
         if (displayName.equals("Estilo de Mano")) {
             String currentStyle = customItem.getConfig().getString("hand-style", "ONE_HANDED");
             String newStyle = currentStyle.equalsIgnoreCase("ONE_HANDED") ? "TWO_HANDED" : "ONE_HANDED";
             customItem.getConfig().set("hand-style", newStyle);
             player.sendMessage(ChatColor.YELLOW + "Estilo de mano cambiado a: " + newStyle);
-            open(); // Refrescar la GUI
+            open();
             return;
         }
 
@@ -84,7 +84,7 @@ public class ItemEditorGUI extends MenuGUI {
         if (key == null) return;
 
         Object currentValue = customItem.getConfig().get(key);
-
+        
         if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.")))) {
              editDoubleValue(key, displayName);
         } else {
@@ -106,18 +106,21 @@ public class ItemEditorGUI extends MenuGUI {
         int slot = 9;
         List<String> keysToShow = new ArrayList<>();
         
+        // CORRECCIÓN: Obtener las claves de nivel superior del archivo de configuración del ítem
         for (String key : customItem.getConfig().getKeys(false)) {
             if (!customItem.getConfig().isConfigurationSection(key) && !key.equalsIgnoreCase("lore")) {
                 keysToShow.add(key);
             }
         }
         
-        if (customItem.getConfig().isConfigurationSection("stats")) {
-            for (String key : customItem.getConfig().getConfigurationSection("stats").getKeys(false)) {
+        // Agregar las estadísticas de stats.yml
+        if (plugin.getItemManager().getStatsConfig() != null && plugin.getItemManager().getStatsConfig().isConfigurationSection("display-names")) {
+            for (String key : plugin.getItemManager().getStatsConfig().getConfigurationSection("display-names").getKeys(false)) {
                 keysToShow.add("stats." + key);
             }
         }
         
+        // Agregar los elementos de elements.yml
         if (!customItem.getConfig().isConfigurationSection("elemental-damage")) {
             customItem.getConfig().createSection("elemental-damage");
         }
@@ -127,6 +130,9 @@ public class ItemEditorGUI extends MenuGUI {
                 keysToShow.add("elemental-damage." + key);
             }
         }
+
+        // Eliminar duplicados
+        keysToShow = keysToShow.stream().distinct().collect(Collectors.toList());
 
         for (String key : keysToShow) {
             if (slot >= 45) break;
@@ -143,7 +149,6 @@ public class ItemEditorGUI extends MenuGUI {
             inventory.setItem(slot++, createGuiItemWithKey(icon, ChatColor.GREEN + friendlyName, key, lore.toArray(new String[0])));
         }
         
-        // --- AÑADIR NUEVO BOTÓN PARA ESTILO DE MANO ---
         String handStyle = customItem.getConfig().getString("hand-style", "ONE_HANDED");
         String handStyleName = handStyle.equalsIgnoreCase("ONE_HANDED") ? "Una Mano" : "Dos Manos";
         inventory.setItem(23, createGuiItem(Material.LEATHER_HORSE_ARMOR, ChatColor.AQUA + "Estilo de Mano", ChatColor.GRAY + "Valor: " + ChatColor.YELLOW + handStyleName, "", ChatColor.AQUA + "Click para cambiar"));
@@ -155,7 +160,6 @@ public class ItemEditorGUI extends MenuGUI {
         fillEmptySlots();
     }
     
-    // ... (El resto de los métodos de la clase permanecen igual) ...
     private void editStringValue(String key, String friendlyName) {
         player.closeInventory();
         player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");
@@ -203,22 +207,30 @@ public class ItemEditorGUI extends MenuGUI {
     private String getFriendlyNameForKey(String key) {
         String[] parts = key.split("\\.");
         String lastPart = parts[parts.length - 1].replace("-", " ");
+        String friendlyName = plugin.getItemManager().getStatsConfig().getString("display-names." + lastPart.toLowerCase(), null);
+        if (friendlyName != null) {
+            return friendlyName;
+        }
         return Character.toUpperCase(lastPart.charAt(0)) + lastPart.substring(1);
     }
 
     private Material getIconForKey(String key) {
         String simpleKey = key.contains(".") ? key.substring(key.lastIndexOf('.') + 1) : key;
         switch (simpleKey.toLowerCase()) {
+            case "id": return Material.ITEM_FRAME;
             case "display-name": return Material.NAME_TAG;
             case "type": return Material.CRAFTING_TABLE;
             case "lore": return Material.BOOK;
             case "rarity": return Material.EMERALD;
             case "revision-id": return Material.COMPASS;
+            case "hand-style": return Material.LEATHER_HORSE_ARMOR;
             case "damage": return Material.DIAMOND_SWORD;
             case "crit-chance": return Material.SPYGLASS;
             case "crit-damage": return Material.ANVIL;
             case "max-health": return Material.GOLDEN_APPLE;
             case "armor": return Material.DIAMOND_CHESTPLATE;
+            case "armor-toughness": return Material.SHIELD;
+            case "knockback-resistance": return Material.IRON_CHESTPLATE;
             case "movement-speed": return Material.SUGAR;
             case "fire": return Material.BLAZE_POWDER;
             case "water": return Material.WATER_BUCKET;

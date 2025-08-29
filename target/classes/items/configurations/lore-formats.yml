@@ -4,10 +4,11 @@
 # que se encuentren en la sección "stats:" del YML de un ítem.
 format:
   - '{bar}'
-  # NUEVO: Un único placeholder para todas las estadísticas base y de combate.
   - '#stats#'
   - '{bar}'
   - '#elements#'
+  - '{bar}'
+  - '#hand_style#' # Nuevo marcador de posición
   - '{bar}'
   - '#lore#'
   - '{bar}'
@@ -26,6 +27,8 @@ entries:
     max-health: '&7{display_name}: &a+{value}'
     movement-speed: '&7{display_name}: &e{value}'
     armor: '&7{display_name}: &9{value}'
+    
+  hand_style: '&7Estilo de Mano: &a{value}' # Nuevo formato para la línea
   
   elements_title: '&7Daño Elemental:'
   element_entry: '&7- {display_name}: &e{value}'
