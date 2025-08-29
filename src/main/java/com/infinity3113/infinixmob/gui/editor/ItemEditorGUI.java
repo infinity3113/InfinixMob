@@ -85,8 +85,12 @@ public class ItemEditorGUI extends MenuGUI {
 
         Object currentValue = customItem.getConfig().get(key);
         
-        if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.")))) {
-             editDoubleValue(key, displayName);
+        // --- MODIFICACIÓN ---
+        // Se asegura que 'revision-id' sea tratado como un número entero.
+        if (key.equalsIgnoreCase("revision-id")) {
+            editIntValue(key, displayName);
+        } else if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.")))) {
+            editDoubleValue(key, displayName);
         } else {
             editStringValue(key, displayName);
         }
@@ -106,11 +110,16 @@ public class ItemEditorGUI extends MenuGUI {
         int slot = 9;
         List<String> keysToShow = new ArrayList<>();
         
-        // CORRECCIÓN: Obtener las claves de nivel superior del archivo de configuración del ítem
         for (String key : customItem.getConfig().getKeys(false)) {
             if (!customItem.getConfig().isConfigurationSection(key) && !key.equalsIgnoreCase("lore")) {
                 keysToShow.add(key);
             }
+        }
+        
+        // --- MODIFICACIÓN ---
+        // Se añade 'revision-id' a la lista si no está presente, para asegurar que siempre se muestre.
+        if (!keysToShow.contains("revision-id")) {
+            keysToShow.add("revision-id");
         }
         
         // Agregar las estadísticas de stats.yml
@@ -139,7 +148,14 @@ public class ItemEditorGUI extends MenuGUI {
 
             Material icon = getIconForKey(key);
             String friendlyName = getFriendlyNameForKey(key);
-            Object value = customItem.getConfig().get(key, 0.0);
+            Object value = customItem.getConfig().get(key, "N/A"); // Default a N/A si no existe
+
+            // --- MODIFICACIÓN ---
+            // Se usa 0 como valor por defecto para revision-id si no está establecido.
+            if (key.equalsIgnoreCase("revision-id")) {
+                value = customItem.getConfig().getInt(key, 0);
+            }
+
 
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "Valor: " + ChatColor.YELLOW + value.toString());
@@ -163,16 +179,24 @@ public class ItemEditorGUI extends MenuGUI {
     private void editStringValue(String key, String friendlyName) {
         player.closeInventory();
         player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");
-        plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, false));
+        plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, "string"));
     }
 
     private void editDoubleValue(String key, String friendlyName) {
         player.closeInventory();
         player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor numérico para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");
-        plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, true));
+        plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, "double"));
+    }
+    
+    // --- NUEVO MÉTODO ---
+    // Método específico para editar valores enteros como el revision-id.
+    private void editIntValue(String key, String friendlyName) {
+        player.closeInventory();
+        player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor numérico (entero) para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");
+        plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, "int"));
     }
 
-    private void handleInput(String key, String friendlyName, String input, boolean isNumeric) {
+    private void handleInput(String key, String friendlyName, String input, String type) {
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -182,22 +206,30 @@ public class ItemEditorGUI extends MenuGUI {
                     return;
                 }
 
-                if (isNumeric) {
-                    try {
-                        double newValue = Double.parseDouble(input);
-                        if (newValue == 0.0) {
-                            customItem.getConfig().set(key, null);
-                            player.sendMessage(ChatColor.YELLOW + "¡" + friendlyName + " eliminado! No olvides guardar.");
-                        } else {
-                            customItem.getConfig().set(key, newValue);
+                try {
+                    switch (type) {
+                        case "int":
+                            int intValue = Integer.parseInt(input);
+                            customItem.getConfig().set(key, intValue);
                             player.sendMessage(ChatColor.GREEN + "¡" + friendlyName + " actualizado! No olvides guardar.");
-                        }
-                    } catch (NumberFormatException e) {
-                        player.sendMessage(ChatColor.RED + "Entrada inválida. Por favor, introduce un número.");
+                            break;
+                        case "double":
+                            double doubleValue = Double.parseDouble(input);
+                             if (doubleValue == 0.0) {
+                                customItem.getConfig().set(key, null);
+                                player.sendMessage(ChatColor.YELLOW + "¡" + friendlyName + " eliminado! No olvides guardar.");
+                            } else {
+                                customItem.getConfig().set(key, doubleValue);
+                                player.sendMessage(ChatColor.GREEN + "¡" + friendlyName + " actualizado! No olvides guardar.");
+                            }
+                            break;
+                        case "string":
+                            customItem.getConfig().set(key, input);
+                            player.sendMessage(ChatColor.GREEN + "¡" + friendlyName + " actualizado! No olvides guardar.");
+                            break;
                     }
-                } else {
-                    customItem.getConfig().set(key, input);
-                    player.sendMessage(ChatColor.GREEN + "¡" + friendlyName + " actualizado! No olvides guardar.");
+                } catch (NumberFormatException e) {
+                    player.sendMessage(ChatColor.RED + "Entrada inválida. Por favor, introduce un número válido.");
                 }
                 open();
             }
@@ -207,6 +239,13 @@ public class ItemEditorGUI extends MenuGUI {
     private String getFriendlyNameForKey(String key) {
         String[] parts = key.split("\\.");
         String lastPart = parts[parts.length - 1].replace("-", " ");
+        
+        // --- MODIFICACIÓN ---
+        // Añade un caso especial para 'revision-id' para que se muestre correctamente.
+        if (key.equalsIgnoreCase("revision-id")) {
+            return "ID de Revisión";
+        }
+
         String friendlyName = plugin.getItemManager().getStatsConfig().getString("display-names." + lastPart.toLowerCase(), null);
         if (friendlyName != null) {
             return friendlyName;
