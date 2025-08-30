@@ -85,8 +85,6 @@ public class ItemEditorGUI extends MenuGUI {
 
         Object currentValue = customItem.getConfig().get(key);
         
-        // --- MODIFICACIÓN ---
-        // Se asegura que 'revision-id' sea tratado como un número entero.
         if (key.equalsIgnoreCase("revision-id")) {
             editIntValue(key, displayName);
         } else if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.")))) {
@@ -116,20 +114,16 @@ public class ItemEditorGUI extends MenuGUI {
             }
         }
         
-        // --- MODIFICACIÓN ---
-        // Se añade 'revision-id' a la lista si no está presente, para asegurar que siempre se muestre.
         if (!keysToShow.contains("revision-id")) {
             keysToShow.add("revision-id");
         }
         
-        // Agregar las estadísticas de stats.yml
         if (plugin.getItemManager().getStatsConfig() != null && plugin.getItemManager().getStatsConfig().isConfigurationSection("display-names")) {
             for (String key : plugin.getItemManager().getStatsConfig().getConfigurationSection("display-names").getKeys(false)) {
                 keysToShow.add("stats." + key);
             }
         }
         
-        // Agregar los elementos de elements.yml
         if (!customItem.getConfig().isConfigurationSection("elemental-damage")) {
             customItem.getConfig().createSection("elemental-damage");
         }
@@ -140,7 +134,6 @@ public class ItemEditorGUI extends MenuGUI {
             }
         }
 
-        // Eliminar duplicados
         keysToShow = keysToShow.stream().distinct().collect(Collectors.toList());
 
         for (String key : keysToShow) {
@@ -148,10 +141,8 @@ public class ItemEditorGUI extends MenuGUI {
 
             Material icon = getIconForKey(key);
             String friendlyName = getFriendlyNameForKey(key);
-            Object value = customItem.getConfig().get(key, "N/A"); // Default a N/A si no existe
+            Object value = customItem.getConfig().get(key, "N/A");
 
-            // --- MODIFICACIÓN ---
-            // Se usa 0 como valor por defecto para revision-id si no está establecido.
             if (key.equalsIgnoreCase("revision-id")) {
                 value = customItem.getConfig().getInt(key, 0);
             }
@@ -188,8 +179,6 @@ public class ItemEditorGUI extends MenuGUI {
         plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, "double"));
     }
     
-    // --- NUEVO MÉTODO ---
-    // Método específico para editar valores enteros como el revision-id.
     private void editIntValue(String key, String friendlyName) {
         player.closeInventory();
         player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor numérico (entero) para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");
@@ -240,8 +229,6 @@ public class ItemEditorGUI extends MenuGUI {
         String[] parts = key.split("\\.");
         String lastPart = parts[parts.length - 1].replace("-", " ");
         
-        // --- MODIFICACIÓN ---
-        // Añade un caso especial para 'revision-id' para que se muestre correctamente.
         if (key.equalsIgnoreCase("revision-id")) {
             return "ID de Revisión";
         }
@@ -267,8 +254,9 @@ public class ItemEditorGUI extends MenuGUI {
             case "crit-chance": return Material.SPYGLASS;
             case "crit-damage": return Material.ANVIL;
             case "max-health": return Material.GOLDEN_APPLE;
-            case "armor": return Material.DIAMOND_CHESTPLATE;
-            case "armor-toughness": return Material.SHIELD;
+            // --- CAMBIO DE ICONO Y NOMBRE DE STAT ---
+            case "defense": return Material.SHIELD; // <-- CAMBIADO DE "armor" y DIAMOND_CHESTPLATE
+            case "armor-toughness": return Material.NETHERITE_INGOT; // <-- Cambiado el icono para diferenciarlo
             case "knockback-resistance": return Material.IRON_CHESTPLATE;
             case "movement-speed": return Material.SUGAR;
             case "fire": return Material.BLAZE_POWDER;

@@ -11,13 +11,15 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
+import org.bukkit.event.entity.EntityDamageEvent; // <-- NUEVA IMPORTACIÓN
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.PlayerInventory; // <-- NUEVA IMPORTACIÓN
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
-import org.bukkit.scheduler.BukkitRunnable; // AÑADIR IMPORTACIÓN
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -32,10 +34,9 @@ public class ItemListener implements Listener {
 
     public ItemListener(InfinixMob plugin) {
         this.plugin = plugin;
-        startTwoHandedWeaponTask(); // Iniciar la nueva tarea
+        startTwoHandedWeaponTask();
     }
 
-    // --- NUEVA TAREA PARA ARMAS A DOS MANOS ---
     private void startTwoHandedWeaponTask() {
         new BukkitRunnable() {
             @Override
@@ -59,9 +60,8 @@ public class ItemListener implements Listener {
                     }
                 }
             }
-        }.runTaskTimer(plugin, 0L, 5L); // Revisa cada 5 ticks
+        }.runTaskTimer(plugin, 0L, 5L);
     }
-    // --- FIN DE LA NUEVA TAREA ---
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
@@ -93,6 +93,50 @@ public class ItemListener implements Listener {
             }
         }
     }
+
+    // ========================================================================
+    // == NUEVO MÉTODO PARA LA DEFENSA PLANA
+    // ========================================================================
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onPlayerTakeDamage(EntityDamageEvent event) {
+        if (event.isCancelled() || !(event.getEntity() instanceof Player)) {
+            return;
+        }
+
+        Player player = (Player) event.getEntity();
+        PlayerInventory inventory = player.getInventory();
+        double totalDefense = 0;
+
+        // Iterar sobre las 4 piezas de armadura del jugador
+        for (ItemStack armorPiece : inventory.getArmorContents()) {
+            if (isCustomItem(armorPiece)) {
+                PersistentDataContainer container = armorPiece.getItemMeta().getPersistentDataContainer();
+                String statsJson = container.get(CustomItem.STATS_KEY, PersistentDataType.STRING);
+                if (statsJson != null) {
+                    Type type = new TypeToken<Map<String, Double>>(){}.getType();
+                    Map<String, Double> stats = plugin.getGson().fromJson(statsJson, type);
+                    
+                    // Obtenemos el valor de "defense" y lo sumamos
+                    totalDefense += stats.getOrDefault("defense", 0.0);
+                }
+            }
+        }
+
+        if (totalDefense > 0) {
+            double originalDamage = event.getDamage();
+            
+            // Resta la defensa directamente del daño
+            double finalDamage = originalDamage - totalDefense;
+
+            // Asegurarse de que el daño no sea negativo (no queremos que el jugador se cure)
+            if (finalDamage < 0) {
+                finalDamage = 0;
+            }
+
+            event.setDamage(finalDamage);
+        }
+    }
+    // ========================================================================
 
     @EventHandler
     public void onPlayerShootBow(EntityShootBowEvent event) {

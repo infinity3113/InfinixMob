@@ -9,8 +9,8 @@ public class SilentRemoveMechanic implements Mechanic {
     @Override
     public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         if (target instanceof LivingEntity) {
-            ((LivingEntity) target).setHealth(0.0);
-            target.remove();
+            // Esto asegura que la entidad muera correctamente, activando todos los eventos necesarios.
+            ((LivingEntity) target).setHealth(0.0); 
         }
     }
 }

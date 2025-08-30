@@ -12,9 +12,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Mecánica que desordena el inventario de un jugador.
- */
 public class ScrambleInventoryMechanic implements Mechanic {
     @Override
     public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
@@ -23,20 +20,22 @@ public class ScrambleInventoryMechanic implements Mechanic {
             PlayerInventory inv = player.getInventory();
             List<ItemStack> items = new ArrayList<>();
 
-            // Recolecta solo los items del inventario principal (excluyendo armadura y hotbar)
-            for (int i = 9; i <= 35; i++) {
+            // El bucle ahora va de 0 a 35, incluyendo la hotbar y el inventario principal.
+            for (int i = 0; i <= 35; i++) {
                 if (inv.getItem(i) != null) {
                     items.add(inv.getItem(i));
-                    inv.setItem(i, null);
                 }
             }
+            
+            // Limpia todos los slots antes de volver a colocar los items.
+            for (int i = 0; i <= 35; i++) {
+                 inv.setItem(i, null);
+            }
 
-            // Baraja la lista de items
             Collections.shuffle(items);
 
-            // Vuelve a colocar los items en el inventario
             for (int i = 0; i < items.size(); i++) {
-                inv.setItem(9 + i, items.get(i));
+                inv.setItem(i, items.get(i)); // Vuelve a llenar desde el slot 0.
             }
             player.updateInventory();
         }

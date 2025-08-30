@@ -5,6 +5,7 @@ com\infinity3113\infinixmob\mechanics\impl\TitleMessageMechanic.class
 com\infinity3113\infinixmob\targeters\impl\TargetEntitiesInRadius.class
 com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic$1$1.class
+com\infinity3113\infinixmob\listeners\ItemListener$3.class
 com\infinity3113\infinixmob\mechanics\impl\PushMechanic.class
 com\infinity3113\infinixmob\listeners\ChatListener.class
 com\infinity3113\infinixmob\core\BlockManager$TemporaryBlock.class
