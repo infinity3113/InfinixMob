@@ -1,7 +1,3 @@
-# -----------------------------
-# ---- HABILIDADES DE MAGO ----
-# -----------------------------
-
 BolaDeFuego: # Fireball
   max-level: 20
   skill-req: 1
@@ -15,10 +11,14 @@ BolaDeFuego: # Fireball
   resource-cost:
     base: 15
     per-level: 1.5
+  damage: # <--- SECCIÓN AÑADIDA PARA LA GUI
+    base: 12
+    per-level: 2.5
+    max: 60
   cooldown:
     base: 4
     per-level: -0.1
-  mechanics:
+  Mechanics:
     - type: 'DAMAGE'
       targeter: '@TARGET'
       parameters:
@@ -50,10 +50,13 @@ Destello: # Blink
   resource-cost:
     base: 25
     per-level: 2
+  max_distance: # <--- SECCIÓN AÑADIDA PARA LA GUI
+    base: 4
+    per-level: 0.75
   cooldown:
     base: 12
     per-level: -0.5
-  mechanics:
+  Mechanics:
     - type: 'TELEPORT_LOOK'
       targeter: '@SELF'
       parameters:
@@ -80,9 +83,13 @@ MisilArcano: # Arcane Missile
   resource-cost:
     base: 10
     per-level: 1
+  damage: # <--- SECCIÓN AÑADIDA PARA LA GUI
+    base: 8
+    per-level: 1.8
+    max: 45
   cooldown: 3
-  mechanics:
-    - type: 'DAMAGE' # Aquí podrías crear una mecánica de proyectil custom si quisieras
+  Mechanics:
+    - type: 'DAMAGE'
       targeter: '@TARGET'
       parameters:
         amount:
@@ -108,10 +115,13 @@ NovaDeEscarcha: # Frost Nova
   resource-cost:
     base: 45
     per-level: 3
+  duration: # <--- SECCIÓN AÑADIDA PARA LA GUI
+    base: 5
+    per-level: 0.5
   cooldown:
     base: 18
     per-level: -0.5
-  mechanics:
+  Mechanics:
     - type: 'POTION_AREA'
       targeter: '@ENTITIESINRADIUS{R=6}'
       parameters:
@@ -143,9 +153,13 @@ Meteoro: # Meteor
     - "&eDaño de Impacto: &f{damage}"
     - "&eCosto de Maná: &f{resource-cost}"
   resource-cost: 80
+  damage: # <--- SECCIÓN AÑADIDA PARA LA GUI
+    base: 40
+    per-level: 8
+    max: 120
   cooldown: 45
-  mechanics:
-    - type: 'METEOR_SHOWER' # Usando tu mecánica existente con 1 solo meteoro
+  Mechanics:
+    - type: 'METEOR_SHOWER'
       targeter: '@TARGET'
       parameters:
         amount: 1
@@ -171,12 +185,15 @@ CadenasInfernales: # Inferno Chains
     - "&eDuración: &f{duration}s"
     - "&eCosto de Maná: &f{resource-cost}"
   resource-cost: 50
+  duration: # <--- SECCIÓN AÑADIDA PARA LA GUI
+    base: 5
+    per-level: 1
   cooldown: 25
-  mechanics:
+  Mechanics:
     - type: 'POTION'
       targeter: '@TARGET'
       parameters:
-        effect: 'WITHER' # Simula el daño por quemadura
+        effect: 'WITHER'
         duration:
           base: 5
           per-level: 1

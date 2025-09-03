@@ -1,5 +1,6 @@
 package com.infinity3113.infinixmob.playerclass;
 
+import org.bukkit.ChatColor; // <-- Asegúrate de que esta línea esté importada
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.Collections;
@@ -23,7 +24,9 @@ public class PlayerClass {
     }
 
     public String getDisplayName() {
-        return config.getString("display-name", "Clase Desconocida");
+        // CORRECCIÓN AÑADIDA AQUÍ:
+        String name = config.getString("display-name", "Clase Desconocida");
+        return ChatColor.translateAlternateColorCodes('&', name);
     }
 
     public String getResourceType() {
