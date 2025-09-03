@@ -67,6 +67,7 @@ public class MechanicManager {
         registeredMechanics.put("SUMMON_STRUCTURE", new SummonStructureMechanic(plugin));
         registeredMechanics.put("DYNAMIC_ARENA", new DynamicArenaMechanic());
         registeredMechanics.put("SILENT_REMOVE", new SilentRemoveMechanic());
+		registeredMechanics.put("TELEPORT_LOOK", new TeleportLookMechanic()); // <-- AÑADE ESTA LÍNEA
     }
 
     public void executeMechanic(String type, LivingEntity caster, Entity target, Map<String, Object> params) {

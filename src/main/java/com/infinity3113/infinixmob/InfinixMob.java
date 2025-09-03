@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.infinity3113.infinixmob.commands.CommandManager;
 import com.infinity3113.infinixmob.core.*;
 import com.infinity3113.infinixmob.listeners.*;
+import com.infinity3113.infinixmob.playerclass.PlayerClassManager; // <-- NUEVA IMPORTACIÓN
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -29,8 +30,13 @@ public final class InfinixMob extends JavaPlugin {
     private WeakPointManager weakPointManager;
     private BlockManager blockManager;
     private CommandManager commandManager;
-    private RecipeManager recipeManager; // Variable para el RecipeManager
+    private RecipeManager recipeManager;
     
+    // --- NUEVOS MANAGERS ---
+    private PlayerClassManager playerClassManager;
+    private CooldownManager cooldownManager;
+    // -----------------------
+
     private MobListener mobListener;
     private BukkitTask timerSkillTask;
     private Gson gson;
@@ -55,13 +61,19 @@ public final class InfinixMob extends JavaPlugin {
         saveResource("items/configurations/stats.yml", false);
         saveResource("items/misc/SpawnerCore.yml", false);
         
-        saveResource("items/sword.yml", false); 
+        saveResource("items/sword.yml", false);
         saveResource("items/axe.yml", false);
         saveResource("items/bow.yml", false);
         saveResource("items/armor.yml", false);
 
         saveResource("StatusEffects/effects.yml", false);
-        
+
+        // --- Guardar archivos de clases ---
+        saveResource("classes/mage.yml", false);
+        saveResource("classes/paladin.yml", false);
+        saveResource("classes/archer.yml", false);
+        // --------------------------------
+
         // Inicializar todos los managers
         this.chatInputManager = new ChatInputManager();
         this.threatManager = new ThreatManager();
@@ -76,7 +88,12 @@ public final class InfinixMob extends JavaPlugin {
         this.soulLinkManager = new SoulLinkManager(this);
         this.weakPointManager = new WeakPointManager(this);
         this.blockManager = new BlockManager(this);
-        this.recipeManager = new RecipeManager(this); // Inicializar el RecipeManager
+        this.recipeManager = new RecipeManager(this);
+
+        // --- INICIALIZAR NUEVOS MANAGERS ---
+        this.playerClassManager = new PlayerClassManager(this);
+        this.cooldownManager = new CooldownManager();
+        // -----------------------------------
 
         this.commandManager = new CommandManager(this);
         getCommand("infinixmob").setExecutor(commandManager);
@@ -90,7 +107,11 @@ public final class InfinixMob extends JavaPlugin {
         getServer().getPluginManager().registerEvents(this.mobListener, this);
         getServer().getPluginManager().registerEvents(new ItemListener(this), this);
         getServer().getPluginManager().registerEvents(new ItemUpdaterListener(this), this);
-        getServer().getPluginManager().registerEvents(new SmithingListener(this), this); // Registrar el SmithingListener
+        getServer().getPluginManager().registerEvents(new SmithingListener(this), this);
+
+        // --- REGISTRAR NUEVO LISTENER ---
+        getServer().getPluginManager().registerEvents(new ClassListener(this), this);
+        // --------------------------------
 
         reload();
         
@@ -135,6 +156,12 @@ public final class InfinixMob extends JavaPlugin {
         this.mobManager.loadMobs();
         this.skillManager.loadSkills();
         
+        // --- RECARGAR CLASES ---
+        if (this.playerClassManager != null) {
+            this.playerClassManager.loadClasses();
+        }
+        // -------------------------
+
         this.spawnerManager.startSpawnerTask();
         this.statusEffectManager.startEffectTicker();
         this.behaviourManager.startBehaviourTicker();
@@ -160,6 +187,11 @@ public final class InfinixMob extends JavaPlugin {
     public WeakPointManager getWeakPointManager() { return weakPointManager; }
     public BlockManager getBlockManager() { return blockManager; }
     public MobListener getMobListener() { return mobListener; }
+    
+    // --- NUEVOS GETTERS ---
+    public PlayerClassManager getPlayerClassManager() { return playerClassManager; }
+    public CooldownManager getCooldownManager() { return cooldownManager; }
+    // ----------------------
     
     public Gson getGson() {
         return gson;

@@ -1,0 +1,16 @@
+display-name: "&aArquero"
+resource-type: "ENERGY"
+max-resource: 120.0
+resource-regen: 2.0
+
+skills:
+  1: 'FlechaVenenosa'
+  2: 'TiroRapido'
+  3: 'SaltoEvasivo'
+  4: 'LluviaDeFlechas'
+
+passive-skill: 'OjoDeAguila'
+
+level-up-rewards:
+  5:
+    - "say <player.name> ha alcanzado el nivel 5 de Arquero!"

@@ -1,0 +1,16 @@
+display-name: "&ePaladín"
+resource-type: "MANA"
+max-resource: 100.0
+resource-regen: 1.0
+
+skills:
+  1: 'GolpeDivino'
+  2: 'LuzSanadora'
+  3: 'EscudoSagrado'
+  4: 'Sentencia'
+
+passive-skill: 'AuraDeProteccion'
+
+level-up-rewards:
+  5:
+    - "say <player.name> ha alcanzado el nivel 5 de Paladín!"

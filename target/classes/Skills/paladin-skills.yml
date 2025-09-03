@@ -1,0 +1,84 @@
+GolpeDivino:
+  cooldown: 6
+  resource-cost: 15
+  Mechanics:
+    - type: 'DAMAGE'
+      targeter: '@TARGET'
+      parameters:
+        amount: 10
+    - type: 'HEAL'
+      targeter: '@SELF'
+      parameters:
+        amount: 2 # Se cura 1 corazón
+    - type: 'PARTICLE'
+      targeter: '@TARGET'
+      parameters:
+        particle: 'CRIT_MAGIC'
+
+LuzSanadora:
+  cooldown: 15
+  resource-cost: 30
+  Mechanics:
+    - type: 'HEAL'
+      targeter: '@SELF'
+      parameters:
+        amount: 10 # Se cura 5 corazones
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'HEART'
+        amount: 15
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'ENTITY_PLAYER_LEVELUP'
+        pitch: 1.5
+
+EscudoSagrado:
+  cooldown: 25
+  resource-cost: 40
+  Mechanics:
+    - type: 'POTION'
+      targeter: '@SELF'
+      parameters:
+        effect: 'DAMAGE_RESISTANCE'
+        duration: 8 # segundos
+        amplifier: 1
+    - type: 'APPLY_SHIELD'
+      targeter: '@SELF'
+      parameters:
+        amount: 8 # 2 corazones de absorción
+
+Sentencia:
+  cooldown: 20
+  resource-cost: 35
+  Mechanics:
+    - type: 'AREA_DAMAGE'
+      targeter: '@ENTITIESINRADIUS{R=5}'
+      parameters:
+        damage: 8
+    - type: 'POTION_AREA'
+      targeter: '@ENTITIESINRADIUS{R=5}'
+      parameters:
+        effect: 'WEAKNESS'
+        duration: 5
+        amplifier: 2
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'ENTITY_EVOKER_CAST_SPELL'
+
+AuraDeProteccion:
+  # Se activa al recibir daño
+  trigger: '~onDamaged'
+  chance: 0.20 # 20% de probabilidad
+  Mechanics:
+    - type: 'POTION'
+      targeter: '@SELF'
+      parameters:
+        effect: 'DAMAGE_RESISTANCE'
+        duration: 3
+        amplifier: 2
+    - type: 'MESSAGE'
+      parameters:
+        message: '&e¡Aura de Protección activada!'

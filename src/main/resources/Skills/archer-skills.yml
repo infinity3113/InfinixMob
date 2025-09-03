@@ -1,0 +1,76 @@
+FlechaVenenosa:
+  cooldown: 8
+  resource-cost: 20
+  Mechanics:
+    - type: 'POTION'
+      targeter: '@TARGET'
+      parameters:
+        effect: 'POISON'
+        duration: 5 # segundos
+        amplifier: 2
+    - type: 'SOUND'
+      targeter: '@TARGET'
+      parameters:
+        sound: 'ENTITY_SPIDER_DEATH'
+
+TiroRapido:
+  cooldown: 20
+  resource-cost: 30
+  Mechanics:
+    - type: 'POTION'
+      targeter: '@SELF'
+      parameters:
+        effect: 'SPEED' # Simula rapidez, podrías hacer un custom effect para velocidad de ataque
+        duration: 6
+        amplifier: 2
+    - type: 'MESSAGE'
+      parameters:
+        message: '&a¡Sientes una ráfaga de velocidad!'
+
+SaltoEvasivo:
+  cooldown: 12
+  resource-cost: 15
+  Mechanics:
+    # Empuja al jugador hacia atrás
+    - type: 'PUSH'
+      targeter: '@SELF'
+      parameters:
+        strength: -1.2 # Fuerza negativa para ir hacia atrás
+        vertical: 0.5
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'ENTITY_BAT_TAKEOFF'
+
+LluviaDeFlechas:
+  cooldown: 30
+  resource-cost: 50
+  Mechanics:
+    # Usa la mecánica que ya tienes creada
+    - type: 'ARROW_RAIN'
+      targeter: '@TARGET' # La lluvia caerá sobre el objetivo
+      parameters:
+        amount: 30
+        duration: 3 # segundos
+        radius: 6
+        pickup: false
+
+# --- HABILIDAD PASIVA ---
+
+OjoDeAguila:
+  # Se activa al atacar
+  trigger: '~onAttack'
+  chance: 0.10 # 10% de probabilidad
+  Mechanics:
+    - type: 'DAMAGE'
+      targeter: '@TARGET'
+      parameters:
+        amount: 5 # 2.5 corazones de daño extra
+    - type: 'MESSAGE'
+      parameters:
+        message: '&c¡Golpe crítico!'
+    - type: 'PARTICLE'
+      targeter: '@TARGET'
+      parameters:
+        particle: 'CRIT'
+        amount: 15

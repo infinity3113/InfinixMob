@@ -1,0 +1,88 @@
+BolaDeFuego:
+  cooldown: 5
+  resource-cost: 20
+  requires-target: true
+  Mechanics:
+    - type: 'DAMAGE'
+      targeter: '@TARGET'
+      parameters:
+        amount: 8
+    - type: 'PARTICLE'
+      targeter: '@TARGET'
+      parameters:
+        particle: 'FLAME'
+        amount: 25
+        speed: 0.1
+    - type: 'SOUND'
+      targeter: '@TARGET'
+      parameters:
+        sound: 'ENTITY_BLAZE_SHOOT'
+
+Teleport:
+  cooldown: 12
+  resource-cost: 25
+  requires-target: false
+  Mechanics:
+    - type: 'TELEPORT_LOOK'
+      targeter: '@SELF'
+      parameters:
+        max_distance: 4
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'ENTITY_ENDERMAN_TELEPORT'
+        volume: 1.0
+        pitch: 1.2
+
+NovaDeEscarcha:
+  cooldown: 18
+  resource-cost: 45
+  requires-target: false
+  Mechanics:
+    # CORRECCIÓN: Ahora solo hay una mecánica de POCIÓN_AREA.
+    # El targeter @ENTITIESINRADIUS por defecto ya excluye al lanzador.
+    - type: 'POTION_AREA'
+      targeter: '@ENTITIESINRADIUS{R=6}'
+      parameters:
+        effect: 'SLOW'
+        duration: 5
+        amplifier: 3
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'SNOWFLAKE'
+        amount: 100
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'BLOCK_GLASS_BREAK'
+
+EscudoArcano:
+  cooldown: 35
+  resource-cost: 60
+  requires-target: false
+  Mechanics:
+    - type: 'APPLY_SHIELD'
+      targeter: '@SELF'
+      parameters:
+        amount: 12
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'ENCHANTMENT_TABLE'
+        amount: 50
+
+# --- HABILIDAD PASIVA ---
+
+SabiduriaArcana:
+  trigger: '~onAttack'
+  chance: 0.15
+  Mechanics:
+    - type: 'MESSAGE'
+      targeter: '@SELF'
+      parameters:
+        message: '&bRecuperas 10 de Maná gracias a tu sabiduría.'
+    # - type: 'ADD_MANA'
+    #   targeter: '@SELF'
+    #   parameters:
+    #     amount: 10
