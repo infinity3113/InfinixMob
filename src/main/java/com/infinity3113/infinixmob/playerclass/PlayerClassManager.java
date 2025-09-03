@@ -12,16 +12,19 @@ import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
 
 public class PlayerClassManager {
 
     private final InfinixMob plugin;
     private final Map<String, PlayerClass> classes = new HashMap<>();
-    private final Map<UUID, PlayerData> playerData = new HashMap<>();
+    private final Map<UUID, PlayerData> playerData = new ConcurrentHashMap<>();
 
     public PlayerClassManager(InfinixMob plugin) {
         this.plugin = plugin;
@@ -57,6 +60,56 @@ public class PlayerClassManager {
     
     public Collection<PlayerClass> getAllClasses() {
         return classes.values();
+    }
+
+    public void loadPlayerData(Player player) {
+        File playerFile = new File(plugin.getDataFolder(), "playerdata/" + player.getUniqueId() + ".yml");
+        if (!playerFile.exists()) {
+            playerData.put(player.getUniqueId(), new PlayerData(player.getUniqueId()));
+            return;
+        }
+        FileConfiguration config = YamlConfiguration.loadConfiguration(playerFile);
+        String className = config.getString("class");
+        PlayerClass playerClass = className != null ? getClass(className) : null;
+        int level = config.getInt("level", 1);
+        double experience = config.getDouble("experience", 0);
+        double currentResource = config.getDouble("current-resource", 0);
+        int skillPoints = config.getInt("skill-points", 1);
+        
+        Map<String, Integer> skillLevels = new HashMap<>();
+        if (config.isConfigurationSection("skill-levels")) {
+            ConfigurationSection skillsSection = config.getConfigurationSection("skill-levels");
+            for (String key : skillsSection.getKeys(false)) {
+                skillLevels.put(key, skillsSection.getInt(key));
+            }
+        }
+
+        PlayerData data = new PlayerData(player.getUniqueId(), playerClass, level, experience, currentResource, skillPoints, skillLevels);
+        playerData.put(player.getUniqueId(), data);
+    }
+
+    public void savePlayerData(Player player) {
+        PlayerData data = playerData.get(player.getUniqueId());
+        if (data == null) return;
+
+        File playerFile = new File(plugin.getDataFolder(), "playerdata/" + player.getUniqueId() + ".yml");
+        FileConfiguration config = new YamlConfiguration();
+        data.saveToConfig(config);
+        try {
+            config.save(playerFile);
+        } catch (IOException e) {
+            plugin.getLogger().log(Level.SEVERE, "No se pudo guardar los datos del jugador " + player.getName(), e);
+        }
+    }
+
+    public void saveAllPlayerData() {
+        for (Player player : Bukkit.getOnlinePlayers()) {
+            savePlayerData(player);
+        }
+    }
+    
+    public void removePlayerData(Player player){
+        playerData.remove(player.getUniqueId());
     }
 
     public void startResourceRegenTask() {

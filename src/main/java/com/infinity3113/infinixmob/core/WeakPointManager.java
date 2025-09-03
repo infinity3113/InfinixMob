@@ -16,13 +16,10 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-/**
- * Gestiona la mecánica de Puntos Débiles (Weak Points).
- */
 public class WeakPointManager implements Listener {
 
     private final InfinixMob plugin;
-    private final Map<UUID, WeakPoint> activeWeakPoints = new ConcurrentHashMap<>(); // ArmorStand UUID -> WeakPoint
+    private final Map<UUID, WeakPoint> activeWeakPoints = new ConcurrentHashMap<>();
 
     public WeakPointManager(InfinixMob plugin) {
         this.plugin = plugin;
@@ -30,27 +27,17 @@ public class WeakPointManager implements Listener {
         startWeakPointTicker();
     }
 
-    /**
-     * Crea un punto débil en un jefe.
-     * @param owner El jefe que tendrá el punto débil.
-     * @param damageMultiplier Multiplicador de daño al atacar el punto.
-     * @param skillOnDamage Skill a ejecutar cuando se daña el punto.
-     * @param offset El desplazamiento relativo al jefe.
-     */
     public void createWeakPoint(LivingEntity owner, double damageMultiplier, String skillOnDamage, Vector offset) {
         Location spawnLoc = owner.getEyeLocation().add(offset);
         ArmorStand armorStand = (ArmorStand) owner.getWorld().spawnEntity(spawnLoc, EntityType.ARMOR_STAND);
         armorStand.setVisible(false);
         armorStand.setGravity(false);
-        armorStand.setMarker(true); // No tiene hitbox, se detecta por proximidad
+        armorStand.setMarker(true);
 
         WeakPoint wp = new WeakPoint(owner, damageMultiplier, skillOnDamage, offset, armorStand);
         activeWeakPoints.put(armorStand.getUniqueId(), wp);
     }
 
-    /**
-     * Ticker para mantener los puntos débiles pegados a sus dueños y mostrar partículas.
-     */
     private void startWeakPointTicker() {
         new BukkitRunnable() {
             @Override
@@ -66,37 +53,29 @@ public class WeakPointManager implements Listener {
                     }
                 });
             }
-        }.runTaskTimer(plugin, 0L, 2L); // Actualiza la posición muy rápido
+        }.runTaskTimer(plugin, 0L, 2L);
     }
 
     @EventHandler
     public void onEntityDamage(EntityDamageByEntityEvent event) {
-        // Detecta si un jugador ha golpeado cerca de un punto débil.
         for (WeakPoint wp : activeWeakPoints.values()) {
             if (event.getDamager().getLocation().distanceSquared(wp.getArmorStand().getLocation()) < 2.0) {
-                // Cancela el evento original para evitar dañar al ArmorStand.
                 event.setCancelled(true);
 
-                // Aplica el daño multiplicado al dueño del punto débil.
                 double finalDamage = event.getDamage() * wp.getDamageMultiplier();
                 wp.getOwner().damage(finalDamage, event.getDamager());
 
-                // Ejecuta la skill asociada, si existe.
                 if (wp.getSkillOnDamage() != null && !wp.getSkillOnDamage().isEmpty()) {
-                    plugin.getSkillManager().executeSkill(wp.getSkillOnDamage(), wp.getOwner(), event.getDamager());
+                    // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
+                    plugin.getSkillManager().executeSkill(wp.getSkillOnDamage(), wp.getOwner(), event.getDamager(), null);
                 }
                 
-                // Efecto visual de "golpeado"
                 wp.getArmorStand().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, wp.getArmorStand().getLocation(), 1);
                 break;
             }
         }
     }
     
-    /**
-     * Elimina todos los puntos débiles de una entidad.
-     * @param owner La entidad cuyos puntos débiles se eliminarán.
-     */
     public void removeWeakPointsFor(LivingEntity owner) {
         activeWeakPoints.entrySet().removeIf(entry -> {
             if (entry.getValue().getOwner().equals(owner)) {
@@ -107,9 +86,6 @@ public class WeakPointManager implements Listener {
         });
     }
 
-    /**
-     * Clase interna para almacenar la información de un punto débil.
-     */
     private static class WeakPoint {
         private final LivingEntity owner;
         private final double damageMultiplier;

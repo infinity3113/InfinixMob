@@ -2,15 +2,13 @@ package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
 import java.util.List;
 import java.util.Map;
 
-/**
- * Mecánica que invoca una estructura de bloques.
- */
 public class SummonStructureMechanic implements Mechanic {
     
     private final InfinixMob plugin;
@@ -20,7 +18,7 @@ public class SummonStructureMechanic implements Mechanic {
     }
 
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         if (target == null) return;
 
         List<String> structureData = (List<String>) params.get("structure");

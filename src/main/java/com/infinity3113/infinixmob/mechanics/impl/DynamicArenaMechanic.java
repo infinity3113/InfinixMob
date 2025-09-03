@@ -1,6 +1,7 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.mechanics.Mechanic;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -9,12 +10,9 @@ import org.bukkit.entity.LivingEntity;
 
 import java.util.Map;
 
-/**
- * Mecánica que modifica el terreno de la arena de combate.
- */
 public class DynamicArenaMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         String action = ((String) params.getOrDefault("action", "REPLACE")).toUpperCase();
         int radius = ((Number) params.getOrDefault("radius", 10)).intValue();
         

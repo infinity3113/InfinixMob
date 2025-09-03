@@ -6,6 +6,7 @@ com\infinity3113\infinixmob\targeters\impl\TargetEntitiesInRadius.class
 com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic$1$1.class
 com\infinity3113\infinixmob\listeners\ItemListener$3.class
+com\infinity3113\infinixmob\gui\SkillTreeGUI.class
 com\infinity3113\infinixmob\mechanics\impl\PushMechanic.class
 com\infinity3113\infinixmob\listeners\ChatListener.class
 com\infinity3113\infinixmob\core\BlockManager$TemporaryBlock.class
@@ -29,6 +30,7 @@ com\infinity3113\infinixmob\gui\editor\ItemEditorGUI.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\HungerMechanic.class
 com\infinity3113\infinixmob\listeners\SpawnerListener.class
+com\infinity3113\infinixmob\InfinixMob$PlayerConnectionListener.class
 com\infinity3113\infinixmob\targeters\Targeter.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportRandomMechanic.class
 com\infinity3113\infinixmob\core\MobManager$1.class
@@ -119,6 +121,7 @@ com\infinity3113\infinixmob\core\WeakPointManager$1.class
 com\infinity3113\infinixmob\core\WeakPointManager$WeakPoint.class
 com\infinity3113\infinixmob\mechanics\Mechanic.class
 com\infinity3113\infinixmob\spawners\Spawner.class
+com\infinity3113\infinixmob\utils\SkillValueCalculator.class
 com\infinity3113\infinixmob\mechanics\impl\SummonMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\SpawnWebMechanic.class
 com\infinity3113\infinixmob\core\BlockManager.class

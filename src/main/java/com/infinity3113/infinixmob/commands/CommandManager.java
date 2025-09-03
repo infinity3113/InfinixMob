@@ -2,6 +2,7 @@ package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.gui.SpawnerListGui;
+import com.infinity3113.infinixmob.gui.SkillTreeGUI; // <-- NUEVA IMPORTACIÓN
 import com.infinity3113.infinixmob.gui.editor.ItemTypeSelectorGUI;
 import com.infinity3113.infinixmob.playerclass.PlayerClass;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
@@ -39,7 +40,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         this.plugin = plugin;
     }
     
-    // ... (tus métodos loadLanguage, getMsg, getRawMsg no cambian) ...
     public void loadLanguage() {
         String langCode = plugin.getConfig().getString("language", "en");
         File langFile = new File(plugin.getDataFolder(), "lang/" + langCode + ".yml");
@@ -68,64 +68,59 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return handleInfinixMobCommand(sender, args);
         } else if (command.getName().equalsIgnoreCase("cast")) {
             return handlePlayerCastCommand(sender, args);
+        } else if (command.getName().equalsIgnoreCase("skills")) { // <-- NUEVO COMANDO
+            if (sender instanceof Player) {
+                new SkillTreeGUI(plugin, (Player) sender).open();
+            }
+            return true;
         }
         return false;
     }
     
-    // --- ESTE ES EL MÉTODO QUE VAMOS A DEPURAR ---
     private boolean handlePlayerCastCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) {
             sender.sendMessage(getMsg("player-only"));
             return true;
         }
         Player player = (Player) sender;
-        
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] Comando /cast ejecutado.");
 
         if (args.length < 1) {
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: No hay argumentos. Mostrando uso.");
             sender.sendMessage(getMsg("usage-cast-player"));
             return true;
         }
-        
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] Argumento detectado: " + args[0]);
 
         PlayerData pData = plugin.getPlayerClassManager().getPlayerData(player);
         PlayerClass pClass = pData.getPlayerClass();
 
         if (pClass == null) {
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: El jugador no tiene clase seleccionada.");
             player.sendMessage(getMsg("cast-no-class"));
             return true;
         }
         
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] Clase del jugador: " + pClass.getId());
-
         int slot;
         try {
             slot = Integer.parseInt(args[0]);
             if (slot < 1 || slot > 4) throw new NumberFormatException();
         } catch (NumberFormatException e) {
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: El argumento no es un número entre 1 y 4.");
             player.sendMessage(getMsg("usage-cast-player"));
             return true;
         }
-        
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] Slot seleccionado: " + slot);
 
         String skillId = pClass.getSkills().get(slot);
         if (skillId == null) {
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: No se encontró habilidad para el slot " + slot);
             player.sendMessage(getMsg("cast-no-skill-in-slot").replace("%slot%", String.valueOf(slot)));
             return true;
         }
         
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] ID de la habilidad: " + skillId);
+        if(pData.getSkillLevel(skillId) == 0){
+             player.sendMessage(ChatColor.RED + "No has aprendido esta habilidad todavía.");
+             return true;
+        }
+
 
         if (plugin.getCooldownManager().isOnCooldown(player.getUniqueId(), skillId)) {
             long remaining = plugin.getCooldownManager().getRemainingCooldown(player.getUniqueId(), skillId);
             String timeLeft = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(remaining) + 1);
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: Habilidad en enfriamiento.");
             player.sendMessage(getMsg("cast-on-cooldown").replace("%time%", timeLeft));
             return true;
         }
@@ -138,11 +133,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         
         ConfigurationSection skillConfig = skillConfigOpt.get();
         double resourceCost = skillConfig.getDouble("resource-cost", 0);
-        
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] Coste de recurso: " + resourceCost + ". Recurso actual: " + pData.getCurrentResource());
 
         if (pData.getCurrentResource() < resourceCost) {
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: Recursos insuficientes.");
             player.sendMessage(getMsg("cast-no-resource").replace("%resource_type%", pClass.getResourceType().toLowerCase()));
             return true;
         }
@@ -152,28 +144,21 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         
         boolean requiresTarget = skillConfig.getBoolean("requires-target", true);
         
-        player.sendMessage(ChatColor.YELLOW + "[DEBUG] Habilidad requiere objetivo: " + requiresTarget + ". Objetivo encontrado: " + (target != null ? target.getName() : "Ninguno"));
-
         if (requiresTarget && target == null) {
-            player.sendMessage(ChatColor.YELLOW + "[DEBUG] Falla: Se requiere objetivo pero no se encontró.");
             player.sendMessage(getMsg("no-target-found"));
             return true;
         }
         
         Entity finalTarget = target != null ? target : player;
         
-        player.sendMessage(ChatColor.GREEN + "[DEBUG] ¡ÉXITO! Lanzando habilidad '" + skillId + "' sobre " + finalTarget.getName());
-
         pData.setCurrentResource(pData.getCurrentResource() - resourceCost);
         int cooldown = skillConfig.getInt("cooldown", 0);
         plugin.getCooldownManager().setCooldown(player.getUniqueId(), skillId, cooldown);
         
-        plugin.getSkillManager().executeSkill(skillId, player, finalTarget);
+        plugin.getSkillManager().executeSkill(skillId, player, finalTarget, pData);
         return true;
     }
 
-    // ... (El resto de tus métodos handleInfinixMobCommand, handleAdminCast, handleClassCommand, onTabComplete) ...
-    // ... DEBEN ESTAR AQUÍ. No los borres, solo reemplaza el archivo completo. ...
     private boolean handleInfinixMobCommand(CommandSender sender, String[] args) {
         if (args.length == 0 || args[0].equalsIgnoreCase("help")) {
             sender.sendMessage(getRawMsg("help-header"));
@@ -336,7 +321,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         
         if (target == null) { caster.sendMessage(getMsg("no-target-found")); return; }
         
-        plugin.getSkillManager().executeSkill(skillId, caster, target);
+        plugin.getSkillManager().executeSkill(skillId, caster, target, plugin.getPlayerClassManager().getPlayerData(caster));
         caster.sendMessage(getMsg("cast-success").replace("%skill%", skillId).replace("%target%", target.getName()));
     }
     private void handleClassCommand(CommandSender sender, String[] args) {

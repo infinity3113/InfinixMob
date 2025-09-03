@@ -1,6 +1,7 @@
 package com.infinity3113.infinixmob.core;
 
 import com.infinity3113.infinixmob.InfinixMob;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,7 +18,6 @@ import java.util.Set;
 public class SkillManager {
 
     private final InfinixMob plugin;
-    // MODIFICACIÓN: Guardamos toda la configuración de la skill, no solo las mecánicas.
     private final Map<String, ConfigurationSection> skillConfigs = new HashMap<>();
 
     public SkillManager(InfinixMob plugin) {
@@ -25,7 +25,7 @@ public class SkillManager {
     }
 
     public void loadSkills() {
-        skillConfigs.clear(); // MODIFICACIÓN
+        skillConfigs.clear();
         File skillsFolder = new File(plugin.getDataFolder(), "Skills");
         if (!skillsFolder.exists()) {
             skillsFolder.mkdirs();
@@ -42,12 +42,11 @@ public class SkillManager {
                         ConfigurationSection skillSection = skillConfig.getConfigurationSection(skillId);
                         if (skillSection == null) continue;
 
-                        if (!skillSection.isList("Mechanics")) { // Verificación simple
+                        if (!skillSection.isList("Mechanics")) {
                             plugin.getLogger().warning("Skill '" + skillId + "' en el archivo '" + skillFile.getName() + "' no tiene una sección de 'Mechanics'. Saltando.");
                             continue;
                         }
-
-                        // MODIFICACIÓN: Guardamos la sección completa
+                        
                         skillConfigs.put(skillId, skillSection);
                         plugin.getLogger().info("Cargada Skill: " + skillId + " desde " + skillFile.getName());
                     }
@@ -59,12 +58,12 @@ public class SkillManager {
         }
     }
 
-    // NUEVO MÉTODO para obtener la configuración de una skill
     public Optional<ConfigurationSection> getSkillConfig(String skillId) {
         return Optional.ofNullable(skillConfigs.get(skillId));
     }
 
-    public void executeSkill(String skillId, LivingEntity caster, Entity initialTarget) {
+    // MÉTODO CORREGIDO
+    public void executeSkill(String skillId, LivingEntity caster, Entity initialTarget, PlayerData playerData) {
         ConfigurationSection skillSection = skillConfigs.get(skillId);
         if (skillSection == null) {
             plugin.getLogger().warning("Se intentó ejecutar una skill inexistente: " + skillId);
@@ -86,8 +85,11 @@ public class SkillManager {
                 if (rawParams instanceof Map) {
                     parametersMap.putAll((Map<String, Object>) rawParams);
                 }
+                
+                parametersMap.put("skillId", skillId);
 
-                plugin.getMechanicManager().executeMechanic(mechanicType, caster, finalTarget, parametersMap);
+                // La llamada ahora coincide con la firma del método en MechanicManager
+                plugin.getMechanicManager().executeMechanic(mechanicType, caster, finalTarget, parametersMap, playerData);
             }
         }
     }

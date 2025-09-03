@@ -10,7 +10,9 @@ commands:
     description: Comando principal de InfinixMob.
     aliases: [im]
     usage: /<command> [help|spawn|item|skills]
-  # --- AÑADE ESTE NUEVO COMANDO AQUÍ ---
   cast:
     description: Lanza una habilidad de tu clase.
     usage: /<command> <1-4>
+  skills:
+    description: Abre el menú de habilidades de tu clase.
+    aliases: [hab]

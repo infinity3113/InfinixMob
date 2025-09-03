@@ -127,7 +127,8 @@ public class MobListener implements Listener {
 
         String skillId = (String) rule.get("skill");
         if (skillId != null) {
-            plugin.getSkillManager().executeSkill(skillId, caster, target);
+            // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
+            plugin.getSkillManager().executeSkill(skillId, caster, target, null);
         }
     }
     
@@ -152,7 +153,8 @@ public class MobListener implements Listener {
         targetDummy.setVisible(false);
         targetDummy.setGravity(false);
         targetDummy.setMarker(true);
-        plugin.getSkillManager().executeSkill(skillId, owner, targetDummy);
+        // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
+        plugin.getSkillManager().executeSkill(skillId, owner, targetDummy, null);
         plugin.getServer().getScheduler().runTaskLater(plugin, targetDummy::remove, 20L);
     }
 

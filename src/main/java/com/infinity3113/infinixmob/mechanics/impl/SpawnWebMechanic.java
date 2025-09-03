@@ -1,17 +1,15 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.mechanics.Mechanic;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 
-/**
- * Mecánica que coloca una telaraña en la ubicación del objetivo.
- */
 public class SpawnWebMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         if (target != null) {
             target.getLocation().getBlock().setType(Material.COBWEB);
         }

@@ -2,6 +2,7 @@ package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -10,9 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-/**
- * Mecánica que vincula las almas de varios objetivos.
- */
 public class SoulLinkMechanic implements Mechanic {
 
     private final InfinixMob plugin;
@@ -22,9 +20,7 @@ public class SoulLinkMechanic implements Mechanic {
     }
 
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
-        // Esta mecánica necesita un selector que devuelva múltiples objetivos.
-        // El targeter se define en el YML, aquí solo recibimos el resultado.
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         String targeterStr = (String) params.get("targeter");
         if (targeterStr == null) return;
 

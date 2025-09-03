@@ -4,9 +4,15 @@ import com.google.gson.Gson;
 import com.infinity3113.infinixmob.commands.CommandManager;
 import com.infinity3113.infinixmob.core.*;
 import com.infinity3113.infinixmob.listeners.*;
-import com.infinity3113.infinixmob.playerclass.PlayerClassManager; // <-- NUEVA IMPORTACIÓN
+import com.infinity3113.infinixmob.playerclass.PlayerClassManager;
+import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
@@ -31,11 +37,8 @@ public final class InfinixMob extends JavaPlugin {
     private BlockManager blockManager;
     private CommandManager commandManager;
     private RecipeManager recipeManager;
-    
-    // --- NUEVOS MANAGERS ---
     private PlayerClassManager playerClassManager;
     private CooldownManager cooldownManager;
-    // -----------------------
 
     private MobListener mobListener;
     private BukkitTask timerSkillTask;
@@ -68,11 +71,9 @@ public final class InfinixMob extends JavaPlugin {
 
         saveResource("StatusEffects/effects.yml", false);
 
-        // --- Guardar archivos de clases ---
         saveResource("classes/mage.yml", false);
         saveResource("classes/paladin.yml", false);
         saveResource("classes/archer.yml", false);
-        // --------------------------------
 
         // Inicializar todos los managers
         this.chatInputManager = new ChatInputManager();
@@ -89,15 +90,14 @@ public final class InfinixMob extends JavaPlugin {
         this.weakPointManager = new WeakPointManager(this);
         this.blockManager = new BlockManager(this);
         this.recipeManager = new RecipeManager(this);
-
-        // --- INICIALIZAR NUEVOS MANAGERS ---
         this.playerClassManager = new PlayerClassManager(this);
         this.cooldownManager = new CooldownManager();
-        // -----------------------------------
 
         this.commandManager = new CommandManager(this);
         getCommand("infinixmob").setExecutor(commandManager);
         getCommand("infinixmob").setTabCompleter(commandManager);
+        getCommand("cast").setExecutor(commandManager);
+        getCommand("skills").setExecutor(commandManager); // <-- LÍNEA AÑADIDA
         
         // Registrar todos los listeners
         this.mobListener = new MobListener(this);
@@ -108,18 +108,32 @@ public final class InfinixMob extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ItemListener(this), this);
         getServer().getPluginManager().registerEvents(new ItemUpdaterListener(this), this);
         getServer().getPluginManager().registerEvents(new SmithingListener(this), this);
-
-        // --- REGISTRAR NUEVO LISTENER ---
         getServer().getPluginManager().registerEvents(new ClassListener(this), this);
-        // --------------------------------
+        getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
 
         reload();
         
-        // Registrar las recetas personalizadas después de cargar todo
         this.recipeManager.registerCustomRecipes();
 
         getLogger().info("InfinixMob ha sido activado!");
     }
+    
+    public class PlayerConnectionListener implements Listener {
+        @EventHandler
+        public void onPlayerJoin(PlayerJoinEvent event) {
+            Player player = event.getPlayer();
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                playerClassManager.loadPlayerData(player);
+            }, 1L);
+        }
+
+        @EventHandler
+        public void onPlayerQuit(PlayerQuitEvent event) {
+            playerClassManager.savePlayerData(event.getPlayer());
+            playerClassManager.removePlayerData(event.getPlayer());
+        }
+    }
+
 
     public void startTimerSkillTicker() {
         if (timerSkillTask != null) {
@@ -141,6 +155,9 @@ public final class InfinixMob extends JavaPlugin {
 
     @Override
     public void onDisable() {
+        if (playerClassManager != null) {
+            playerClassManager.saveAllPlayerData();
+        }
         getLogger().info("InfinixMob ha sido desactivado.");
     }
     
@@ -156,11 +173,9 @@ public final class InfinixMob extends JavaPlugin {
         this.mobManager.loadMobs();
         this.skillManager.loadSkills();
         
-        // --- RECARGAR CLASES ---
         if (this.playerClassManager != null) {
             this.playerClassManager.loadClasses();
         }
-        // -------------------------
 
         this.spawnerManager.startSpawnerTask();
         this.statusEffectManager.startEffectTicker();
@@ -187,12 +202,8 @@ public final class InfinixMob extends JavaPlugin {
     public WeakPointManager getWeakPointManager() { return weakPointManager; }
     public BlockManager getBlockManager() { return blockManager; }
     public MobListener getMobListener() { return mobListener; }
-    
-    // --- NUEVOS GETTERS ---
     public PlayerClassManager getPlayerClassManager() { return playerClassManager; }
     public CooldownManager getCooldownManager() { return cooldownManager; }
-    // ----------------------
-    
     public Gson getGson() {
         return gson;
     }

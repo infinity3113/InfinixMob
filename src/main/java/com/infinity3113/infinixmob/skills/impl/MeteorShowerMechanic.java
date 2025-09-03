@@ -1,6 +1,7 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
@@ -15,7 +16,7 @@ public class MeteorShowerMechanic implements Mechanic {
     private final InfinixMob plugin;
     public MeteorShowerMechanic(InfinixMob plugin) { this.plugin = plugin; }
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         if (target == null) return;
         int amount = ((Number) params.getOrDefault("amount", 10)).intValue();
         int durationTicks = ((Number) params.getOrDefault("duration", 3)).intValue() * 20;

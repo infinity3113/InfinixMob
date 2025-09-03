@@ -3,6 +3,7 @@ package com.infinity3113.infinixmob.core;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.mechanics.impl.*;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -46,13 +47,13 @@ public class MechanicManager {
         registeredMechanics.put("CUSTOM_STATUS_EFFECT", new CustomStatusEffectMechanic(plugin));
         registeredMechanics.put("THREAT", new ThreatMechanic(plugin));
         registeredMechanics.put("IGNITE", new IgniteMechanic());
-        registeredMechanics.put("FREEZE", new FreezeMechanic(plugin)); // FreezeMechanic no fue proporcionada
+        registeredMechanics.put("FREEZE", new FreezeMechanic(plugin));
         registeredMechanics.put("VAMPIRISM", new VampirismMechanic());
         registeredMechanics.put("LAUNCH", new LaunchMechanic());
         registeredMechanics.put("SWAP", new SwapMechanic());
         registeredMechanics.put("EXPLOSION", new ExplosionMechanic());
         registeredMechanics.put("BLINDNESS", new BlindnessMechanic());
-        registeredMechanics.put("SPAWN_WEB", new SpawnWebMechanic()); // SpawnWebMechanic no fue proporcionada
+        registeredMechanics.put("SPAWN_WEB", new SpawnWebMechanic());
         registeredMechanics.put("AREA_DAMAGE", new AreaDamageMechanic());
         registeredMechanics.put("POTION_AREA", new PotionAreaMechanic());
         registeredMechanics.put("HUNGER", new HungerMechanic());
@@ -67,13 +68,14 @@ public class MechanicManager {
         registeredMechanics.put("SUMMON_STRUCTURE", new SummonStructureMechanic(plugin));
         registeredMechanics.put("DYNAMIC_ARENA", new DynamicArenaMechanic());
         registeredMechanics.put("SILENT_REMOVE", new SilentRemoveMechanic());
-		registeredMechanics.put("TELEPORT_LOOK", new TeleportLookMechanic()); // <-- AÑADE ESTA LÍNEA
+		registeredMechanics.put("TELEPORT_LOOK", new TeleportLookMechanic());
     }
 
-    public void executeMechanic(String type, LivingEntity caster, Entity target, Map<String, Object> params) {
+    // MÉTODO CORREGIDO
+    public void executeMechanic(String type, LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         Mechanic mechanic = registeredMechanics.get(type.toUpperCase());
         if (mechanic != null) {
-            mechanic.execute(caster, target, params);
+            mechanic.execute(caster, target, params, playerData); // Ahora pasa el PlayerData
         } else {
             plugin.getLogger().warning("Unknown mechanic type: " + type);
         }

@@ -40,6 +40,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\SmithingListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetPlayersInRadius.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\BlockManager.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\SkillTreeGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\DamageMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemBrowserGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\SoundMechanic.java
@@ -89,6 +90,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemTypeSelectorGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mobs\CustomMob.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\utils\SkillValueCalculator.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\playerclass\PlayerClass.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\MobSelectionGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\GUIListener.java

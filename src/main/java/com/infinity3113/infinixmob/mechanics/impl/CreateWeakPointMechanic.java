@@ -2,15 +2,13 @@ package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
+import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.util.Vector;
 
 import java.util.Map;
 
-/**
- * Mecánica que crea un punto débil en una entidad.
- */
 public class CreateWeakPointMechanic implements Mechanic {
 
     private final InfinixMob plugin;
@@ -20,7 +18,7 @@ public class CreateWeakPointMechanic implements Mechanic {
     }
 
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         if (target instanceof LivingEntity) {
             double damageMultiplier = ((Number) params.getOrDefault("damage_multiplier", 1.5)).doubleValue();
             String skillOnDamage = (String) params.get("skill_on_damage");

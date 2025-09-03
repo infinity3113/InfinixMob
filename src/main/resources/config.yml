@@ -1,3 +1,4 @@
+language: es
 item-revision:
   # Define qué datos se deben conservar cuando un ítem se actualiza a una nueva versión.
   keep-data:
