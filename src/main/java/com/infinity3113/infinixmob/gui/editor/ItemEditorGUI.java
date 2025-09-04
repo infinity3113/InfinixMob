@@ -70,6 +70,16 @@ public class ItemEditorGUI extends MenuGUI {
             new ItemLoreEditorGUI(plugin, player, customItem, this).open();
             return;
         }
+
+        if (displayName.equals("Amplificadores de Habilidad")) {
+            new SkillModifierGUI(plugin, player, customItem, this).open();
+            return;
+        }
+
+        if (displayName.equals("Daño Elemental")) {
+            new ElementalDamageGUI(plugin, player, customItem, this).open();
+            return;
+        }
         
         if (displayName.equals("Estilo de Mano")) {
             String currentStyle = customItem.getConfig().getString("hand-style", "ONE_HANDED");
@@ -87,7 +97,7 @@ public class ItemEditorGUI extends MenuGUI {
         
         if (key.equalsIgnoreCase("revision-id")) {
             editIntValue(key, displayName);
-        } else if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.") || key.startsWith("skill-modifiers.")))) {
+        } else if (currentValue instanceof Number || (currentValue == null && key.startsWith("stats."))) {
             editDoubleValue(key, displayName);
         } else {
             editStringValue(key, displayName);
@@ -123,25 +133,6 @@ public class ItemEditorGUI extends MenuGUI {
                 keysToShow.add("stats." + key);
             }
         }
-        
-        if (!customItem.getConfig().isConfigurationSection("elemental-damage")) {
-            customItem.getConfig().createSection("elemental-damage");
-        }
-        ConfigurationSection elementsConfig = plugin.getItemManager().getElementsConfig();
-        if (elementsConfig != null) {
-            for (String key : elementsConfig.getKeys(false)) {
-                keysToShow.add("elemental-damage." + key);
-            }
-        }
-        
-        // --- NUEVA LÓGICA PARA MOSTRAR SKILL MODIFIERS EN LA GUI ---
-        if (!customItem.getConfig().isConfigurationSection("skill-modifiers")) {
-            customItem.getConfig().createSection("skill-modifiers");
-        }
-        for(String skillId : plugin.getSkillManager().getLoadedSkillNames()){
-            keysToShow.add("skill-modifiers." + skillId);
-        }
-        // --- FIN DE LA NUEVA LÓGICA ---
 
         keysToShow = keysToShow.stream().distinct().collect(Collectors.toList());
 
@@ -156,7 +147,6 @@ public class ItemEditorGUI extends MenuGUI {
                 value = customItem.getConfig().getInt(key, 0);
             }
 
-
             List<String> lore = new ArrayList<>();
             lore.add(ChatColor.GRAY + "Valor: " + ChatColor.YELLOW + value.toString());
             lore.add("");
@@ -170,6 +160,10 @@ public class ItemEditorGUI extends MenuGUI {
         inventory.setItem(23, createGuiItem(Material.LEATHER_HORSE_ARMOR, ChatColor.AQUA + "Estilo de Mano", ChatColor.GRAY + "Valor: " + ChatColor.YELLOW + handStyleName, "", ChatColor.AQUA + "Click para cambiar"));
 
         inventory.setItem(22, createGuiItem(Material.BOOK, ChatColor.AQUA + "Editar Lore", ChatColor.GRAY + "Click para añadir/quitar lore."));
+        
+        inventory.setItem(24, createGuiItem(Material.ENCHANTED_BOOK, ChatColor.AQUA + "Amplificadores de Habilidad", ChatColor.GRAY + "Click para editar los bonos", ChatColor.GRAY + "de daño para habilidades."));
+        inventory.setItem(25, createGuiItem(Material.BLAZE_POWDER, ChatColor.AQUA + "Daño Elemental", ChatColor.GRAY + "Click para editar los valores", ChatColor.GRAY + "de daño elemental."));
+
         inventory.setItem(45, createGuiItem(Material.BARRIER, ChatColor.RED + "Volver a la Lista"));
         inventory.setItem(53, createGuiItem(Material.LIME_DYE, ChatColor.GREEN + "Guardar Cambios"));
 
@@ -182,7 +176,7 @@ public class ItemEditorGUI extends MenuGUI {
         plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, "string"));
     }
 
-    private void editDoubleValue(String key, String friendlyName) {
+    protected void editDoubleValue(String key, String friendlyName) {
         player.closeInventory();
         player.sendMessage(ChatColor.GOLD + "Escribe el nuevo valor numérico para '" + friendlyName + "'. Escribe 'cancelar' para abortar.");
         plugin.getChatInputManager().requestInput(player, input -> handleInput(key, friendlyName, input, "double"));
@@ -234,21 +228,19 @@ public class ItemEditorGUI extends MenuGUI {
         }.runTask(plugin);
     }
 
-    private String getFriendlyNameForKey(String key) {
+    protected String getFriendlyNameForKey(String key) {
         String[] parts = key.split("\\.");
         String lastPart = parts[parts.length - 1].replace("-", " ");
-        
+
         if (key.equalsIgnoreCase("revision-id")) {
             return "ID de Revisión";
         }
-        
-        // --- NUEVA LÓGICA PARA SKILL MODIFIERS ---
+
         if (key.startsWith("skill-modifiers.")) {
             return "Daño: " + plugin.getSkillManager().getSkillConfig(lastPart)
                 .map(cfg -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', cfg.getString("display-name"))))
                 .orElse(lastPart);
         }
-        // --- FIN ---
 
         String friendlyName = plugin.getItemManager().getStatsConfig().getString("display-names." + lastPart.toLowerCase(), null);
         if (friendlyName != null) {
@@ -257,9 +249,9 @@ public class ItemEditorGUI extends MenuGUI {
         return Character.toUpperCase(lastPart.charAt(0)) + lastPart.substring(1);
     }
 
-    private Material getIconForKey(String key) {
+    protected Material getIconForKey(String key) {
         if (key.startsWith("skill-modifiers.")) {
-            return Material.ENCHANTED_BOOK; // Icono para todos los modificadores de habilidad
+            return Material.ENCHANTED_BOOK;
         }
         
         String simpleKey = key.contains(".") ? key.substring(key.lastIndexOf('.') + 1) : key;

@@ -30,6 +30,7 @@ com\infinity3113\infinixmob\gui\editor\ItemEditorGUI.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\HungerMechanic.class
 com\infinity3113\infinixmob\listeners\SpawnerListener.class
+com\infinity3113\infinixmob\gui\editor\SkillModifierGUI.class
 com\infinity3113\infinixmob\InfinixMob$PlayerConnectionListener.class
 com\infinity3113\infinixmob\targeters\Targeter.class
 com\infinity3113\infinixmob\mechanics\impl\TeleportRandomMechanic.class
@@ -101,6 +102,7 @@ com\infinity3113\infinixmob\mechanics\impl\ParticleMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\MessageMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\PotionAreaMechanic.class
 com\infinity3113\infinixmob\gui\SpawnerListGui.class
+com\infinity3113\infinixmob\gui\editor\ElementalDamageGUI.class
 com\infinity3113\infinixmob\playerclass\PlayerData.class
 com\infinity3113\infinixmob\gui\SpawnerGUI$1.class
 com\infinity3113\infinixmob\mechanics\impl\ItemCooldownMechanic.class
