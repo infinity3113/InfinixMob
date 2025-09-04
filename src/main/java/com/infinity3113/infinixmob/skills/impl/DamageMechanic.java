@@ -49,7 +49,7 @@ public class DamageMechanic implements Mechanic {
             amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
         }
 
-        // --- NUEVA LÓGICA PARA MODIFICADORES DE HABILIDAD ---
+        // --- LÓGICA PARA MODIFICADORES DE HABILIDAD ---
         if (caster instanceof Player && skillId != null) {
             Player player = (Player) caster;
             double bonusDamage = 0;
