@@ -1,5 +1,8 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
+import com.google.gson.reflect.TypeToken;
+import com.infinity3113.infinixmob.InfinixMob;
+import com.infinity3113.infinixmob.items.CustomItem;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
@@ -9,37 +12,79 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataType;
 
+import java.lang.reflect.Type;
 import java.util.Map;
 
 public class DamageMechanic implements Mechanic {
     @Override
     public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
-        if (target instanceof LivingEntity) {
-            double amount;
-            Object amountObj = params.get("amount");
+        if (!(target instanceof LivingEntity)) {
+            return;
+        }
 
-            if (amountObj instanceof Map) {
-                ConfigurationSection amountSection;
-                if (amountObj instanceof ConfigurationSection) {
-                    amountSection = (ConfigurationSection) amountObj;
-                } else {
-                    FileConfiguration tempConfig = new YamlConfiguration();
-                    amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
-                }
-                
-                int skillLevel = 1;
-                if (caster instanceof Player && playerData != null) {
-                    String skillId = (String) params.get("skillId");
-                    if (skillId != null) {
-                        skillLevel = playerData.getSkillLevel(skillId);
-                    }
-                }
-                amount = SkillValueCalculator.calculate(amountSection, skillLevel);
+        double amount;
+        Object amountObj = params.get("amount");
+        String skillId = (String) params.get("skillId");
+
+        if (amountObj instanceof Map) {
+            ConfigurationSection amountSection;
+            if (amountObj instanceof ConfigurationSection) {
+                amountSection = (ConfigurationSection) amountObj;
             } else {
-                amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
+                FileConfiguration tempConfig = new YamlConfiguration();
+                amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
             }
+            
+            int skillLevel = 1;
+            if (caster instanceof Player && playerData != null) {
+                if (skillId != null) {
+                    skillLevel = playerData.getSkillLevel(skillId);
+                }
+            }
+            amount = SkillValueCalculator.calculate(amountSection, skillLevel);
+        } else {
+            amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
+        }
+
+        // --- NUEVA LÓGICA PARA MODIFICADORES DE HABILIDAD ---
+        if (caster instanceof Player && skillId != null) {
+            Player player = (Player) caster;
+            double bonusDamage = 0;
+            for (ItemStack item : player.getInventory().getArmorContents()) {
+                bonusDamage += getBonusDamageFromItem(item, skillId);
+            }
+            bonusDamage += getBonusDamageFromItem(player.getInventory().getItemInMainHand(), skillId);
+            bonusDamage += getBonusDamageFromItem(player.getInventory().getItemInOffHand(), skillId);
+            amount += bonusDamage;
+        }
+        // --- FIN ---
+
+        boolean addWeaponDamage = (boolean) params.getOrDefault("sumar_daño_arma", false);
+
+        if (caster instanceof Player && !addWeaponDamage) {
+            Player playerCaster = (Player) caster;
+            ItemStack weapon = playerCaster.getInventory().getItemInMainHand();
+            playerCaster.getInventory().setItemInMainHand(null);
+            ((LivingEntity) target).damage(amount, caster);
+            playerCaster.getInventory().setItemInMainHand(weapon);
+        } else {
             ((LivingEntity) target).damage(amount, caster);
         }
+    }
+
+    private double getBonusDamageFromItem(ItemStack item, String skillId) {
+        if (item == null || item.getItemMeta() == null) {
+            return 0;
+        }
+        String json = item.getItemMeta().getPersistentDataContainer().get(CustomItem.SKILL_MODIFIERS_KEY, PersistentDataType.STRING);
+        if (json == null) {
+            return 0;
+        }
+        Type type = new TypeToken<Map<String, Double>>(){}.getType();
+        Map<String, Double> modifiers = InfinixMob.getPlugin().getGson().fromJson(json, type);
+        return modifiers.getOrDefault(skillId.toLowerCase(), 0.0);
     }
 }

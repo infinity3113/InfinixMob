@@ -96,6 +96,7 @@ com\infinity3113\infinixmob\core\RecipeManager$1.class
 com\infinity3113\infinixmob\core\StatusEffectManager$ActiveEffect.class
 com\infinity3113\infinixmob\listeners\ClassListener.class
 com\infinity3113\infinixmob\core\BlockManager$2.class
+com\infinity3113\infinixmob\mechanics\impl\DamageMechanic$1.class
 com\infinity3113\infinixmob\mechanics\impl\ParticleMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\MessageMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\PotionAreaMechanic.class

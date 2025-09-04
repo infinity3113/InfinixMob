@@ -36,6 +36,8 @@ public class CustomItem {
     public static final NamespacedKey STATS_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_stats");
     public static final NamespacedKey ELEMENTAL_DAMAGE_KEY = new NamespacedKey(InfinixMob.getPlugin(), "item_elemental_damage");
     public static final NamespacedKey WEAKNESSES_KEY = new NamespacedKey(InfinixMob.getPlugin(), "elemental_weaknesses");
+    // --- NUEVA LÍNEA ---
+    public static final NamespacedKey SKILL_MODIFIERS_KEY = new NamespacedKey(InfinixMob.getPlugin(), "skill_modifiers");
 
 
     public CustomItem(InfinixMob plugin, String id, ConfigurationSection config) {
@@ -82,7 +84,16 @@ public class CustomItem {
         }
         meta.getPersistentDataContainer().set(ELEMENTAL_DAMAGE_KEY, PersistentDataType.STRING, gson.toJson(elementalDamageMap));
         
-        // Declaración de variables movida a la parte superior del método
+        // --- NUEVA LÓGICA PARA SKILL MODIFIERS ---
+        Map<String, Double> skillModifiersMap = new HashMap<>();
+        if (config.isConfigurationSection("skill-modifiers")) {
+            ConfigurationSection skillModifiersSection = config.getConfigurationSection("skill-modifiers");
+            for (String skillId : skillModifiersSection.getKeys(false)) {
+                skillModifiersMap.put(skillId.toLowerCase(), skillModifiersSection.getDouble(skillId));
+            }
+        }
+        meta.getPersistentDataContainer().set(SKILL_MODIFIERS_KEY, PersistentDataType.STRING, gson.toJson(skillModifiersMap));
+        
         String rarityColor = raritiesConfig.getString(rarityKey.toLowerCase() + ".color", "&7");
         String rarityName = raritiesConfig.getString(rarityKey.toLowerCase() + ".display-name", "Común");
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', rarityColor + config.getString("display-name")));
@@ -91,13 +102,13 @@ public class CustomItem {
         List<String> rawLore = new ArrayList<>();
         List<String> statsLines = new ArrayList<>();
         List<String> elementsLines = new ArrayList<>();
-        List<String> handStyleLines = new ArrayList<>(); // Nueva lista para el estilo de mano
+        List<String> skillModifiersLines = new ArrayList<>(); // <-- NUEVA LÍNEA
+        List<String> handStyleLines = new ArrayList<>();
         List<String> customLoreLines = new ArrayList<>();
         String rarityLine = null;
 
         ConfigurationSection entries = loreFormatsConfig.getConfigurationSection("entries");
 
-        // 1. Recopilar todas las líneas de cada sección si tienen contenido
         if (!allStats.isEmpty()) {
             statsLines.add(format(entries.getString("stats_title")));
             for (Map.Entry<String, Double> entry : allStats.entrySet()) {
@@ -118,7 +129,19 @@ public class CustomItem {
             }
         }
         
-        // Lógica para el estilo de mano
+        // --- NUEVA LÓGICA PARA AÑADIR SKILL MODIFIERS AL LORE ---
+        if (!skillModifiersMap.isEmpty()) {
+            skillModifiersLines.add(format(entries.getString("skill_modifiers_title")));
+            for (Map.Entry<String, Double> entry : skillModifiersMap.entrySet()) {
+                // Obtener el nombre de la habilidad desde el SkillManager para mostrarlo bonito
+                String skillName = plugin.getSkillManager().getSkillConfig(entry.getKey())
+                        .map(cfg -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', cfg.getString("display-name", entry.getKey()))))
+                        .orElse(entry.getKey());
+                String value = String.format("%.1f", entry.getValue());
+                skillModifiersLines.add(format(entries.getString("skill_modifier_entry"), "{display_name}", skillName, "{value}", value));
+            }
+        }
+
         String handStyle = config.getString("hand-style", null);
         if (handStyle != null) {
             String handStyleName = handStyle.equalsIgnoreCase("ONE_HANDED") ? "Una Mano" : "Dos Manos";
@@ -135,38 +158,32 @@ public class CustomItem {
             rarityLine = format(entries.getString("rarity"), "{color}", rarityColor, "{value}", rarityName);
         }
 
-        // 2. Combinar las secciones y añadir las barras condicionalmente
         List<List<String>> sections = new ArrayList<>();
         if (!statsLines.isEmpty()) sections.add(statsLines);
         if (!elementsLines.isEmpty()) sections.add(elementsLines);
-        if (!handStyleLines.isEmpty()) sections.add(handStyleLines); // Añadir sección de estilo de mano
+        if (!skillModifiersLines.isEmpty()) sections.add(skillModifiersLines); // <-- AÑADIR SECCIÓN
+        if (!handStyleLines.isEmpty()) sections.add(handStyleLines);
         if (!customLoreLines.isEmpty()) sections.add(customLoreLines);
         if (rarityLine != null) sections.add(Collections.singletonList(rarityLine));
 
-        // Si hay más de una sección, procesarlas y añadir las barras entre ellas
         for (int i = 0; i < sections.size(); i++) {
             rawLore.addAll(sections.get(i));
-            if (i < sections.size() - 1) { // Si no es la última sección, añade una barra
+            if (i < sections.size() - 1 && !sections.get(i).isEmpty()) {
                 rawLore.add(format(entries.getString("bar")));
             }
         }
 
         meta.setLore(rawLore);
 
-        // --- APLICAR ATRIBUTOS Y FLAGS ---
         meta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES, ItemFlag.HIDE_ENCHANTS, ItemFlag.HIDE_UNBREAKABLE);
 
         for(Map.Entry<String, Double> stat : allStats.entrySet()){
             Attribute attribute = getAttributeFromString(stat.getKey());
             if (attribute != null) {
-                
-                double value = stat.getValue(); // Valor del YML
-
-                // 1 Corazón = 2 Puntos de Vida en Minecraft.
+                double value = stat.getValue();
                 if (attribute == Attribute.GENERIC_MAX_HEALTH) {
                     value *= 2;
                 }
-
                 AttributeModifier modifier = new AttributeModifier(
                     UUID.randomUUID(), 
                     "infinix." + stat.getKey(), 

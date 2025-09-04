@@ -26,7 +26,10 @@ entries:
     crit-damage: '&7{display_name}: &c+{value}%'
     max-health: '&7{display_name}: &a+{value}'
     movement-speed: '&7{display_name}: &e{value}'
-    armor: '&7{display_name}: &9{value}'
+    defense: '&7{display_name}: &9{value}'
+    
+  skill_modifiers_title: '&dModificadores de Habilidad:'
+  skill_modifier_entry: '&7- &e+{value} &a{display_name}'
     
   hand_style: '&7Estilo de Mano: &a{value}' # Nuevo formato para la línea
   

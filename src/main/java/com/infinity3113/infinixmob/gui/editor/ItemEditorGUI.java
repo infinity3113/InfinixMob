@@ -87,7 +87,7 @@ public class ItemEditorGUI extends MenuGUI {
         
         if (key.equalsIgnoreCase("revision-id")) {
             editIntValue(key, displayName);
-        } else if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.")))) {
+        } else if (currentValue instanceof Number || (currentValue == null && (key.startsWith("stats.") || key.startsWith("elemental-damage.") || key.startsWith("skill-modifiers.")))) {
             editDoubleValue(key, displayName);
         } else {
             editStringValue(key, displayName);
@@ -133,6 +133,15 @@ public class ItemEditorGUI extends MenuGUI {
                 keysToShow.add("elemental-damage." + key);
             }
         }
+        
+        // --- NUEVA LÓGICA PARA MOSTRAR SKILL MODIFIERS EN LA GUI ---
+        if (!customItem.getConfig().isConfigurationSection("skill-modifiers")) {
+            customItem.getConfig().createSection("skill-modifiers");
+        }
+        for(String skillId : plugin.getSkillManager().getLoadedSkillNames()){
+            keysToShow.add("skill-modifiers." + skillId);
+        }
+        // --- FIN DE LA NUEVA LÓGICA ---
 
         keysToShow = keysToShow.stream().distinct().collect(Collectors.toList());
 
@@ -232,6 +241,14 @@ public class ItemEditorGUI extends MenuGUI {
         if (key.equalsIgnoreCase("revision-id")) {
             return "ID de Revisión";
         }
+        
+        // --- NUEVA LÓGICA PARA SKILL MODIFIERS ---
+        if (key.startsWith("skill-modifiers.")) {
+            return "Daño: " + plugin.getSkillManager().getSkillConfig(lastPart)
+                .map(cfg -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', cfg.getString("display-name"))))
+                .orElse(lastPart);
+        }
+        // --- FIN ---
 
         String friendlyName = plugin.getItemManager().getStatsConfig().getString("display-names." + lastPart.toLowerCase(), null);
         if (friendlyName != null) {
@@ -241,6 +258,10 @@ public class ItemEditorGUI extends MenuGUI {
     }
 
     private Material getIconForKey(String key) {
+        if (key.startsWith("skill-modifiers.")) {
+            return Material.ENCHANTED_BOOK; // Icono para todos los modificadores de habilidad
+        }
+        
         String simpleKey = key.contains(".") ? key.substring(key.lastIndexOf('.') + 1) : key;
         switch (simpleKey.toLowerCase()) {
             case "id": return Material.ITEM_FRAME;
@@ -254,9 +275,8 @@ public class ItemEditorGUI extends MenuGUI {
             case "crit-chance": return Material.SPYGLASS;
             case "crit-damage": return Material.ANVIL;
             case "max-health": return Material.GOLDEN_APPLE;
-            // --- CAMBIO DE ICONO Y NOMBRE DE STAT ---
-            case "defense": return Material.SHIELD; // <-- CAMBIADO DE "armor" y DIAMOND_CHESTPLATE
-            case "armor-toughness": return Material.NETHERITE_INGOT; // <-- Cambiado el icono para diferenciarlo
+            case "defense": return Material.SHIELD;
+            case "armor-toughness": return Material.NETHERITE_INGOT;
             case "knockback-resistance": return Material.IRON_CHESTPLATE;
             case "movement-speed": return Material.SUGAR;
             case "fire": return Material.BLAZE_POWDER;
