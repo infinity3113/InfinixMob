@@ -75,15 +75,13 @@ public class SkillTreeGUI extends MenuGUI {
 
         Map<Integer, String> skills = playerClass.getSkills();
 
-        // MENSAJE DE DEPURACIÓN: Te avisará si no encuentra skills
         if (skills.isEmpty()) {
             player.sendMessage(ChatColor.RED + "[DEBUG] No se encontraron habilidades en la configuración de la clase '" + playerClass.getId() + "'. Revisa el archivo 'plugins/InfinixMob/classes/" + playerClass.getId() + ".yml'.");
         }
 
         for (Map.Entry<Integer, String> entry : skills.entrySet()) {
-            // Lógica de slots mejorada: skill 1 va al slot 10, skill 2 al 11...
             int slot = 9 + entry.getKey();
-            if (slot >= getSlots()) continue; // Evita errores si hay más skills que espacio
+            if (slot >= getSlots()) continue;
 
             String skillId = entry.getValue();
             plugin.getSkillManager().getSkillConfig(skillId).ifPresent(skillConfig -> {
@@ -94,6 +92,7 @@ public class SkillTreeGUI extends MenuGUI {
     }
 
     private void setPlayerInfoPanel() {
+        // ... (Este método no necesita cambios)
         ItemStack profile = new ItemStack(Material.PLAYER_HEAD, 1);
         SkullMeta profileMeta = (SkullMeta) profile.getItemMeta();
         if (profileMeta != null) {
@@ -127,66 +126,88 @@ public class SkillTreeGUI extends MenuGUI {
     }
 
     private ItemStack createSkillItem(String skillId, ConfigurationSection skillConfig) {
-        Material icon = Material.matchMaterial(skillConfig.getString("icon", "BARRIER"));
         int currentLevel = playerData.getSkillLevel(skillId);
         int maxLevel = skillConfig.getInt("max-level", 1);
         int playerLevelReq = skillConfig.getInt("skill-req", 1);
+        boolean isLocked = playerData.getLevel() < playerLevelReq;
 
+        Material icon;
+        if (isLocked) {
+            icon = Material.BARRIER;
+        } else {
+            icon = Material.matchMaterial(skillConfig.getString("icon", "BARRIER"));
+            if (icon == null) {
+                icon = Material.BARRIER;
+            }
+        }
+        
         ItemStack item = new ItemStack(icon);
         ItemMeta meta = item.getItemMeta();
-
         meta.setDisplayName(ChatColor.translateAlternateColorCodes('&', skillConfig.getString("display-name", skillId)));
         
-        List<String> lore = new ArrayList<>();
+        List<String> baseLore = new ArrayList<>();
         for (String line : skillConfig.getStringList("lore")) {
-            lore.add(ChatColor.translateAlternateColorCodes('&', line));
+            baseLore.add(ChatColor.translateAlternateColorCodes('&', line));
         }
-        lore.add("");
-
-        if (playerData.getLevel() < playerLevelReq) {
-            lore.add(ChatColor.RED + "Bloqueado (Requiere Nivel " + playerLevelReq + ")");
-        } else if (currentLevel == 0) {
-            lore.add(ChatColor.GRAY + "Nivel: 0 / " + maxLevel);
-             if (playerData.getSkillPoints() > 0) {
-                lore.add(ChatColor.YELLOW + "¡Click para aprender!");
-            } else {
-                lore.add(ChatColor.RED + "Puntos Insuficientes");
-            }
-        } else if (currentLevel >= maxLevel) {
-            lore.add(ChatColor.GOLD + "Nivel: " + currentLevel + " / " + maxLevel + " (MAX)");
-        } else {
-            lore.add(ChatColor.GRAY + "Nivel: " + currentLevel + " / " + maxLevel);
-            if (playerData.getSkillPoints() > 0) {
-                lore.add(ChatColor.GREEN + "¡Click para subir de nivel!");
-            } else {
-                lore.add(ChatColor.RED + "Puntos Insuficientes");
-            }
-        }
-
-        lore.add("");
-
+        
         List<String> finalLore = new ArrayList<>();
         Pattern pattern = Pattern.compile("\\{([a-zA-Z0-9_.-]+)\\}");
 
-        for (String line : lore) {
+        for (String line : baseLore) {
             Matcher matcher = pattern.matcher(line);
             StringBuffer sb = new StringBuffer();
             while (matcher.find()) {
                 String key = matcher.group(1);
-                ConfigurationSection valueConfig = skillConfig.getConfigurationSection(key);
-                if (valueConfig != null) {
-                    double currentValue = SkillValueCalculator.calculate(valueConfig, currentLevel > 0 ? currentLevel : 1);
-                    double nextValue = SkillValueCalculator.calculate(valueConfig, currentLevel + 1);
+                String replacement = "";
+                Object valueObject = skillConfig.get(key);
 
-                    String replacement = ChatColor.WHITE + String.format("%.1f", currentValue);
-                    if (currentLevel < maxLevel && currentLevel > 0) {
-                        replacement += ChatColor.GRAY + " -> " + ChatColor.GREEN + String.format("%.1f", nextValue);
+                try {
+                    if (valueObject instanceof ConfigurationSection) {
+                        ConfigurationSection valueConfig = (ConfigurationSection) valueObject;
+                        double currentValue = SkillValueCalculator.calculate(valueConfig, currentLevel > 0 ? currentLevel : 1);
+                        replacement = ChatColor.WHITE + String.format("%.1f", currentValue);
+
+                        if (currentLevel > 0 && currentLevel < maxLevel && playerData.getSkillPoints() > 0) {
+                            double nextValue = SkillValueCalculator.calculate(valueConfig, currentLevel + 1);
+                            if (nextValue != currentValue) {
+                               replacement += ChatColor.GRAY + " -> " + ChatColor.GREEN + String.format("%.1f", nextValue);
+                            }
+                        }
+                    } else if (valueObject instanceof Number) {
+                        replacement = ChatColor.WHITE + String.format("%.1f", ((Number) valueObject).doubleValue());
                     }
-                    matcher.appendReplacement(sb, replacement);
+                } catch (Exception e) {
+                    replacement = ChatColor.RED + "Error";
+                }
+                
+                if (!replacement.isEmpty()) {
+                    matcher.appendReplacement(sb, Matcher.quoteReplacement(replacement));
                 }
             }
             matcher.appendTail(sb);
             finalLore.add(sb.toString());
+        }
+        
+        finalLore.add("");
+
+        if (isLocked) {
+            finalLore.add(ChatColor.RED + "Bloqueado (Requiere Nivel " + playerLevelReq + ")");
+        } else if (currentLevel == 0) {
+            finalLore.add(ChatColor.GRAY + "Nivel: 0 / " + maxLevel);
+             if (playerData.getSkillPoints() > 0) {
+                finalLore.add(ChatColor.YELLOW + "¡Click para aprender!");
+            } else {
+                finalLore.add(ChatColor.RED + "Puntos Insuficientes");
+            }
+        } else if (currentLevel >= maxLevel) {
+            finalLore.add(ChatColor.GOLD + "Nivel: " + currentLevel + " / " + maxLevel + " (MAX)");
+        } else {
+            finalLore.add(ChatColor.GRAY + "Nivel: " + currentLevel + " / " + maxLevel);
+            if (playerData.getSkillPoints() > 0) {
+                finalLore.add(ChatColor.GREEN + "¡Click para subir de nivel!");
+            } else {
+                finalLore.add(ChatColor.RED + "Puntos Insuficientes");
+            }
         }
 
         meta.setLore(finalLore);

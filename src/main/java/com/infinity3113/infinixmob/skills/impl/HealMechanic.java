@@ -4,6 +4,8 @@ import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -16,13 +18,25 @@ public class HealMechanic implements Mechanic {
         if (target instanceof LivingEntity) {
             LivingEntity healTarget = (LivingEntity) target;
             double amount;
-            if (params.get("amount") instanceof ConfigurationSection) {
+            Object amountObj = params.get("amount");
+
+            if (amountObj instanceof Map) {
+                ConfigurationSection amountSection;
+                if (amountObj instanceof ConfigurationSection) {
+                    amountSection = (ConfigurationSection) amountObj;
+                } else {
+                    FileConfiguration tempConfig = new YamlConfiguration();
+                    amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
+                }
+
                 int skillLevel = 1;
                 if (caster instanceof Player && playerData != null) {
                     String skillId = (String) params.get("skillId");
-                    skillLevel = playerData.getSkillLevel(skillId);
+                    if (skillId != null) {
+                        skillLevel = playerData.getSkillLevel(skillId);
+                    }
                 }
-                amount = SkillValueCalculator.calculate((ConfigurationSection) params.get("amount"), skillLevel);
+                amount = SkillValueCalculator.calculate(amountSection, skillLevel);
             } else {
                 amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
             }

@@ -4,6 +4,8 @@ import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -26,15 +28,31 @@ public class PotionMechanic implements Mechanic {
             }
 
             double durationSeconds;
-            if (params.get("duration") instanceof ConfigurationSection) {
-                durationSeconds = SkillValueCalculator.calculate((ConfigurationSection) params.get("duration"), skillLevel);
+            Object durationObj = params.get("duration");
+            if (durationObj instanceof Map) {
+                ConfigurationSection durationSection;
+                if(durationObj instanceof ConfigurationSection){
+                    durationSection = (ConfigurationSection) durationObj;
+                } else {
+                    FileConfiguration tempConfig = new YamlConfiguration();
+                    durationSection = tempConfig.createSection("temp", (Map<?,?>) durationObj);
+                }
+                durationSeconds = SkillValueCalculator.calculate(durationSection, skillLevel);
             } else {
                 durationSeconds = ((Number) params.getOrDefault("duration", 3.0)).doubleValue();
             }
 
             double amplifierDouble;
-            if (params.get("amplifier") instanceof ConfigurationSection) {
-                amplifierDouble = SkillValueCalculator.calculate((ConfigurationSection) params.get("amplifier"), skillLevel);
+            Object amplifierObj = params.get("amplifier");
+            if (amplifierObj instanceof Map) {
+                ConfigurationSection amplifierSection;
+                if(amplifierObj instanceof ConfigurationSection){
+                    amplifierSection = (ConfigurationSection) amplifierObj;
+                } else {
+                    FileConfiguration tempConfig = new YamlConfiguration();
+                    amplifierSection = tempConfig.createSection("temp", (Map<?,?>) amplifierObj);
+                }
+                amplifierDouble = SkillValueCalculator.calculate(amplifierSection, skillLevel);
             } else {
                 amplifierDouble = ((Number) params.getOrDefault("amplifier", 1.0)).doubleValue();
             }

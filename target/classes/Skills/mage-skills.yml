@@ -1,4 +1,5 @@
 BolaDeFuego: # Fireball
+  icon: BLAZE_POWDER # <-- AÑADIR ESTA LÍNEA
   max-level: 20
   skill-req: 1
   display-name: "&cBola de Fuego"
@@ -38,6 +39,7 @@ BolaDeFuego: # Fireball
         sound: 'ENTITY_BLAZE_SHOOT'
 
 Destello: # Blink
+  icon: ENDER_PEARL # <-- AÑADIR ESTA LÍNEA
   max-level: 10
   skill-req: 5
   display-name: "&bDestello"
@@ -71,6 +73,7 @@ Destello: # Blink
         pitch: 1.2
 
 MisilArcano: # Arcane Missile
+  icon: REDSTONE # <-- AÑADIR ESTA LÍNEA
   max-level: 20
   skill-req: 1
   display-name: "&5Misil Arcano"
@@ -103,6 +106,7 @@ MisilArcano: # Arcane Missile
         amount: 30
 
 NovaDeEscarcha: # Frost Nova
+  icon: ICE # <-- AÑADIR ESTA LÍNEA
   max-level: 15
   skill-req: 8
   display-name: "&9Nova de Escarcha"
@@ -143,6 +147,7 @@ NovaDeEscarcha: # Frost Nova
         sound: 'BLOCK_GLASS_BREAK'
 
 Meteoro: # Meteor
+  icon: FIRE_CHARGE # <-- AÑADIR ESTA LÍNEA
   max-level: 10
   skill-req: 20
   display-name: "&6Meteoro"
@@ -175,6 +180,7 @@ Meteoro: # Meteor
           max: 120
 
 CadenasInfernales: # Inferno Chains
+  icon: CHAIN # <-- AÑADIR ESTA LÍNEA
   max-level: 10
   skill-req: 15
   display-name: "&4Cadenas Infernales"
