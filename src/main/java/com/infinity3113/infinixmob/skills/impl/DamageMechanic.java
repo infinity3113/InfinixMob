@@ -29,6 +29,7 @@ public class DamageMechanic implements Mechanic {
         Object amountObj = params.get("amount");
         String skillId = (String) params.get("skillId");
 
+        // 1. Calcular el daño base de la habilidad (con niveles)
         if (amountObj instanceof Map) {
             ConfigurationSection amountSection;
             if (amountObj instanceof ConfigurationSection) {
@@ -37,19 +38,17 @@ public class DamageMechanic implements Mechanic {
                 FileConfiguration tempConfig = new YamlConfiguration();
                 amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
             }
-            
+
             int skillLevel = 1;
-            if (caster instanceof Player && playerData != null) {
-                if (skillId != null) {
-                    skillLevel = playerData.getSkillLevel(skillId);
-                }
+            if (caster instanceof Player && playerData != null && skillId != null) {
+                skillLevel = playerData.getSkillLevel(skillId);
             }
             amount = SkillValueCalculator.calculate(amountSection, skillLevel);
         } else {
             amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
         }
 
-        // --- LÓGICA PARA MODIFICADORES DE HABILIDAD ---
+        // 2. Sumar el bonificador de los amplificadores de habilidad de los ítems
         if (caster instanceof Player && skillId != null) {
             Player player = (Player) caster;
             double bonusDamage = 0;
@@ -60,19 +59,9 @@ public class DamageMechanic implements Mechanic {
             bonusDamage += getBonusDamageFromItem(player.getInventory().getItemInOffHand(), skillId);
             amount += bonusDamage;
         }
-        // --- FIN ---
 
-        boolean addWeaponDamage = (boolean) params.getOrDefault("sumar_daño_arma", false);
-
-        if (caster instanceof Player && !addWeaponDamage) {
-            Player playerCaster = (Player) caster;
-            ItemStack weapon = playerCaster.getInventory().getItemInMainHand();
-            playerCaster.getInventory().setItemInMainHand(null);
-            ((LivingEntity) target).damage(amount, caster);
-            playerCaster.getInventory().setItemInMainHand(weapon);
-        } else {
-            ((LivingEntity) target).damage(amount, caster);
-        }
+        // 3. Aplicar el daño final directamente
+        ((LivingEntity) target).damage(amount, caster);
     }
 
     private double getBonusDamageFromItem(ItemStack item, String skillId) {

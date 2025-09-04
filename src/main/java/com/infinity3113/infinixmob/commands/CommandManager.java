@@ -70,6 +70,14 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return handlePlayerCastCommand(sender, args);
         } else if (command.getName().equalsIgnoreCase("skills")) {
             if (sender instanceof Player) {
+                // --- INICIO DE LA CORRECCIÓN ---
+                Player player = (Player) sender;
+                PlayerData pData = plugin.getPlayerClassManager().getPlayerData(player);
+                if (pData.getPlayerClass() == null) {
+                    player.sendMessage(getMsg("cast-no-class")); // Reutilizamos el mensaje que dice que necesita una clase
+                    return true;
+                }
+                // --- FIN DE LA CORRECCIÓN ---
                 new SkillTreeGUI(plugin, (Player) sender).open();
             }
             return true;

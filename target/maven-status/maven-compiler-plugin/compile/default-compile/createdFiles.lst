@@ -74,6 +74,7 @@ com\infinity3113\infinixmob\mechanics\impl\ArrowRainMechanic$1.class
 com\infinity3113\infinixmob\mechanics\impl\DynamicArenaMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\SummonStructureMechanic.class
 com\infinity3113\infinixmob\core\BlockManager$Trap.class
+com\infinity3113\infinixmob\mechanics\impl\AreaDamageMechanic$1.class
 com\infinity3113\infinixmob\gui\SpawnerGUI$1$1.class
 com\infinity3113\infinixmob\mechanics\impl\CustomStatusEffectMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\PotionMechanic.class
