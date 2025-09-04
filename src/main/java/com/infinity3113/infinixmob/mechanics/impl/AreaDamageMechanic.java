@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Type;
@@ -24,6 +25,7 @@ public class AreaDamageMechanic implements Mechanic {
         double damage;
         Object damageObj = params.get("damage");
         String skillId = (String) params.get("skillId");
+        InfinixMob plugin = InfinixMob.getPlugin();
 
         // 1. Calcular el daño base de la habilidad (con niveles)
         if (damageObj instanceof Map) {
@@ -58,14 +60,20 @@ public class AreaDamageMechanic implements Mechanic {
 
         double radius = ((Number) params.getOrDefault("radius", 5.0)).doubleValue();
 
-        // 3. Aplicar el daño final a las entidades en el radio
+        // 3. Marcar el daño como basado en habilidad y aplicarlo a las entidades en el radio
         final double finalDamage = damage; // Usar una variable final para la lambda
-        target.getWorld().getNearbyEntities(target.getLocation(), radius, radius, radius).stream()
-            .filter(e -> e instanceof LivingEntity && !e.equals(caster))
-            .forEach(e -> {
-                LivingEntity victim = (LivingEntity) e;
-                victim.damage(finalDamage, caster);
-            });
+        try {
+            caster.setMetadata("infinix:skill_damage", new FixedMetadataValue(plugin, true));
+            target.getWorld().getNearbyEntities(target.getLocation(), radius, radius, radius).stream()
+                .filter(e -> e instanceof LivingEntity && !e.equals(caster))
+                .forEach(e -> {
+                    LivingEntity victim = (LivingEntity) e;
+                    victim.damage(finalDamage, caster);
+                });
+        } finally {
+            // Asegurarse de que los metadatos se eliminen incluso si hay un error
+            caster.removeMetadata("infinix:skill_damage", plugin);
+        }
     }
 
     private double getBonusDamageFromItem(ItemStack item, String skillId) {

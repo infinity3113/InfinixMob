@@ -11,10 +11,10 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDamageEvent; // <-- NUEVA IMPORTACIÓN
+import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityShootBowEvent;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.PlayerInventory; // <-- NUEVA IMPORTACIÓN
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataContainer;
@@ -67,6 +67,11 @@ public class ItemListener implements Listener {
     public void onEntityDamageByEntity(EntityDamageByEntityEvent event) {
         if (event.isCancelled()) return;
 
+        // Si el daño viene de una habilidad (marcado con metadata), no hacemos nada.
+        if (event.getDamager().hasMetadata("infinix:skill_damage")) {
+            return;
+        }
+
         if (event.getDamager() instanceof Player && event.getEntity() instanceof LivingEntity) {
             Player player = (Player) event.getDamager();
             ItemStack weapon = player.getInventory().getItemInMainHand();
@@ -94,9 +99,6 @@ public class ItemListener implements Listener {
         }
     }
 
-    // ========================================================================
-    // == NUEVO MÉTODO PARA LA DEFENSA PLANA
-    // ========================================================================
     @EventHandler(priority = EventPriority.HIGH)
     public void onPlayerTakeDamage(EntityDamageEvent event) {
         if (event.isCancelled() || !(event.getEntity() instanceof Player)) {
@@ -107,7 +109,6 @@ public class ItemListener implements Listener {
         PlayerInventory inventory = player.getInventory();
         double totalDefense = 0;
 
-        // Iterar sobre las 4 piezas de armadura del jugador
         for (ItemStack armorPiece : inventory.getArmorContents()) {
             if (isCustomItem(armorPiece)) {
                 PersistentDataContainer container = armorPiece.getItemMeta().getPersistentDataContainer();
@@ -116,7 +117,6 @@ public class ItemListener implements Listener {
                     Type type = new TypeToken<Map<String, Double>>(){}.getType();
                     Map<String, Double> stats = plugin.getGson().fromJson(statsJson, type);
                     
-                    // Obtenemos el valor de "defense" y lo sumamos
                     totalDefense += stats.getOrDefault("defense", 0.0);
                 }
             }
@@ -124,11 +124,8 @@ public class ItemListener implements Listener {
 
         if (totalDefense > 0) {
             double originalDamage = event.getDamage();
-            
-            // Resta la defensa directamente del daño
             double finalDamage = originalDamage - totalDefense;
 
-            // Asegurarse de que el daño no sea negativo (no queremos que el jugador se cure)
             if (finalDamage < 0) {
                 finalDamage = 0;
             }
@@ -136,7 +133,6 @@ public class ItemListener implements Listener {
             event.setDamage(finalDamage);
         }
     }
-    // ========================================================================
 
     @EventHandler
     public void onPlayerShootBow(EntityShootBowEvent event) {

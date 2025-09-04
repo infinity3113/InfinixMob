@@ -13,6 +13,7 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Type;
@@ -28,6 +29,7 @@ public class DamageMechanic implements Mechanic {
         double amount;
         Object amountObj = params.get("amount");
         String skillId = (String) params.get("skillId");
+        InfinixMob plugin = InfinixMob.getPlugin();
 
         // 1. Calcular el daño base de la habilidad (con niveles)
         if (amountObj instanceof Map) {
@@ -60,8 +62,14 @@ public class DamageMechanic implements Mechanic {
             amount += bonusDamage;
         }
 
-        // 3. Aplicar el daño final directamente
-        ((LivingEntity) target).damage(amount, caster);
+        // 3. Marcar el daño como basado en habilidad y aplicarlo
+        try {
+            caster.setMetadata("infinix:skill_damage", new FixedMetadataValue(plugin, true));
+            ((LivingEntity) target).damage(amount, caster);
+        } finally {
+            // Asegurarse de que los metadatos se eliminen incluso si hay un error
+            caster.removeMetadata("infinix:skill_damage", plugin);
+        }
     }
 
     private double getBonusDamageFromItem(ItemStack item, String skillId) {
