@@ -1,7 +1,8 @@
 BolaDeFuego: # Fireball
-  icon: BLAZE_POWDER # <-- AÑADIR ESTA LÍNEA
+  icon: BLAZE_POWDER
   max-level: 20
   skill-req: 1
+  requires-target: false
   display-name: "&cBola de Fuego"
   lore:
     - "&7Lanza una bola de fuego que"
@@ -12,7 +13,7 @@ BolaDeFuego: # Fireball
   resource-cost:
     base: 15
     per-level: 1.5
-  damage: # <--- SECCIÓN AÑADIDA PARA LA GUI
+  damage:
     base: 12
     per-level: 2.5
     max: 60
@@ -20,26 +21,35 @@ BolaDeFuego: # Fireball
     base: 4
     per-level: -0.1
   Mechanics:
-    - type: 'DAMAGE'
-      targeter: '@TARGET'
+    - type: 'PROJECTILE'
+      targeter: '@SELF'
       parameters:
-        amount:
-          base: 12
+        projectile: 'FIREBALL'
+        speed: 1.5
+        skill_on_hit: 'BolaDeFuego_Impacto'
+
+BolaDeFuego_Impacto:
+  display-name: "Impacto de Bola de Fuego"
+  Mechanics:
+    - type: 'AREA_DAMAGE'
+      targeter: '@ENTITIESINRADIUS{R=3}'
+      parameters:
+        damage:
+          base: 18
           per-level: 2.5
           max: 60
     - type: 'PARTICLE'
-      targeter: '@TARGET'
+      targeter: '@SELF'
       parameters:
-        particle: 'FLAME'
-        amount: 25
-        speed: 0.1
+        particle: 'EXPLOSION_LARGE'
+        amount: 1
     - type: 'SOUND'
-      targeter: '@TARGET'
+      targeter: '@SELF'
       parameters:
-        sound: 'ENTITY_BLAZE_SHOOT'
+        sound: 'ENTITY_GENERIC_EXPLODE'
 
 Destello: # Blink
-  icon: ENDER_PEARL # <-- AÑADIR ESTA LÍNEA
+  icon: ENDER_PEARL
   max-level: 10
   skill-req: 5
   display-name: "&bDestello"
@@ -52,7 +62,7 @@ Destello: # Blink
   resource-cost:
     base: 25
     per-level: 2
-  max_distance: # <--- SECCIÓN AÑADIDA PARA LA GUI
+  max_distance:
     base: 4
     per-level: 0.75
   cooldown:
@@ -73,7 +83,7 @@ Destello: # Blink
         pitch: 1.2
 
 MisilArcano: # Arcane Missile
-  icon: REDSTONE # <-- AÑADIR ESTA LÍNEA
+  icon: REDSTONE
   max-level: 20
   skill-req: 1
   display-name: "&5Misil Arcano"
@@ -86,7 +96,7 @@ MisilArcano: # Arcane Missile
   resource-cost:
     base: 10
     per-level: 1
-  damage: # <--- SECCIÓN AÑADIDA PARA LA GUI
+  damage:
     base: 8
     per-level: 1.8
     max: 45
@@ -106,7 +116,7 @@ MisilArcano: # Arcane Missile
         amount: 30
 
 NovaDeEscarcha: # Frost Nova
-  icon: ICE # <-- AÑADIR ESTA LÍNEA
+  icon: ICE
   max-level: 15
   skill-req: 8
   display-name: "&9Nova de Escarcha"
@@ -119,7 +129,7 @@ NovaDeEscarcha: # Frost Nova
   resource-cost:
     base: 45
     per-level: 3
-  duration: # <--- SECCIÓN AÑADIDA PARA LA GUI
+  duration:
     base: 5
     per-level: 0.5
   cooldown:
@@ -147,7 +157,7 @@ NovaDeEscarcha: # Frost Nova
         sound: 'BLOCK_GLASS_BREAK'
 
 Meteoro: # Meteor
-  icon: FIRE_CHARGE # <-- AÑADIR ESTA LÍNEA
+  icon: FIRE_CHARGE
   max-level: 10
   skill-req: 20
   display-name: "&6Meteoro"
@@ -158,7 +168,7 @@ Meteoro: # Meteor
     - "&eDaño de Impacto: &f{damage}"
     - "&eCosto de Maná: &f{resource-cost}"
   resource-cost: 80
-  damage: # <--- SECCIÓN AÑADIDA PARA LA GUI
+  damage:
     base: 40
     per-level: 8
     max: 120
@@ -180,7 +190,7 @@ Meteoro: # Meteor
           max: 120
 
 CadenasInfernales: # Inferno Chains
-  icon: CHAIN # <-- AÑADIR ESTA LÍNEA
+  icon: CHAIN
   max-level: 10
   skill-req: 15
   display-name: "&4Cadenas Infernales"
@@ -191,7 +201,7 @@ CadenasInfernales: # Inferno Chains
     - "&eDuración: &f{duration}s"
     - "&eCosto de Maná: &f{resource-cost}"
   resource-cost: 50
-  duration: # <--- SECCIÓN AÑADIDA PARA LA GUI
+  duration:
     base: 5
     per-level: 1
   cooldown: 25

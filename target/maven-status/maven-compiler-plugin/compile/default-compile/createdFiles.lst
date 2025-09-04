@@ -23,6 +23,7 @@ com\infinity3113\infinixmob\core\TargeterManager.class
 com\infinity3113\infinixmob\mechanics\impl\ActionBarMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\SpawnFallingBlockMechanic.class
 com\infinity3113\infinixmob\listeners\ItemListener.class
+com\infinity3113\infinixmob\mechanics\impl\ProjectileMechanic.class
 com\infinity3113\infinixmob\core\RecipeManager.class
 com\infinity3113\infinixmob\items\CustomItem.class
 com\infinity3113\infinixmob\gui\editor\ItemEditorGUI$1.class

@@ -69,6 +69,7 @@ public class MechanicManager {
         registeredMechanics.put("DYNAMIC_ARENA", new DynamicArenaMechanic());
         registeredMechanics.put("SILENT_REMOVE", new SilentRemoveMechanic());
 		registeredMechanics.put("TELEPORT_LOOK", new TeleportLookMechanic());
+		registeredMechanics.put("PROJECTILE", new ProjectileMechanic(plugin));
     }
 
     // MÉTODO CORREGIDO

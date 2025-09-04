@@ -75,6 +75,15 @@ public final class InfinixMob extends JavaPlugin {
         saveResource("classes/paladin.yml", false);
         saveResource("classes/archer.yml", false);
 
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Asegurarse de que los archivos de habilidades por defecto se copien
+        saveResource("Skills/mage-skills.yml", false);
+        saveResource("Skills/archer-skills.yml", false);
+        saveResource("Skills/paladin-skills.yml", false);
+        saveResource("Skills/GolpeBasico.yml", false);
+        // --- FIN DE LA CORRECCIÓN ---
+
+
         // Inicializar todos los managers
         this.chatInputManager = new ChatInputManager();
         this.threatManager = new ThreatManager();
@@ -97,7 +106,7 @@ public final class InfinixMob extends JavaPlugin {
         getCommand("infinixmob").setExecutor(commandManager);
         getCommand("infinixmob").setTabCompleter(commandManager);
         getCommand("cast").setExecutor(commandManager);
-        getCommand("skills").setExecutor(commandManager); // <-- LÍNEA AÑADIDA
+        getCommand("skills").setExecutor(commandManager);
         
         // Registrar todos los listeners
         this.mobListener = new MobListener(this);

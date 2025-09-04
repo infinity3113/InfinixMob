@@ -27,8 +27,20 @@ public class AreaDamageMechanic implements Mechanic {
 
         double radius = ((Number) params.getOrDefault("radius", 5.0)).doubleValue();
         
+        // --- INICIO DE LA MODIFICACIÓN ---
+        // Se obtiene una lista de entidades y se itera sobre ellas para aplicar el daño manualmente.
         target.getWorld().getNearbyEntities(target.getLocation(), radius, radius, radius).stream()
             .filter(e -> e instanceof LivingEntity && !e.equals(caster))
-            .forEach(e -> ((LivingEntity) e).damage(damage, caster));
+            .forEach(e -> {
+                LivingEntity victim = (LivingEntity) e;
+                
+                // Se calcula la nueva vida restando el daño plano
+                double newHealth = victim.getHealth() - damage;
+                
+                // Se asegura que la vida no sea negativa y se aplica.
+                // Esto simula un daño que ignora armadura y protecciones.
+                victim.setHealth(Math.max(0, newHealth));
+            });
+        // --- FIN DE LA MODIFICACIÓN ---
     }
 }

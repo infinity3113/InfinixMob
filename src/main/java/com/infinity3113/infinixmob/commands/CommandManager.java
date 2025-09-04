@@ -2,7 +2,7 @@ package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.gui.SpawnerListGui;
-import com.infinity3113.infinixmob.gui.SkillTreeGUI; // <-- NUEVA IMPORTACIÓN
+import com.infinity3113.infinixmob.gui.SkillTreeGUI;
 import com.infinity3113.infinixmob.gui.editor.ItemTypeSelectorGUI;
 import com.infinity3113.infinixmob.playerclass.PlayerClass;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
@@ -68,7 +68,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return handleInfinixMobCommand(sender, args);
         } else if (command.getName().equalsIgnoreCase("cast")) {
             return handlePlayerCastCommand(sender, args);
-        } else if (command.getName().equalsIgnoreCase("skills")) { // <-- NUEVO COMANDO
+        } else if (command.getName().equalsIgnoreCase("skills")) {
             if (sender instanceof Player) {
                 new SkillTreeGUI(plugin, (Player) sender).open();
             }
@@ -117,7 +117,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
              return true;
         }
 
-
         if (plugin.getCooldownManager().isOnCooldown(player.getUniqueId(), skillId)) {
             long remaining = plugin.getCooldownManager().getRemainingCooldown(player.getUniqueId(), skillId);
             String timeLeft = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(remaining) + 1);
@@ -149,7 +148,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return true;
         }
         
-        Entity finalTarget = target != null ? target : player;
+        Entity finalTarget = target;
         
         pData.setCurrentResource(pData.getCurrentResource() - resourceCost);
         int cooldown = skillConfig.getInt("cooldown", 0);

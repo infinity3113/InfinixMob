@@ -231,16 +231,19 @@ public class ItemEditorGUI extends MenuGUI {
     protected String getFriendlyNameForKey(String key) {
         String[] parts = key.split("\\.");
         String lastPart = parts[parts.length - 1].replace("-", " ");
-
+        
         if (key.equalsIgnoreCase("revision-id")) {
             return "ID de Revisión";
         }
-
+        
+        // --- INICIO DE LA CORRECCIÓN ---
         if (key.startsWith("skill-modifiers.")) {
+            // Se usa el ID de la habilidad (lastPart) como valor por defecto si "display-name" no existe.
             return "Daño: " + plugin.getSkillManager().getSkillConfig(lastPart)
-                .map(cfg -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', cfg.getString("display-name"))))
+                .map(cfg -> ChatColor.stripColor(ChatColor.translateAlternateColorCodes('&', cfg.getString("display-name", lastPart))))
                 .orElse(lastPart);
         }
+        // --- FIN DE LA CORRECCIÓN ---
 
         String friendlyName = plugin.getItemManager().getStatsConfig().getString("display-names." + lastPart.toLowerCase(), null);
         if (friendlyName != null) {
