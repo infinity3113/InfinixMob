@@ -70,13 +70,13 @@ public class MechanicManager {
         registeredMechanics.put("SILENT_REMOVE", new SilentRemoveMechanic());
 		registeredMechanics.put("TELEPORT_LOOK", new TeleportLookMechanic());
 		registeredMechanics.put("PROJECTILE", new ProjectileMechanic(plugin));
+        registeredMechanics.put("DELAY", new DelayMechanic(plugin)); // <-- MECÁNICA NUEVA
     }
 
-    // MÉTODO CORREGIDO
     public void executeMechanic(String type, LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         Mechanic mechanic = registeredMechanics.get(type.toUpperCase());
         if (mechanic != null) {
-            mechanic.execute(caster, target, params, playerData); // Ahora pasa el PlayerData
+            mechanic.execute(caster, target, params, playerData);
         } else {
             plugin.getLogger().warning("Unknown mechanic type: " + type);
         }

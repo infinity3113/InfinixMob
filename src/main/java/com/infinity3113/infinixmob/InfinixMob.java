@@ -75,13 +75,11 @@ public final class InfinixMob extends JavaPlugin {
         saveResource("classes/paladin.yml", false);
         saveResource("classes/archer.yml", false);
 
-        // --- INICIO DE LA CORRECCIÓN ---
         // Asegurarse de que los archivos de habilidades por defecto se copien
         saveResource("Skills/mage-skills.yml", false);
         saveResource("Skills/archer-skills.yml", false);
         saveResource("Skills/paladin-skills.yml", false);
         saveResource("Skills/GolpeBasico.yml", false);
-        // --- FIN DE LA CORRECCIÓN ---
 
 
         // Inicializar todos los managers
@@ -107,6 +105,9 @@ public final class InfinixMob extends JavaPlugin {
         getCommand("infinixmob").setTabCompleter(commandManager);
         getCommand("cast").setExecutor(commandManager);
         getCommand("skills").setExecutor(commandManager);
+        // --- Registro del nuevo comando ---
+        getCommand("classadmin").setExecutor(commandManager);
+        getCommand("classadmin").setTabCompleter(commandManager);
         
         // Registrar todos los listeners
         this.mobListener = new MobListener(this);
@@ -167,7 +168,7 @@ public final class InfinixMob extends JavaPlugin {
         if (playerClassManager != null) {
             playerClassManager.saveAllPlayerData();
         }
-        getLogger().info("InfinixMob ha sido desactivado.");
+        getLogger().info("InfinixMob ha sido deshabilitado.");
     }
     
     public void reload() {

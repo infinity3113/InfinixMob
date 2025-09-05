@@ -1,0 +1,232 @@
+# --- HABILIDAD PASIVA ---
+SelloArcano:
+  display-name: "&dPasiva: Sello Arcano"
+  lore:
+    - "&7Una marca de tu conexión constante con el éter."
+    - "&7Otorga efectos visuales pasivos."
+  trigger: '~onTimer:20' # Cada segundo
+  conditions:
+    - 'is_on_ground'
+  Mechanics:
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'ENCHANTMENT_TABLE'
+        amount: 2
+        speed: 0.05
+        offset_y: 0.2
+
+# --- HABILIDAD 1 ---
+CometaAstral:
+  icon: FIREWORK_STAR
+  max-level: 15
+  skill-req: 1
+  requires-target: true
+  display-name: "&bCometa Astral"
+  lore:
+    - "&7Disparas un devastador cometa de energía cósmica."
+    - ""
+    - "&eDaño de Impacto: &f{damage}"
+    - "&eCosto de Maná: &f{resource-cost}"
+  resource-cost:
+    base: 20
+    per-level: 2
+  cooldown:
+    base: 5
+    per-level: -0.1
+  damage:
+    base: 18
+    per-level: 3
+  Mechanics:
+    - type: 'PROJECTILE'
+      targeter: '@SELF'
+      parameters:
+        projectile: 'SNOWBALL'
+        speed: 2.5
+        skill_on_hit: 'CometaAstral_Impacto'
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'PORTAL'
+        amount: 30
+        speed: 0.1
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'ENTITY_EVOKER_CAST_SPELL'
+        pitch: 1.5
+
+CometaAstral_Impacto:
+  Mechanics:
+    - type: 'AREA_DAMAGE'
+      targeter: '@ENTITIESINRADIUS{R=3}'
+      parameters: {}
+    - type: 'PARTICLE'
+      targeter: '@TARGET'
+      parameters:
+        particle: 'PORTAL'
+        amount: 100
+        speed: 0.5
+        offset_x: 1.5
+        offset_y: 1.5
+        offset_z: 1.5
+    - type: 'SOUND'
+      targeter: '@TARGET'
+      parameters:
+        sound: 'ENTITY_GENERIC_EXPLODE'
+
+# --- HABILIDAD 2 ---
+SingularidadEntropica:
+  icon: ENDER_EYE
+  max-level: 10
+  skill-req: 8
+  display-name: "&5Singularidad Entrópica"
+  lore:
+    - "&7Creas un pozo gravitatorio que"
+    - "&7atrae y daña a los enemigos cercanos."
+    - ""
+    - "&eDaño por segundo: &f{tick_damage}"
+    - "&eDaño de Explosión: &f{damage}"
+    - "&eCosto de Maná: &f{resource-cost}"
+  resource-cost: 60
+  cooldown: 25
+  damage: # Daño de la explosión final
+    base: 25
+    per-level: 5
+  tick_damage: # Daño por segundo mientras atrae
+    base: 2
+    per-level: 0.5
+  Mechanics:
+    - type: 'SUMMON'
+      targeter: '@TARGET'
+      parameters:
+        type: 'ARMOR_STAND'
+        duration: 4
+        glowing: false
+        invisible: true
+        marker: true
+        silent: true
+        skills_on_timer:
+          20: 'SingularidadEntropica_Pull'
+    - type: 'DELAY'
+      parameters:
+        duration: 4
+        mechanics:
+          - type: 'AREA_DAMAGE'
+            targeter: '@ENTITIESINRADIUS{R=5}'
+            parameters: {}
+          - type: 'PARTICLE'
+            targeter: '@TARGET'
+            parameters:
+              particle: 'EXPLOSION_HUGE'
+              amount: 1
+          - type: 'SOUND'
+            targeter: '@TARGET'
+            parameters:
+              sound: 'ENTITY_WITHER_DEATH'
+              volume: 0.8
+              pitch: 0.5
+
+SingularidadEntropica_Pull:
+  damage: # Hereda el valor de 'tick_damage' de la habilidad principal
+  Mechanics:
+    - type: 'PULL'
+      targeter: '@ENTITIESINRADIUS{R=7;ignore_caster=true}'
+      parameters:
+        strength: 0.8
+    - type: 'AREA_DAMAGE'
+      targeter: '@ENTITIESINRADIUS{R=7;ignore_caster=true}'
+      parameters: {}
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'SQUID_INK'
+        amount: 50
+        speed: 0.1
+        offset_x: 3.0
+        offset_y: 1.0
+        offset_z: 3.0
+
+# --- HABILIDAD 3 ---
+FaseEstelar:
+  icon: ENDER_PEARL
+  max-level: 5
+  skill-req: 3
+  display-name: "&3Fase Estelar"
+  lore:
+    - "&7Te desvaneces y reapareces a corta distancia."
+    - ""
+    - "&eDistancia: &f{max_distance}"
+    - "&eCosto de Maná: &f{resource-cost}"
+  resource-cost: 30
+  cooldown: 10
+  max_distance:
+    base: 6
+    per-level: 1.5
+  Mechanics:
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'CRIT'
+        amount: 50
+    - type: 'TELEPORT_LOOK'
+      targeter: '@SELF'
+      parameters: {}
+    - type: 'PARTICLE'
+      targeter: '@SELF'
+      parameters:
+        particle: 'ENCHANTMENT_TABLE'
+        amount: 80
+        speed: 0.2
+    - type: 'SOUND'
+      targeter: '@SELF'
+      parameters:
+        sound: 'ENTITY_ENDERMAN_TELEPORT'
+
+# --- HABILIDAD 4 (ULTIMATE) ---
+LluviaDeEones:
+  icon: NETHER_STAR
+  max-level: 5
+  skill-req: 25
+  display-name: "&6Lluvia de Eones"
+  lore:
+    - "&7Invocas meteoritos arcanos del cosmos."
+    - ""
+    - "&eDaño por meteorito: &f{damage}"
+    - "&eCosto de Maná: &f{resource-cost}"
+  resource-cost: 100
+  cooldown: 60
+  damage:
+    base: 15
+    per-level: 3
+  Mechanics:
+    - type: 'METEOR_SHOWER'
+      targeter: '@TARGET'
+      parameters:
+        amount: 15
+        duration: 5
+        radius: 10
+        fire: false
+        skill_on_hit: 'LluviaDeEones_Impacto'
+    - type: 'SOUND'
+      targeter: '@CASTER'
+      parameters:
+        sound: 'ENTITY_WITHER_SPAWN'
+        volume: 2.0
+        pitch: 1.2
+
+LluviaDeEones_Impacto:
+  Mechanics:
+    - type: 'AREA_DAMAGE'
+      targeter: '@ENTITIESINRADIUS{R=3}'
+      parameters: {}
+    - type: 'PARTICLE'
+      targeter: '@TARGET'
+      parameters:
+        particle: 'SOUL_FIRE_FLAME'
+        amount: 50
+        speed: 0.3
+    - type: 'COMMAND'
+      targeter: '@TARGET'
+      parameters:
+        command: "fill ~-1 ~-1 ~-1 ~1 ~-1 ~1 soul_fire replace air"

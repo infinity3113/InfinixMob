@@ -70,17 +70,17 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             return handlePlayerCastCommand(sender, args);
         } else if (command.getName().equalsIgnoreCase("skills")) {
             if (sender instanceof Player) {
-                // --- INICIO DE LA CORRECCIÓN ---
                 Player player = (Player) sender;
                 PlayerData pData = plugin.getPlayerClassManager().getPlayerData(player);
                 if (pData.getPlayerClass() == null) {
-                    player.sendMessage(getMsg("cast-no-class")); // Reutilizamos el mensaje que dice que necesita una clase
+                    player.sendMessage(getMsg("cast-no-class"));
                     return true;
                 }
-                // --- FIN DE LA CORRECCIÓN ---
                 new SkillTreeGUI(plugin, (Player) sender).open();
             }
             return true;
+        } else if (command.getName().equalsIgnoreCase("classadmin")) { // <-- NUEVO COMANDO
+            return handleClassAdminCommand(sender, args);
         }
         return false;
     }
@@ -315,6 +315,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 return true;
         }
     }
+
     private void handleAdminCast(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) { sender.sendMessage(getMsg("player-only")); return; }
         if (!sender.hasPermission("infinixmob.cast")) { sender.sendMessage(getMsg("no-permission")); return; }
@@ -331,6 +332,7 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         plugin.getSkillManager().executeSkill(skillId, caster, target, plugin.getPlayerClassManager().getPlayerData(caster));
         caster.sendMessage(getMsg("cast-success").replace("%skill%", skillId).replace("%target%", target.getName()));
     }
+    
     private void handleClassCommand(CommandSender sender, String[] args) {
         if (!(sender instanceof Player)) { sender.sendMessage(getMsg("player-only")); return; }
         Player player = (Player) sender;
@@ -367,6 +369,83 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                 break;
         }
     }
+
+    // --- NUEVOS MÉTODOS PARA /classadmin ---
+    private boolean handleClassAdminCommand(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("infinixmob.admin")) {
+            sender.sendMessage(getMsg("no-permission"));
+            return true;
+        }
+    
+        if (args.length < 4) {
+            sendAdminUsage(sender);
+            return true;
+        }
+    
+        String subCommand = args[0].toLowerCase();
+        String action = args[1].toLowerCase();
+        Player target = Bukkit.getPlayer(args[2]);
+        double amount;
+    
+        if (target == null) {
+            sender.sendMessage(ChatColor.RED + "Jugador no encontrado: " + args[2]);
+            return true;
+        }
+    
+        try {
+            amount = Double.parseDouble(args[3]);
+        } catch (NumberFormatException e) {
+            sender.sendMessage(ChatColor.RED + "La cantidad debe ser un número.");
+            return true;
+        }
+    
+        PlayerData playerData = plugin.getPlayerClassManager().getPlayerData(target);
+        if (playerData.getPlayerClass() == null) {
+            sender.sendMessage(ChatColor.RED + "El jugador '" + target.getName() + "' no tiene una clase seleccionada.");
+            return true;
+        }
+    
+        switch (subCommand) {
+            case "exp":
+                if ("add".equals(action)) {
+                    playerData.addExperience(amount);
+                    sender.sendMessage(ChatColor.GREEN + "Añadidos " + amount + " de EXP a " + target.getName() + ".");
+                } else if ("set".equals(action)) {
+                    playerData.setExperience(amount);
+                    sender.sendMessage(ChatColor.GREEN + "Establecida la EXP de " + target.getName() + " a " + amount + ".");
+                } else {
+                    sendAdminUsage(sender);
+                }
+                // Comprobar si sube de nivel
+                while(playerData.canLevelUp()){
+                    playerData.levelUp();
+                    target.sendMessage(ChatColor.GOLD + "¡Has subido al nivel " + playerData.getLevel() + "!");
+                }
+                break;
+            case "skillpoints":
+                if ("add".equals(action)) {
+                    playerData.setSkillPoints(playerData.getSkillPoints() + (int)amount);
+                    sender.sendMessage(ChatColor.GREEN + "Añadidos " + (int)amount + " puntos de habilidad a " + target.getName() + ".");
+                } else if ("set".equals(action)) {
+                    playerData.setSkillPoints((int)amount);
+                    sender.sendMessage(ChatColor.GREEN + "Establecidos los puntos de habilidad de " + target.getName() + " a " + (int)amount + ".");
+                } else {
+                    sendAdminUsage(sender);
+                }
+                break;
+            default:
+                sendAdminUsage(sender);
+                break;
+        }
+        return true;
+    }
+    
+    private void sendAdminUsage(CommandSender sender) {
+        sender.sendMessage(ChatColor.GOLD + "--- Comandos de Administración de Clases ---");
+        sender.sendMessage(ChatColor.YELLOW + "/classadmin exp <add|set> <jugador> <cantidad>");
+        sender.sendMessage(ChatColor.YELLOW + "/classadmin skillpoints <add|set> <jugador> <cantidad>");
+    }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         final List<String> completions = new ArrayList<>();
@@ -384,6 +463,14 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     List<String> classNames = plugin.getPlayerClassManager().getAllClasses().stream().map(PlayerClass::getId).collect(Collectors.toList());
                     StringUtil.copyPartialMatches(args[2], classNames, completions);
                 }
+            }
+        } else if (command.getName().equalsIgnoreCase("classadmin")) { // <-- AUTOCOMPLETADO PARA EL NUEVO COMANDO
+            if (args.length == 1) {
+                StringUtil.copyPartialMatches(args[0], Arrays.asList("exp", "skillpoints"), completions);
+            } else if (args.length == 2) {
+                StringUtil.copyPartialMatches(args[1], Arrays.asList("add", "set"), completions);
+            } else if (args.length == 3) {
+                return null; // Deja que Bukkit autocomplete los nombres de jugadores
             }
         }
         return completions;

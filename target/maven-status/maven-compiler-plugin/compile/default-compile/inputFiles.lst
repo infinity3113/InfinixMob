@@ -54,6 +54,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\GUIListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\listeners\ItemUpdaterListener.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\ChatInputManager.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\commands\ClassAdminCommand.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\InfinixMob.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\IgniteMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\Mechanic.java
@@ -70,6 +71,7 @@ C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\SummonStructureMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\items\CustomItem.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\skills\impl\SpawnFallingBlockMechanic.java
+C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\mechanics\impl\DelayMechanic.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\gui\editor\ItemLoreEditorGUI.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\MechanicManager.java
 C:\Users\pikac\Documents\Proyectos Plugin\InfinixMob\src\main\java\com\infinity3113\infinixmob\core\BlockManager.java

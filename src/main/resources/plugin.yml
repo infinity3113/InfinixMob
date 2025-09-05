@@ -16,3 +16,12 @@ commands:
   skills:
     description: Abre el menú de habilidades de tu clase.
     aliases: [hab]
+  classadmin: # <-- NUEVO COMANDO
+    description: Administra la experiencia y puntos de habilidad de los jugadores.
+    usage: /classadmin <exp|skillpoints> <add|set> <jugador> <cantidad>
+    permission: infinixmob.admin
+
+permissions:
+  infinixmob.admin: # <-- NUEVO PERMISO
+    description: Permite usar los comandos de administración de InfinixMob.
+    default: op

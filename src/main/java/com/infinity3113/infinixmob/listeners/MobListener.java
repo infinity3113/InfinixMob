@@ -1,13 +1,11 @@
 package com.infinity3113.infinixmob.listeners;
 
-import com.infinity3113.infinixmob.InfinixMob;
-import com.infinity3113.infinixmob.mobs.CustomMob;
-import com.infinity3113.infinixmob.items.CustomItem;
-import com.infinity3113.infinixmob.utils.PlaceholderParser;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-
-import org.bukkit.ChatColor;
+import com.infinity3113.infinixmob.InfinixMob;
+import com.infinity3113.infinixmob.items.CustomItem;
+import com.infinity3113.infinixmob.mobs.CustomMob;
+import com.infinity3113.infinixmob.utils.PlaceholderParser;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
@@ -23,14 +21,12 @@ import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class MobListener implements Listener {
 
@@ -47,7 +43,7 @@ public class MobListener implements Listener {
     @EventHandler
     public void onEntitySpawn(EntitySpawnEvent event) {
         if (!(event.getEntity() instanceof LivingEntity)) return;
-        
+
         LivingEntity entity = (LivingEntity) event.getEntity();
         plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
             if (entity.isValid() && entity.hasMetadata("InfinixMobID")) {
@@ -67,6 +63,23 @@ public class MobListener implements Listener {
         }
 
         handleTrigger("~onTimer", mob, target);
+
+        if (mob.hasMetadata("infinix:skills_on_timer")) {
+            String json = mob.getMetadata("infinix:skills_on_timer").get(0).asString();
+            Type type = new TypeToken<Map<String, String>>() {}.getType();
+            Map<String, String> skillsOnTimer = gson.fromJson(json, type);
+
+            for (Map.Entry<String, String> entry : skillsOnTimer.entrySet()) {
+                try {
+                    int interval = Integer.parseInt(entry.getKey());
+                    if (currentTick % interval == 0) {
+                        plugin.getSkillManager().executeSkill(entry.getValue(), mob, target, null);
+                    }
+                } catch (NumberFormatException e) {
+                    plugin.getLogger().warning("Intervalo inválido en skills_on_timer para un mob invocado: " + entry.getKey());
+                }
+            }
+        }
     }
 
     public void handleTrigger(String triggerName, LivingEntity caster, Entity target) {
@@ -96,7 +109,8 @@ public class MobListener implements Listener {
                             container.set(plugin.TIMER_KEY, PersistentDataType.INTEGER, 0);
                             executeSkillLogic(rule, caster, target);
                         }
-                    } catch (NumberFormatException ignored) {}
+                    } catch (NumberFormatException ignored) {
+                    }
                 }
             } else if (baseTrigger.equalsIgnoreCase(triggerName)) {
                 executeSkillLogic(rule, caster, target);
@@ -130,28 +144,25 @@ public class MobListener implements Listener {
             plugin.getSkillManager().executeSkill(skillId, caster, target, null);
         }
     }
-    
+
     @EventHandler
     public void onProjectileHit(ProjectileHitEvent event) {
         Projectile projectile = event.getEntity();
         if (!projectile.hasMetadata("InfinixMob_ProjectileSkill")) return;
-        
+
         String skillOnHitId = projectile.getMetadata("InfinixMob_ProjectileSkill").get(0).asString();
         UUID ownerUUID = UUID.fromString(projectile.getMetadata("InfinixMob_Owner").get(0).asString());
-        
-        // --- INICIO DE LA CORRECCIÓN ---
-        // Recuperamos el ID de la habilidad original. Si no existe, usamos la habilidad de impacto como fallback.
-        String parentSkillId = skillOnHitId; 
-        if(projectile.hasMetadata("InfinixMob_ParentSkill")){
+
+        String parentSkillId = skillOnHitId;
+        if (projectile.hasMetadata("InfinixMob_ParentSkill")) {
             parentSkillId = projectile.getMetadata("InfinixMob_ParentSkill").get(0).asString();
         }
-        // --- FIN DE LA CORRECCIÓN ---
-        
+
         Entity ownerEntity = plugin.getServer().getEntity(ownerUUID);
         if (!(ownerEntity instanceof LivingEntity) || ownerEntity.isDead()) return;
-        
+
         LivingEntity owner = (LivingEntity) ownerEntity;
-        
+
         Location impactLocation;
         if (event.getHitBlock() != null) {
             impactLocation = event.getHitBlock().getLocation();
@@ -160,24 +171,21 @@ public class MobListener implements Listener {
         } else {
             return;
         }
-        
+
         ArmorStand targetDummy = (ArmorStand) impactLocation.getWorld().spawnEntity(impactLocation, EntityType.ARMOR_STAND);
         targetDummy.setVisible(false);
         targetDummy.setGravity(false);
         targetDummy.setMarker(true);
-        
-        // --- INICIO DE LA CORRECCIÓN ---
-        // Pasamos ambos IDs de habilidad al SkillManager.
+
         plugin.getSkillManager().executeSkill(skillOnHitId, parentSkillId, owner, targetDummy, null);
-        // --- FIN DE LA CORRECCIÓN ---
-        
+
         plugin.getServer().getScheduler().runTaskLater(plugin, targetDummy::remove, 20L);
     }
 
     @EventHandler
     public void onEntityShoot(EntityShootBowEvent event) {
         if (!(event.getEntity() instanceof LivingEntity) || !event.getEntity().hasMetadata("InfinixMobID")) return;
-        
+
         LivingEntity caster = (LivingEntity) event.getEntity();
         String mobId = caster.getMetadata("InfinixMobID").get(0).asString();
 
@@ -188,7 +196,7 @@ public class MobListener implements Listener {
             for (Map<?, ?> rule : skillRules) {
                 String trigger = (String) rule.get("trigger");
                 if (trigger != null && trigger.equalsIgnoreCase("~onShoot")) {
-                    
+
                     double chance = 1.0;
                     if (rule.get("chance") instanceof Number) {
                         chance = ((Number) rule.get("chance")).doubleValue();
@@ -206,12 +214,12 @@ public class MobListener implements Listener {
             }
         });
     }
-    
+
     @EventHandler
     public void onEntityDamage(EntityDamageEvent event) {
         if (!(event.getEntity() instanceof LivingEntity)) return;
         LivingEntity victim = (LivingEntity) event.getEntity();
-        
+
         if (event.getCause() == EntityDamageEvent.DamageCause.LAVA && victim.hasMetadata("InfinixMob_LavaImmunity")) {
             event.setCancelled(true);
             return;
@@ -255,7 +263,7 @@ public class MobListener implements Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent event) {
         event.getEntity().getPersistentDataContainer().remove(plugin.TIMER_KEY);
-        
+
         LivingEntity deceased = event.getEntity();
         if (deceased.hasMetadata("InfinixMobID")) {
             plugin.getWeakPointManager().removeWeakPointsFor(deceased);
@@ -290,11 +298,11 @@ public class MobListener implements Listener {
                                 amount = ThreadLocalRandom.current().nextInt(min, max + 1);
                             }
                             Optional<ItemStack> itemStackOptional = plugin.getItemManager().getItem(itemIdentifier)
-                                .map(customItem -> customItem.buildItemStack())
-                                .or(() -> {
-                                    Material material = Material.matchMaterial(itemIdentifier.toUpperCase());
-                                    return material != null ? Optional.of(new ItemStack(material)) : Optional.empty();
-                                });
+                                    .map(CustomItem::buildItemStack)
+                                    .or(() -> {
+                                        Material material = Material.matchMaterial(itemIdentifier.toUpperCase());
+                                        return material != null ? Optional.of(new ItemStack(material)) : Optional.empty();
+                                    });
                             if (itemStackOptional.isPresent()) {
                                 ItemStack itemStack = itemStackOptional.get();
                                 if (itemStack.getType() != Material.AIR && amount > 0) {
@@ -314,28 +322,28 @@ public class MobListener implements Listener {
             handleTrigger("~onDeath", deceased, deceased.getKiller());
         }
     }
-    
+
     @EventHandler
     public void onCombust(EntityCombustEvent event) {
         if (event.getEntity() instanceof LivingEntity && event.getEntity().hasMetadata("InfinixMobID")) {
             handleTrigger("~onCombust", (LivingEntity) event.getEntity(), null);
         }
     }
-    
+
     @EventHandler
     public void onPlayerInteract(PlayerInteractEntityEvent event) {
         if (event.getRightClicked().hasMetadata("InfinixMobID")) {
             handleTrigger("~onInteract", (LivingEntity) event.getRightClicked(), event.getPlayer());
         }
     }
-    
+
     @EventHandler
     public void onEntityHeal(EntityRegainHealthEvent event) {
         if (event.getEntity() instanceof LivingEntity && event.getEntity().hasMetadata("InfinixMobID")) {
             handleTrigger("~onHeal", (LivingEntity) event.getEntity(), null);
         }
     }
-    
+
     @EventHandler
     public void onTarget(EntityTargetEvent event) {
         if (event.getTarget() == null || !(event.getEntity() instanceof LivingEntity)) {
@@ -366,7 +374,7 @@ public class MobListener implements Listener {
             handleTrigger("~onTeleport", (LivingEntity) event.getEntity(), null);
         }
     }
-    
+
     private boolean checkCondition(String condition, LivingEntity caster, Entity target) {
         boolean negate = false;
         if (condition.startsWith("!")) {
@@ -387,20 +395,39 @@ public class MobListener implements Listener {
                 double value = Double.parseDouble(numericMatcher.group(3));
                 double actualValue = 0;
                 switch (variable) {
-                    case "health": actualValue = caster.getHealth(); break;
-                    case "distance": if (target == null) return false; actualValue = caster.getLocation().distance(target.getLocation()); break;
-                    case "worldtime": actualValue = caster.getWorld().getTime(); break;
+                    case "health":
+                        actualValue = caster.getHealth();
+                        break;
+                    case "distance":
+                        if (target == null) return false;
+                        actualValue = caster.getLocation().distance(target.getLocation());
+                        break;
+                    case "worldtime":
+                        actualValue = caster.getWorld().getTime();
+                        break;
                 }
                 boolean result = false;
                 switch (operator) {
-                    case ">": result = actualValue > value; break;
-                    case "<": result = actualValue < value; break;
-                    case "=": result = actualValue == value; break;
-                    case ">=": result = actualValue >= value; break;
-                    case "<=": result = actualValue <= value; break;
-                    case "!=": result = actualValue != value; break;
+                    case ">":
+                        result = actualValue > value;
+                        break;
+                    case "<":
+                        result = actualValue < value;
+                        break;
+                    case "=":
+                        result = actualValue == value;
+                        break;
+                    case ">=":
+                        result = actualValue >= value;
+                        break;
+                    case "<=":
+                        result = actualValue <= value;
+                        break;
+                    case "!=":
+                        result = actualValue != value;
+                        break;
                 }
-                return negate ? !result : result;
+                return negate != result;
             }
             Matcher genericMatcher = GENERIC_PATTERN.matcher(condition.toLowerCase());
             if (genericMatcher.matches()) {
@@ -408,7 +435,9 @@ public class MobListener implements Listener {
                 String params = genericMatcher.group(2);
                 boolean result = false;
                 switch (type) {
-                    case "in_biome": result = caster.getLocation().getBlock().getBiome().name().equalsIgnoreCase(params); break;
+                    case "in_biome":
+                        result = caster.getLocation().getBlock().getBiome().name().equalsIgnoreCase(params);
+                        break;
                     case "has_potion_effect":
                         PotionEffectType effect = PotionEffectType.getByName(params.toUpperCase());
                         result = effect != null && caster.hasPotionEffect(effect);
@@ -428,7 +457,7 @@ public class MobListener implements Listener {
                     case "target_has_item":
                         if (!(target instanceof Player)) return false;
                         ItemStack item = ((Player) target).getInventory().getItemInMainHand();
-                        result = item != null && item.getType().name().equalsIgnoreCase(params);
+                        result = item.getType().name().equalsIgnoreCase(params);
                         break;
                     case "mob_count":
                         String[] mobCountParams = params.split(";");
@@ -437,21 +466,43 @@ public class MobListener implements Listener {
                         result = countMobs(caster, mobType, radius) > 0;
                         break;
                 }
-                return negate ? !result : result;
+                return negate != result;
             }
             boolean result = false;
             switch (condition.toLowerCase()) {
-                case "is_underground": result = caster.getLocation().getY() < 50; break;
-                case "is_thundering": result = caster.getWorld().isThundering(); break;
-                case "target_is_burning": result = target != null && target.getFireTicks() > 0; break;
-                case "target_is_player": result = target instanceof Player; break;
-                case "target_is_sneaking": result = target instanceof Player && ((Player) target).isSneaking(); break;
-                case "is_on_fire": result = caster.getFireTicks() > 0; break;
-                case "is_day": result = caster.getWorld().getTime() >= 0 && caster.getWorld().getTime() < 12300; break;
-                case "is_night": result = caster.getWorld().getTime() >= 12300; break;
-                case "is_raining": result = caster.getWorld().hasStorm(); break;
-                case "is_in_water": result = caster.isInWater(); break;
-                case "is_on_ground": result = caster.isOnGround(); break;
+                case "is_underground":
+                    result = caster.getLocation().getY() < 50;
+                    break;
+                case "is_thundering":
+                    result = caster.getWorld().isThundering();
+                    break;
+                case "target_is_burning":
+                    result = target != null && target.getFireTicks() > 0;
+                    break;
+                case "target_is_player":
+                    result = target instanceof Player;
+                    break;
+                case "target_is_sneaking":
+                    result = target instanceof Player && ((Player) target).isSneaking();
+                    break;
+                case "is_on_fire":
+                    result = caster.getFireTicks() > 0;
+                    break;
+                case "is_day":
+                    result = caster.getWorld().getTime() < 12300;
+                    break;
+                case "is_night":
+                    result = caster.getWorld().getTime() >= 12300;
+                    break;
+                case "is_raining":
+                    result = caster.getWorld().hasStorm();
+                    break;
+                case "is_in_water":
+                    result = caster.isInWater();
+                    break;
+                case "is_on_ground":
+                    result = caster.isOnGround();
+                    break;
                 case "target_is_looking_at_caster":
                     if (!(target instanceof Player)) return false;
                     Player player = (Player) target;
@@ -462,26 +513,26 @@ public class MobListener implements Listener {
                 default:
                     return true;
             }
-             return negate ? !result : result;
+            return negate != result;
         } catch (Exception e) {
             return true;
         }
     }
-    
+
     private long countMinions(LivingEntity owner, String mobType, double radius) {
         String ownerId = owner.getUniqueId().toString();
         return owner.getWorld().getNearbyEntities(owner.getLocation(), radius, radius, radius).stream()
-            .filter(entity -> entity.hasMetadata("InfinixMob_Owner"))
-            .filter(entity -> entity.getMetadata("InfinixMob_Owner").get(0).asString().equals(ownerId))
-            .filter(entity -> entity.hasMetadata("InfinixMobID"))
-            .filter(entity -> entity.getMetadata("InfinixMobID").get(0).asString().equalsIgnoreCase(mobType))
-            .count();
+                .filter(entity -> entity.hasMetadata("InfinixMob_Owner"))
+                .filter(entity -> entity.getMetadata("InfinixMob_Owner").get(0).asString().equals(ownerId))
+                .filter(entity -> entity.hasMetadata("InfinixMobID"))
+                .filter(entity -> entity.getMetadata("InfinixMobID").get(0).asString().equalsIgnoreCase(mobType))
+                .count();
     }
-    
+
     private long countMobs(LivingEntity caster, String mobType, double radius) {
         return caster.getWorld().getNearbyEntities(caster.getLocation(), radius, radius, radius).stream()
-            .filter(entity -> entity.hasMetadata("InfinixMobID"))
-            .filter(entity -> entity.getMetadata("InfinixMobID").get(0).asString().equalsIgnoreCase(mobType))
-            .count();
+                .filter(entity -> entity.hasMetadata("InfinixMobID"))
+                .filter(entity -> entity.getMetadata("InfinixMobID").get(0).asString().equalsIgnoreCase(mobType))
+                .count();
     }
 }

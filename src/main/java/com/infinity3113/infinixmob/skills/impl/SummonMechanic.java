@@ -1,5 +1,6 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
+import com.google.gson.Gson;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
@@ -17,13 +18,18 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class SummonMechanic implements Mechanic {
     private final InfinixMob plugin;
+    private final Gson gson = new Gson();
+
     public SummonMechanic(InfinixMob plugin) { this.plugin = plugin; }
 
     @Override
     public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
         String mobId = (String) params.get("mobId");
         int amount = ((Number) params.getOrDefault("amount", 1)).intValue();
-        int radius = ((Number) params.getOrDefault("radius", 0)).intValue(); 
+        int radius = ((Number) params.getOrDefault("radius", 0)).intValue();
+        int duration = ((Number) params.getOrDefault("duration", 0)).intValue();
+        Map<String, String> skillsOnTimer = (Map<String, String>) params.get("skills_on_timer");
+
         Location center = (target != null) ? target.getLocation() : caster.getLocation();
 
         for (int i = 0; i < amount; i++) {
@@ -46,10 +52,24 @@ public class SummonMechanic implements Mechanic {
             }
 
             if (summoned != null) {
-                summoned.setMetadata("InfinixMob_Owner", new FixedMetadataValue(plugin, caster.getUniqueId().toString()));
+                final LivingEntity finalSummoned = summoned; // <-- CORRECCIÓN
+                finalSummoned.setMetadata("InfinixMob_Owner", new FixedMetadataValue(plugin, caster.getUniqueId().toString()));
+
+                if (skillsOnTimer != null && !skillsOnTimer.isEmpty()) {
+                    String json = gson.toJson(skillsOnTimer);
+                    finalSummoned.setMetadata("infinix:skills_on_timer", new FixedMetadataValue(plugin, json));
+                }
                 
-                if (summoned instanceof Creature && target instanceof LivingEntity) {
-                    ((Creature) summoned).setTarget((LivingEntity) target);
+                if (duration > 0 && finalSummoned.isValid()) {
+                    plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+                        if(finalSummoned.isValid() && !finalSummoned.isDead()){
+                            finalSummoned.remove();
+                        }
+                    }, duration * 20L);
+                }
+
+                if (finalSummoned instanceof Creature && target instanceof LivingEntity) {
+                    ((Creature) finalSummoned).setTarget((LivingEntity) target);
                 }
             }
         }
