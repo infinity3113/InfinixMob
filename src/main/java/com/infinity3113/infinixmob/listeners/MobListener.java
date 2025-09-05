@@ -127,7 +127,6 @@ public class MobListener implements Listener {
 
         String skillId = (String) rule.get("skill");
         if (skillId != null) {
-            // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
             plugin.getSkillManager().executeSkill(skillId, caster, target, null);
         }
     }
@@ -136,11 +135,23 @@ public class MobListener implements Listener {
     public void onProjectileHit(ProjectileHitEvent event) {
         Projectile projectile = event.getEntity();
         if (!projectile.hasMetadata("InfinixMob_ProjectileSkill")) return;
-        String skillId = projectile.getMetadata("InfinixMob_ProjectileSkill").get(0).asString();
+        
+        String skillOnHitId = projectile.getMetadata("InfinixMob_ProjectileSkill").get(0).asString();
         UUID ownerUUID = UUID.fromString(projectile.getMetadata("InfinixMob_Owner").get(0).asString());
+        
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Recuperamos el ID de la habilidad original. Si no existe, usamos la habilidad de impacto como fallback.
+        String parentSkillId = skillOnHitId; 
+        if(projectile.hasMetadata("InfinixMob_ParentSkill")){
+            parentSkillId = projectile.getMetadata("InfinixMob_ParentSkill").get(0).asString();
+        }
+        // --- FIN DE LA CORRECCIÓN ---
+        
         Entity ownerEntity = plugin.getServer().getEntity(ownerUUID);
         if (!(ownerEntity instanceof LivingEntity) || ownerEntity.isDead()) return;
+        
         LivingEntity owner = (LivingEntity) ownerEntity;
+        
         Location impactLocation;
         if (event.getHitBlock() != null) {
             impactLocation = event.getHitBlock().getLocation();
@@ -149,12 +160,17 @@ public class MobListener implements Listener {
         } else {
             return;
         }
+        
         ArmorStand targetDummy = (ArmorStand) impactLocation.getWorld().spawnEntity(impactLocation, EntityType.ARMOR_STAND);
         targetDummy.setVisible(false);
         targetDummy.setGravity(false);
         targetDummy.setMarker(true);
-        // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
-        plugin.getSkillManager().executeSkill(skillId, owner, targetDummy, null);
+        
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Pasamos ambos IDs de habilidad al SkillManager.
+        plugin.getSkillManager().executeSkill(skillOnHitId, parentSkillId, owner, targetDummy, null);
+        // --- FIN DE LA CORRECCIÓN ---
+        
         plugin.getServer().getScheduler().runTaskLater(plugin, targetDummy::remove, 20L);
     }
 

@@ -20,6 +20,11 @@ public class ProjectileMechanic implements Mechanic {
         String skillOnHit = (String) params.get("skill_on_hit");
         if (skillOnHit == null) return;
 
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Obtenemos el ID de la habilidad que lanzó este proyectil (ej: "BolaDeFuego")
+        String parentSkillId = (String) params.get("skillId");
+        // --- FIN DE LA CORRECCIÓN ---
+
         try {
             EntityType projectileType = EntityType.valueOf(((String) params.getOrDefault("projectile", "FIREBALL")).toUpperCase());
             double speed = ((Number) params.getOrDefault("speed", 1.5)).doubleValue();
@@ -31,16 +36,24 @@ public class ProjectileMechanic implements Mechanic {
                 Projectile projectile = caster.launchProjectile(projectileClass);
                 projectile.setVelocity(caster.getEyeLocation().getDirection().multiply(speed));
                 
-                // Neutralizamos la bola de fuego para que no cause su propia explosión.
                 if (projectile instanceof Fireball) {
                     Fireball fireball = (Fireball) projectile;
-                    fireball.setYield(0.0F); // Radio de explosión 0
-                    fireball.setIsIncendiary(false); // No causa fuego
+                    fireball.setYield(0.0F);
+                    fireball.setIsIncendiary(false);
                 }
-
+                projectile.setMetadata("infinix:skill_projectile", new FixedMetadataValue(plugin, true));
+                
                 // Adjuntar los metadatos que el MobListener buscará
                 projectile.setMetadata("InfinixMob_ProjectileSkill", new FixedMetadataValue(plugin, skillOnHit));
                 projectile.setMetadata("InfinixMob_Owner", new FixedMetadataValue(plugin, caster.getUniqueId().toString()));
+
+                // --- INICIO DE LA CORRECCIÓN ---
+                // Guardamos el ID de la habilidad original para que el daño y los modificadores se calculen correctamente.
+                if (parentSkillId != null) {
+                    projectile.setMetadata("InfinixMob_ParentSkill", new FixedMetadataValue(plugin, parentSkillId));
+                }
+                // --- FIN DE LA CORRECCIÓN ---
+
             } else {
                 plugin.getLogger().warning("La entidad '" + projectileType.name() + "' no es un proyectil y no puede ser lanzada.");
             }

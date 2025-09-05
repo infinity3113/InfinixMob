@@ -7,6 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Arrow;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Projectile;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -71,6 +72,15 @@ public class ItemListener implements Listener {
         if (event.getDamager().hasMetadata("infinix:skill_damage")) {
             return;
         }
+
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Si el que hace daño es un proyectil de habilidad, cancelamos el evento de daño vanilla.
+        // El daño real se calculará en el MobListener cuando detecte el impacto del proyectil.
+        if (event.getDamager() instanceof Projectile && event.getDamager().hasMetadata("infinix:skill_projectile")) {
+            event.setCancelled(true);
+            return;
+        }
+        // --- FIN DE LA CORRECCIÓN ---
 
         if (event.getDamager() instanceof Player && event.getEntity() instanceof LivingEntity) {
             Player player = (Player) event.getDamager();

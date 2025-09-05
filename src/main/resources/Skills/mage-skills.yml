@@ -13,8 +13,9 @@ BolaDeFuego: # Fireball
   resource-cost:
     base: 15
     per-level: 1.5
+  # --- ¡EL DAÑO AHORA ESTÁ AQUÍ! ---
   damage:
-    base: 12
+    base: 15 # O 12, o el valor que desees
     per-level: 2.5
     max: 60
   cooldown:
@@ -34,10 +35,8 @@ BolaDeFuego_Impacto:
     - type: 'AREA_DAMAGE'
       targeter: '@ENTITIESINRADIUS{R=3}'
       parameters:
-        damage:
-          base: 18
-          per-level: 2.5
-          max: 60
+        # --- ¡LA SECCIÓN DE DAÑO SE HA ELIMINADO DE AQUÍ! ---
+        # La mecánica ahora tomará el daño de la habilidad "BolaDeFuego"
     - type: 'PARTICLE'
       targeter: '@SELF'
       parameters:
@@ -47,7 +46,6 @@ BolaDeFuego_Impacto:
       targeter: '@SELF'
       parameters:
         sound: 'ENTITY_GENERIC_EXPLODE'
-
 Destello: # Blink
   icon: ENDER_PEARL
   max-level: 10

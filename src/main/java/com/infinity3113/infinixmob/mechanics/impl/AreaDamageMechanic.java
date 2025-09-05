@@ -1,11 +1,11 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
+import com.google.gson.reflect.TypeToken;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.items.CustomItem;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
-import com.google.gson.reflect.TypeToken;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -18,32 +18,49 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 public class AreaDamageMechanic implements Mechanic {
     @Override
     public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
-        double damage;
-        Object damageObj = params.get("damage");
+        if (!(target instanceof LivingEntity)) {
+            return;
+        }
+
+        double amount;
+        // --- INICIO DE LA CORRECCIÓN ---
+        // Este será el ID de la habilidad de CONTEXTO (ej: "BolaDeFuego")
         String skillId = (String) params.get("skillId");
         InfinixMob plugin = InfinixMob.getPlugin();
 
+        // Buscamos la configuración de la habilidad de contexto para obtener sus valores de daño.
+        Optional<ConfigurationSection> skillConfigOpt = plugin.getSkillManager().getSkillConfig(skillId);
+        if(!skillConfigOpt.isPresent()){
+            plugin.getLogger().warning("AreaDamageMechanic no pudo encontrar la configuración para la skillId: " + skillId);
+            return;
+        }
+        ConfigurationSection skillConfig = skillConfigOpt.get();
+        // Obtenemos la sección de "damage" de la habilidad principal.
+        Object amountObj = skillConfig.get("damage");
+        // --- FIN DE LA CORRECCIÓN ---
+        
         // 1. Calcular el daño base de la habilidad (con niveles)
-        if (damageObj instanceof Map) {
-            ConfigurationSection damageSection;
-            if (damageObj instanceof ConfigurationSection) {
-                damageSection = (ConfigurationSection) damageObj;
+        if (amountObj instanceof Map) {
+            ConfigurationSection amountSection;
+            if (amountObj instanceof ConfigurationSection) {
+                amountSection = (ConfigurationSection) amountObj;
             } else {
                 FileConfiguration tempConfig = new YamlConfiguration();
-                damageSection = tempConfig.createSection("temp", (Map<?, ?>) damageObj);
+                amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
             }
 
             int skillLevel = 1;
             if (caster instanceof Player && playerData != null && skillId != null) {
                 skillLevel = playerData.getSkillLevel(skillId);
             }
-            damage = SkillValueCalculator.calculate(damageSection, skillLevel);
+            amount = SkillValueCalculator.calculate(amountSection, skillLevel);
         } else {
-            damage = ((Number) params.getOrDefault("damage", 5.0)).doubleValue();
+            amount = ((Number) params.getOrDefault("damage", params.getOrDefault("amount", 1.0))).doubleValue();
         }
 
         // 2. Sumar el bonificador de los amplificadores de habilidad de los ítems
@@ -55,23 +72,14 @@ public class AreaDamageMechanic implements Mechanic {
             }
             bonusDamage += getBonusDamageFromItem(player.getInventory().getItemInMainHand(), skillId);
             bonusDamage += getBonusDamageFromItem(player.getInventory().getItemInOffHand(), skillId);
-            damage += bonusDamage;
+            amount += bonusDamage;
         }
 
-        double radius = ((Number) params.getOrDefault("radius", 5.0)).doubleValue();
-
-        // 3. Marcar el daño como basado en habilidad y aplicarlo a las entidades en el radio
-        final double finalDamage = damage; // Usar una variable final para la lambda
+        // 3. Marcar el daño como basado en habilidad y aplicarlo
         try {
             caster.setMetadata("infinix:skill_damage", new FixedMetadataValue(plugin, true));
-            target.getWorld().getNearbyEntities(target.getLocation(), radius, radius, radius).stream()
-                .filter(e -> e instanceof LivingEntity && !e.equals(caster))
-                .forEach(e -> {
-                    LivingEntity victim = (LivingEntity) e;
-                    victim.damage(finalDamage, caster);
-                });
+            ((LivingEntity) target).damage(amount, caster);
         } finally {
-            // Asegurarse de que los metadatos se eliminen incluso si hay un error
             caster.removeMetadata("infinix:skill_damage", plugin);
         }
     }
