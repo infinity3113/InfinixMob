@@ -28,23 +28,30 @@ public class AreaDamageMechanic implements Mechanic {
         }
 
         double amount;
-        // --- INICIO DE LA CORRECCIÓN ---
-        // Este será el ID de la habilidad de CONTEXTO (ej: "BolaDeFuego")
         String skillId = (String) params.get("skillId");
         InfinixMob plugin = InfinixMob.getPlugin();
 
-        // Buscamos la configuración de la habilidad de contexto para obtener sus valores de daño.
-        Optional<ConfigurationSection> skillConfigOpt = plugin.getSkillManager().getSkillConfig(skillId);
-        if(!skillConfigOpt.isPresent()){
-            plugin.getLogger().warning("AreaDamageMechanic no pudo encontrar la configuración para la skillId: " + skillId);
-            return;
+        // Intenta obtener el daño de la habilidad de contexto.
+        Object amountObj = null;
+        if (skillId != null) {
+            Optional<ConfigurationSection> skillConfigOpt = plugin.getSkillManager().getSkillConfig(skillId);
+            if(skillConfigOpt.isPresent()){
+                ConfigurationSection skillConfig = skillConfigOpt.get();
+                amountObj = skillConfig.get("damage");
+            } else {
+                 plugin.getLogger().warning("AreaDamageMechanic no pudo encontrar la configuración para la skillId: " + skillId);
+            }
         }
-        ConfigurationSection skillConfig = skillConfigOpt.get();
-        // Obtenemos la sección de "damage" de la habilidad principal.
-        Object amountObj = skillConfig.get("damage");
-        // --- FIN DE LA CORRECCIÓN ---
+
+        // Si no se pudo heredar, busca un valor local.
+        if (amountObj == null) {
+            amountObj = params.get("damage");
+            if (amountObj == null) {
+                amountObj = params.get("amount");
+            }
+        }
         
-        // 1. Calcular el daño base de la habilidad (con niveles)
+        // Calcula el daño base.
         if (amountObj instanceof Map) {
             ConfigurationSection amountSection;
             if (amountObj instanceof ConfigurationSection) {
@@ -53,7 +60,6 @@ public class AreaDamageMechanic implements Mechanic {
                 FileConfiguration tempConfig = new YamlConfiguration();
                 amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
             }
-
             int skillLevel = 1;
             if (caster instanceof Player && playerData != null && skillId != null) {
                 skillLevel = playerData.getSkillLevel(skillId);
@@ -63,7 +69,7 @@ public class AreaDamageMechanic implements Mechanic {
             amount = ((Number) params.getOrDefault("damage", params.getOrDefault("amount", 1.0))).doubleValue();
         }
 
-        // 2. Sumar el bonificador de los amplificadores de habilidad de los ítems
+        // Añade bonificaciones de ítems.
         if (caster instanceof Player && skillId != null) {
             Player player = (Player) caster;
             double bonusDamage = 0;
@@ -74,8 +80,8 @@ public class AreaDamageMechanic implements Mechanic {
             bonusDamage += getBonusDamageFromItem(player.getInventory().getItemInOffHand(), skillId);
             amount += bonusDamage;
         }
-
-        // 3. Marcar el daño como basado en habilidad y aplicarlo
+        
+        // Aplica el daño.
         try {
             caster.setMetadata("infinix:skill_damage", new FixedMetadataValue(plugin, true));
             ((LivingEntity) target).damage(amount, caster);

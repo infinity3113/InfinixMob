@@ -32,7 +32,20 @@ public class DamageMechanic implements Mechanic {
         String skillId = (String) params.get("skillId");
         InfinixMob plugin = InfinixMob.getPlugin();
 
-        // 1. Calcular el daño base de la habilidad (con niveles)
+        // Si 'amount' no está en los parámetros de la mecánica, intenta heredarlo
+        // de la sección 'damage' de la habilidad principal (contexto).
+        if (amountObj == null && skillId != null) {
+            Optional<ConfigurationSection> skillConfigOpt = plugin.getSkillManager().getSkillConfig(skillId);
+            if(!skillConfigOpt.isPresent()){
+                 plugin.getLogger().warning("DamageMechanic no pudo encontrar la configuración para la skillId: " + skillId);
+                 amountObj = params.get("amount"); // Reintento por si acaso
+            } else {
+                ConfigurationSection skillConfig = skillConfigOpt.get();
+                amountObj = skillConfig.get("damage");
+            }
+        }
+
+        // Calcula el daño base, ya sea un valor fijo o escalado por nivel.
         if (amountObj instanceof Map) {
             ConfigurationSection amountSection;
             if (amountObj instanceof ConfigurationSection) {
@@ -41,17 +54,18 @@ public class DamageMechanic implements Mechanic {
                 FileConfiguration tempConfig = new YamlConfiguration();
                 amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
             }
-
             int skillLevel = 1;
             if (caster instanceof Player && playerData != null && skillId != null) {
                 skillLevel = playerData.getSkillLevel(skillId);
             }
             amount = SkillValueCalculator.calculate(amountSection, skillLevel);
         } else {
+            // Si no hay sección de daño, usa el valor 'amount' o por defecto 1.0.
+            // Este era el origen del error.
             amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();
         }
 
-        // 2. Sumar el bonificador de los amplificadores de habilidad de los ítems
+        // Añade bonificaciones de daño de los ítems del jugador.
         if (caster instanceof Player && skillId != null) {
             Player player = (Player) caster;
             double bonusDamage = 0;
@@ -63,12 +77,10 @@ public class DamageMechanic implements Mechanic {
             amount += bonusDamage;
         }
 
-        // 3. Marcar el daño como basado en habilidad y aplicarlo
         try {
             caster.setMetadata("infinix:skill_damage", new FixedMetadataValue(plugin, true));
             ((LivingEntity) target).damage(amount, caster);
         } finally {
-            // Asegurarse de que los metadatos se eliminen incluso si hay un error
             caster.removeMetadata("infinix:skill_damage", plugin);
         }
     }
