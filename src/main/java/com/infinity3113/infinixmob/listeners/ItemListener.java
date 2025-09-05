@@ -77,6 +77,7 @@ public class ItemListener implements Listener {
         // Si el que hace daño es un proyectil de habilidad, cancelamos el evento de daño vanilla.
         // El daño real se calculará en el MobListener cuando detecte el impacto del proyectil.
         if (event.getDamager() instanceof Projectile && event.getDamager().hasMetadata("infinix:skill_projectile")) {
+            // Esto cancela tanto el impacto directo como cualquier daño de explosión que pueda generar
             event.setCancelled(true);
             return;
         }

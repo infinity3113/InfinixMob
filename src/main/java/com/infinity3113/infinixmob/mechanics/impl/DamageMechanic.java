@@ -18,6 +18,7 @@ import org.bukkit.persistence.PersistentDataType;
 
 import java.lang.reflect.Type;
 import java.util.Map;
+import java.util.Optional;
 
 public class DamageMechanic implements Mechanic {
     @Override
