@@ -27,31 +27,31 @@ public class AreaDamageMechanic implements Mechanic {
             return;
         }
 
-        double amount;
+        double amount = 1.0; // Default damage
+        Object amountObj = null;
         String skillId = (String) params.get("skillId");
         InfinixMob plugin = InfinixMob.getPlugin();
 
-        // Intenta obtener el daño de la habilidad de contexto.
-        Object amountObj = null;
+        // 1. Try to inherit damage config from the parent skill (context)
         if (skillId != null) {
             Optional<ConfigurationSection> skillConfigOpt = plugin.getSkillManager().getSkillConfig(skillId);
-            if(skillConfigOpt.isPresent()){
+            if (skillConfigOpt.isPresent()) {
                 ConfigurationSection skillConfig = skillConfigOpt.get();
-                amountObj = skillConfig.get("damage");
-            } else {
-                 plugin.getLogger().warning("AreaDamageMechanic no pudo encontrar la configuración para la skillId: " + skillId);
+                if (skillConfig.isConfigurationSection("damage")) {
+                    amountObj = skillConfig.getConfigurationSection("damage");
+                }
             }
         }
-
-        // Si no se pudo heredar, busca un valor local.
+        
+        // 2. If not inherited, try to get from the mechanic's own parameters
         if (amountObj == null) {
             amountObj = params.get("damage");
             if (amountObj == null) {
                 amountObj = params.get("amount");
             }
         }
-        
-        // Calcula el daño base.
+
+        // 3. Calculate base damage from whatever we found
         if (amountObj instanceof Map) {
             ConfigurationSection amountSection;
             if (amountObj instanceof ConfigurationSection) {
@@ -65,11 +65,11 @@ public class AreaDamageMechanic implements Mechanic {
                 skillLevel = playerData.getSkillLevel(skillId);
             }
             amount = SkillValueCalculator.calculate(amountSection, skillLevel);
-        } else {
-            amount = ((Number) params.getOrDefault("damage", params.getOrDefault("amount", 1.0))).doubleValue();
+        } else if (amountObj instanceof Number) {
+            amount = ((Number) amountObj).doubleValue();
         }
-
-        // Añade bonificaciones de ítems.
+        
+        // 4. Add bonus damage from item skill modifiers
         if (caster instanceof Player && skillId != null) {
             Player player = (Player) caster;
             double bonusDamage = 0;
@@ -81,7 +81,7 @@ public class AreaDamageMechanic implements Mechanic {
             amount += bonusDamage;
         }
         
-        // Aplica el daño.
+        // 5. Apply final damage
         try {
             caster.setMetadata("infinix:skill_damage", new FixedMetadataValue(plugin, true));
             ((LivingEntity) target).damage(amount, caster);
