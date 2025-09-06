@@ -1,0 +1,28 @@
+name: "Mago"
+gui_icon: "BLAZE_ROD"
+description:
+  - "&bUna clase que domina las artes arcanas."
+  - "&bUsa un báculo para lanzar poderosos hechizos."
+  - ""
+  - "&eEstilo de juego: &fRango, Daño Mágico"
+
+stats:
+  base_health: 20.0
+  base_mana: 100.0
+  mana_regen: 2.5
+
+stats_per_level:
+  add_health: 2.0
+  add_mana: 10.0
+  skill_points_per_level: 1 # Gana 1 punto de habilidad por nivel
+
+leveling:
+  base_xp_needed: 100
+  xp_increase_per_level: 50
+
+# Lista de IDs de habilidades que esta clase puede aprender (deben coincidir con skills.yml)
+available_skills:
+  - "fireball"
+  - "ice_shard"
+  - "lightning_bolt"
+  - "arcane_missile"

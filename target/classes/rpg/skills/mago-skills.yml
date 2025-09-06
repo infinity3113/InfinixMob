@@ -1,0 +1,110 @@
+fireball:
+  display_name: "Bola de Fuego"
+  gui_icon: "FIRE_CHARGE"
+  max_level: 5
+  levels:
+    1:
+      mana_cost: 15
+      cooldown: 3
+      damage: 5
+      description: "Lanza una bola de fuego básica."
+    2:
+      mana_cost: 14
+      cooldown: 2.8
+      damage: 7
+      description: "Daño aumentado."
+    3:
+      mana_cost: 13
+      cooldown: 2.5
+      damage: 9
+      description: "Reduce el coste de maná."
+    4:
+      mana_cost: 12
+      cooldown: 2.2
+      damage: 11
+      description: "Menor enfriamiento."
+    5:
+      mana_cost: 10
+      cooldown: 2
+      damage: 14
+      description: "Potencia máxima."
+ice_shard:
+  display_name: "Esquirla de Hielo"
+  gui_icon: "ICE"
+  max_level: 5
+  levels:
+    1:
+      mana_cost: 20
+      cooldown: 5
+      damage: 7
+      description: "Lanza un fragmento que ralentiza."
+    2:
+      mana_cost: 18
+      cooldown: 4.5
+      damage: 9
+      description: "Mayor daño y ralentización."
+    3:
+      mana_cost: 16
+      cooldown: 4
+      damage: 11
+      description: "Efecto de ralentización mejorado."
+    4:
+      mana_cost: 15
+      cooldown: 3.5
+      damage: 13
+      description: "Menor coste y enfriamiento."
+    5:
+      mana_cost: 14
+      cooldown: 3
+      damage: 15
+      description: "Congelación profunda."
+lightning_bolt:
+  display_name: "Rayo"
+  gui_icon: "TRIDENT"
+  max_level: 3
+  levels:
+    1:
+      mana_cost: 35
+      cooldown: 10
+      damage: 10
+      description: "Invoca un rayo sobre el objetivo."
+    2:
+      mana_cost: 30
+      cooldown: 8
+      damage: 15
+      description: "Daño y área de efecto aumentados."
+    3:
+      mana_cost: 25
+      cooldown: 6
+      damage: 20
+      description: "Invoca una tormenta localizada."
+arcane_missile:
+  display_name: "Misil Arcano"
+  gui_icon: "SPECTRAL_ARROW"
+  max_level: 5
+  levels:
+    1:
+      mana_cost: 10
+      cooldown: 2
+      damage: 3
+      description: "Dispara un misil de energía pura."
+    2:
+      mana_cost: 9
+      cooldown: 1.8
+      damage: 5
+      description: "Más rápido y dañino."
+    3:
+      mana_cost: 8
+      cooldown: 1.5
+      damage: 7
+      description: "Capaz de perforar armaduras ligeras."
+    4:
+      mana_cost: 7
+      cooldown: 1.2
+      damage: 9
+      description: "Reducción de coste y enfriamiento."
+    5:
+      mana_cost: 5
+      cooldown: 1
+      damage: 12
+      description: "Un torrente de energía arcana."
