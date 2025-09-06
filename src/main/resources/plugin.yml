@@ -10,3 +10,20 @@ commands:
     description: Comando principal de InfinixMob.
     aliases: [im]
     usage: /<command> [help|spawn|item|skills]
+  clase:
+    description: Elige o ve información sobre tu clase.
+    usage: /clase
+  cast:
+    description: Lanza una habilidad de tu clase.
+    usage: /cast <habilidad>
+  skills:
+    description: Abre el menú para mejorar tus habilidades.
+    usage: /skills
+  rpgadmin:
+    description: Comandos de administración para InfiniClassRPG.
+    usage: /<command> <levelup|setlevel|addxp|addsp> <jugador> [cantidad]
+    permission: infiniclassrpg.admin
+permissions:
+  infiniclassrpg.admin:
+    description: Permite usar los comandos de administración del plugin.
+    default: op
