@@ -23,19 +23,3 @@ help-spawn: "&e/im spawn <mob> &7- Hace aparecer un mob personalizado."
 help-item: "&e/im item <item> &7- Obtiene un item personalizado."
 help-skills: "&e/im skills &7- Lista las skills cargadas."
 help-reload: "&e/im reload &7- Recarga la configuración."
-
-# --- NUEVOS MENSAJES PARA EL SISTEMA DE CLASES ---
-usage-class: "&cUso: /im class <select|info|list> [nombre_clase]"
-class-list-header: "&6--- Clases Disponibles ---"
-class-select-success: "&aHas seleccionado la clase %class%&a."
-class-select-fail: "&cLa clase '&e%class%&c' no existe."
-class-info-header: "&6--- Tu Información de Clase ---"
-class-info-entry: "&e{label}: &f{value}"
-class-info-none: "&cNo has seleccionado ninguna clase."
-
-# --- NUEVOS MENSAJES PARA EL COMANDO /CAST ---
-usage-cast-player: "&cUso: /cast <1-4>"
-cast-no-class: "&cNecesitas seleccionar una clase para poder lanzar habilidades."
-cast-no-skill-in-slot: "&cNo tienes ninguna habilidad en el slot &e%slot%&c."
-cast-on-cooldown: "&cHabilidad en enfriamiento por &e%time%s&c."
-cast-no-resource: "&cNo tienes suficiente &e%resource_type%&c."

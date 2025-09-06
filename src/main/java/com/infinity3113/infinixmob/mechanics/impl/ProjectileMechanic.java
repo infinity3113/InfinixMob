@@ -2,7 +2,6 @@ package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Fireball;
@@ -16,14 +15,11 @@ public class ProjectileMechanic implements Mechanic {
     public ProjectileMechanic(InfinixMob plugin) { this.plugin = plugin; }
 
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         String skillOnHit = (String) params.get("skill_on_hit");
         if (skillOnHit == null) return;
 
-        // --- INICIO DE LA CORRECCIÓN ---
-        // Obtenemos el ID de la habilidad que lanzó este proyectil (ej: "BolaDeFuego")
         String parentSkillId = (String) params.get("skillId");
-        // --- FIN DE LA CORRECCIÓN ---
 
         try {
             EntityType projectileType = EntityType.valueOf(((String) params.getOrDefault("projectile", "FIREBALL")).toUpperCase());
@@ -43,16 +39,12 @@ public class ProjectileMechanic implements Mechanic {
                 }
                 projectile.setMetadata("infinix:skill_projectile", new FixedMetadataValue(plugin, true));
                 
-                // Adjuntar los metadatos que el MobListener buscará
                 projectile.setMetadata("InfinixMob_ProjectileSkill", new FixedMetadataValue(plugin, skillOnHit));
                 projectile.setMetadata("InfinixMob_Owner", new FixedMetadataValue(plugin, caster.getUniqueId().toString()));
 
-                // --- INICIO DE LA CORRECCIÓN ---
-                // Guardamos el ID de la habilidad original para que el daño y los modificadores se calculen correctamente.
                 if (parentSkillId != null) {
                     projectile.setMetadata("InfinixMob_ParentSkill", new FixedMetadataValue(plugin, parentSkillId));
                 }
-                // --- FIN DE LA CORRECCIÓN ---
 
             } else {
                 plugin.getLogger().warning("La entidad '" + projectileType.name() + "' no es un proyectil y no puede ser lanzada.");

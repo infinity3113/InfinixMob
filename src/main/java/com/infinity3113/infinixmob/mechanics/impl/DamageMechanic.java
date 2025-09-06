@@ -4,7 +4,6 @@ import com.google.gson.reflect.TypeToken;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.items.CustomItem;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 public class DamageMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         if (!(target instanceof LivingEntity)) {
             return;
         }
@@ -61,9 +60,7 @@ public class DamageMechanic implements Mechanic {
                 amountSection = tempConfig.createSection("temp", (Map<?, ?>) amountObj);
             }
             int skillLevel = 1;
-            if (caster instanceof Player && playerData != null && skillId != null) {
-                skillLevel = playerData.getSkillLevel(skillId);
-            }
+            
             amount = SkillValueCalculator.calculate(amountSection, skillLevel);
         } else if (amountObj instanceof Number) {
             amount = ((Number) amountObj).doubleValue();

@@ -1,7 +1,6 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
@@ -15,7 +14,7 @@ import java.util.Map;
 
 public class ScrambleInventoryMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         if (target instanceof Player) {
             Player player = (Player) target;
             PlayerInventory inv = player.getInventory();

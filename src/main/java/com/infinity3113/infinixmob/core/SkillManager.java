@@ -1,7 +1,6 @@
 package com.infinity3113.infinixmob.core;
 
 import com.infinity3113.infinixmob.InfinixMob;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -62,22 +61,11 @@ public class SkillManager {
         return Optional.ofNullable(skillConfigs.get(skillId));
     }
 
-    // --- INICIO DE LA CORRECCIÓN ---
-    // Método sobrecargado para mantener la compatibilidad con llamadas antiguas.
-    public void executeSkill(String skillId, LivingEntity caster, Entity initialTarget, PlayerData playerData) {
-        // Llama a la nueva versión, usando el mismo ID para la habilidad y el contexto.
-        executeSkill(skillId, skillId, caster, initialTarget, playerData);
+    public void executeSkill(String skillId, LivingEntity caster, Entity initialTarget) {
+        executeSkill(skillId, skillId, caster, initialTarget);
     }
 
-    /**
-     * Ejecuta una habilidad.
-     * @param skillId El ID de la habilidad a ejecutar (ej: BolaDeFuego_Impacto).
-     * @param contextSkillId El ID de la habilidad original para obtener valores como el daño (ej: BolaDeFuego).
-     * @param caster La entidad que lanza la habilidad.
-     * @param initialTarget El objetivo inicial de la habilidad.
-     * @param playerData Los datos del jugador si el lanzador es un jugador.
-     */
-    public void executeSkill(String skillId, String contextSkillId, LivingEntity caster, Entity initialTarget, PlayerData playerData) {
+    public void executeSkill(String skillId, String contextSkillId, LivingEntity caster, Entity initialTarget) {
         ConfigurationSection skillSection = skillConfigs.get(skillId);
         if (skillSection == null) {
             plugin.getLogger().warning("Se intentó ejecutar una skill inexistente: " + skillId);
@@ -100,15 +88,12 @@ public class SkillManager {
                     parametersMap.putAll((Map<String, Object>) rawParams);
                 }
                 
-                // ¡IMPORTANTE! Pasamos el ID de la habilidad de contexto a las mecánicas.
-                // Así, mecánicas como DAMAGE sabrán de dónde sacar el daño y los amplificadores.
                 parametersMap.put("skillId", contextSkillId);
 
-                plugin.getMechanicManager().executeMechanic(mechanicType, caster, finalTarget, parametersMap, playerData);
+                plugin.getMechanicManager().executeMechanic(mechanicType, caster, finalTarget, parametersMap);
             }
         }
     }
-    // --- FIN DE LA CORRECCIÓN ---
 
     public Set<String> getLoadedSkillNames() {
         return skillConfigs.keySet();

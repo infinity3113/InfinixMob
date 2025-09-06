@@ -11,6 +11,3 @@ item-revision:
     lore: false
     # Un prefijo para identificar las líneas de lore que se deben conservar.
     kept-lore-prefix: '&7'
-classes:
-  enabled: true
-  exp-modifier: 1.0 # Multiplicador de experiencia global

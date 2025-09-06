@@ -1,7 +1,6 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -14,7 +13,7 @@ import java.util.Map;
 
 public class HealMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         if (target instanceof LivingEntity) {
             LivingEntity healTarget = (LivingEntity) target;
             double amount;
@@ -30,12 +29,7 @@ public class HealMechanic implements Mechanic {
                 }
 
                 int skillLevel = 1;
-                if (caster instanceof Player && playerData != null) {
-                    String skillId = (String) params.get("skillId");
-                    if (skillId != null) {
-                        skillLevel = playerData.getSkillLevel(skillId);
-                    }
-                }
+                
                 amount = SkillValueCalculator.calculate(amountSection, skillLevel);
             } else {
                 amount = ((Number) params.getOrDefault("amount", 1.0)).doubleValue();

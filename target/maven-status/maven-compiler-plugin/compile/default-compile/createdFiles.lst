@@ -5,7 +5,6 @@ com\infinity3113\infinixmob\mechanics\impl\TitleMessageMechanic.class
 com\infinity3113\infinixmob\targeters\impl\TargetEntitiesInRadius.class
 com\infinity3113\infinixmob\targeters\impl\TargetMobsInRadius.class
 com\infinity3113\infinixmob\listeners\ItemListener$3.class
-com\infinity3113\infinixmob\gui\SkillTreeGUI.class
 com\infinity3113\infinixmob\mechanics\impl\PushMechanic.class
 com\infinity3113\infinixmob\listeners\ChatListener.class
 com\infinity3113\infinixmob\core\BlockManager$TemporaryBlock.class
@@ -38,7 +37,6 @@ com\infinity3113\infinixmob\core\MobManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\SilentRemoveMechanic.class
 com\infinity3113\infinixmob\listeners\ItemListener$1.class
 com\infinity3113\infinixmob\targeters\impl\TargetTarget.class
-com\infinity3113\infinixmob\playerclass\PlayerClassManager.class
 com\infinity3113\infinixmob\core\SpawnerManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\ExplosionMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\HealMechanic.class
@@ -64,7 +62,6 @@ com\infinity3113\infinixmob\InfinixMob$1.class
 com\infinity3113\infinixmob\gui\editor\ItemTypeSelectorGUI.class
 com\infinity3113\infinixmob\gui\MobSelectionGUI.class
 com\infinity3113\infinixmob\mechanics\impl\MeteorShowerMechanic.class
-com\infinity3113\infinixmob\playerclass\PlayerClassManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\CommandMechanic.class
 com\infinity3113\infinixmob\core\WeakPointManager.class
 com\infinity3113\infinixmob\mechanics\impl\FreezeMechanic.class
@@ -98,16 +95,13 @@ com\infinity3113\infinixmob\mechanics\impl\DelayMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\DisarmMechanic.class
 com\infinity3113\infinixmob\core\RecipeManager$1.class
 com\infinity3113\infinixmob\core\StatusEffectManager$ActiveEffect.class
-com\infinity3113\infinixmob\listeners\ClassListener.class
 com\infinity3113\infinixmob\core\BlockManager$2.class
 com\infinity3113\infinixmob\mechanics\impl\DamageMechanic$1.class
 com\infinity3113\infinixmob\mechanics\impl\ParticleMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\MessageMechanic.class
 com\infinity3113\infinixmob\mechanics\impl\PotionAreaMechanic.class
 com\infinity3113\infinixmob\gui\SpawnerListGui.class
-com\infinity3113\infinixmob\commands\ClassAdminCommand.class
 com\infinity3113\infinixmob\gui\editor\ElementalDamageGUI.class
-com\infinity3113\infinixmob\playerclass\PlayerData.class
 com\infinity3113\infinixmob\gui\SpawnerGUI$1.class
 com\infinity3113\infinixmob\mechanics\impl\ItemCooldownMechanic.class
 com\infinity3113\infinixmob\core\SkillManager.class
@@ -120,7 +114,6 @@ com\infinity3113\infinixmob\targeters\impl\TargetOwner.class
 com\infinity3113\infinixmob\targeters\impl\TargetSelf.class
 com\infinity3113\infinixmob\core\SoulLinkManager.class
 com\infinity3113\infinixmob\core\ThreatManager.class
-com\infinity3113\infinixmob\playerclass\PlayerClass.class
 com\infinity3113\infinixmob\core\CooldownManager.class
 com\infinity3113\infinixmob\core\ItemManager.class
 com\infinity3113\infinixmob\core\SpawnerManager$3.class

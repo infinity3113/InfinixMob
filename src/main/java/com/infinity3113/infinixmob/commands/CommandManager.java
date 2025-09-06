@@ -2,18 +2,13 @@ package com.infinity3113.infinixmob.commands;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.gui.SpawnerListGui;
-import com.infinity3113.infinixmob.gui.SkillTreeGUI;
 import com.infinity3113.infinixmob.gui.editor.ItemTypeSelectorGUI;
-import com.infinity3113.infinixmob.playerclass.PlayerClass;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
-import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Entity;
@@ -28,8 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class CommandManager implements CommandExecutor, TabCompleter {
@@ -66,104 +59,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (command.getName().equalsIgnoreCase("infinixmob")) {
             return handleInfinixMobCommand(sender, args);
-        } else if (command.getName().equalsIgnoreCase("cast")) {
-            return handlePlayerCastCommand(sender, args);
-        } else if (command.getName().equalsIgnoreCase("skills")) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
-                PlayerData pData = plugin.getPlayerClassManager().getPlayerData(player);
-                if (pData.getPlayerClass() == null) {
-                    player.sendMessage(getMsg("cast-no-class"));
-                    return true;
-                }
-                new SkillTreeGUI(plugin, (Player) sender).open();
-            }
-            return true;
-        } else if (command.getName().equalsIgnoreCase("classadmin")) { // <-- NUEVO COMANDO
-            return handleClassAdminCommand(sender, args);
         }
         return false;
-    }
-    
-    private boolean handlePlayerCastCommand(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) {
-            sender.sendMessage(getMsg("player-only"));
-            return true;
-        }
-        Player player = (Player) sender;
-
-        if (args.length < 1) {
-            sender.sendMessage(getMsg("usage-cast-player"));
-            return true;
-        }
-
-        PlayerData pData = plugin.getPlayerClassManager().getPlayerData(player);
-        PlayerClass pClass = pData.getPlayerClass();
-
-        if (pClass == null) {
-            player.sendMessage(getMsg("cast-no-class"));
-            return true;
-        }
-        
-        int slot;
-        try {
-            slot = Integer.parseInt(args[0]);
-            if (slot < 1 || slot > 4) throw new NumberFormatException();
-        } catch (NumberFormatException e) {
-            player.sendMessage(getMsg("usage-cast-player"));
-            return true;
-        }
-
-        String skillId = pClass.getSkills().get(slot);
-        if (skillId == null) {
-            player.sendMessage(getMsg("cast-no-skill-in-slot").replace("%slot%", String.valueOf(slot)));
-            return true;
-        }
-        
-        if(pData.getSkillLevel(skillId) == 0){
-             player.sendMessage(ChatColor.RED + "No has aprendido esta habilidad todavía.");
-             return true;
-        }
-
-        if (plugin.getCooldownManager().isOnCooldown(player.getUniqueId(), skillId)) {
-            long remaining = plugin.getCooldownManager().getRemainingCooldown(player.getUniqueId(), skillId);
-            String timeLeft = String.valueOf(TimeUnit.MILLISECONDS.toSeconds(remaining) + 1);
-            player.sendMessage(getMsg("cast-on-cooldown").replace("%time%", timeLeft));
-            return true;
-        }
-
-        Optional<ConfigurationSection> skillConfigOpt = plugin.getSkillManager().getSkillConfig(skillId);
-        if (!skillConfigOpt.isPresent()) {
-            player.sendMessage(ChatColor.RED + "[DEBUG] Falla CRÍTICA: La habilidad '" + skillId + "' existe en la clase pero no está cargada en SkillManager.");
-            return true;
-        }
-        
-        ConfigurationSection skillConfig = skillConfigOpt.get();
-        double resourceCost = skillConfig.getDouble("resource-cost", 0);
-
-        if (pData.getCurrentResource() < resourceCost) {
-            player.sendMessage(getMsg("cast-no-resource").replace("%resource_type%", pClass.getResourceType().toLowerCase()));
-            return true;
-        }
-        
-        RayTraceResult rayTraceResult = player.getWorld().rayTraceEntities(player.getEyeLocation(), player.getEyeLocation().getDirection(), 40, entity -> entity instanceof LivingEntity && !entity.equals(player));
-        Entity target = (rayTraceResult != null && rayTraceResult.getHitEntity() != null) ? rayTraceResult.getHitEntity() : null;
-        
-        boolean requiresTarget = skillConfig.getBoolean("requires-target", true);
-        
-        if (requiresTarget && target == null) {
-            player.sendMessage(getMsg("no-target-found"));
-            return true;
-        }
-        
-        Entity finalTarget = target;
-        
-        pData.setCurrentResource(pData.getCurrentResource() - resourceCost);
-        int cooldown = skillConfig.getInt("cooldown", 0);
-        plugin.getCooldownManager().setCooldown(player.getUniqueId(), skillId, cooldown);
-        
-        plugin.getSkillManager().executeSkill(skillId, player, finalTarget, pData);
-        return true;
     }
 
     private boolean handleInfinixMobCommand(CommandSender sender, String[] args) {
@@ -176,8 +73,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
             sender.sendMessage(getRawMsg("help-cast"));
             sender.sendMessage(getRawMsg("help-getspawner"));
             sender.sendMessage(getRawMsg("help-spawners"));
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e/im class <select|info|list> &7- Gestiona tu clase."));
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', "&e/cast <1-4> &7- Lanza una habilidad de tu clase."));
             if (sender.hasPermission("infinixmob.admin")) {
                 sender.sendMessage(getRawMsg("help-reload"));
             }
@@ -305,10 +200,6 @@ public class CommandManager implements CommandExecutor, TabCompleter {
                     playerSpawners.sendMessage(getMsg("usage-spawners"));
                 }
                 return true;
-            
-            case "class":
-                handleClassCommand(sender, args);
-                return true;
 
             default:
                 sender.sendMessage(getRawMsg("help-header"));
@@ -329,121 +220,8 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         
         if (target == null) { caster.sendMessage(getMsg("no-target-found")); return; }
         
-        plugin.getSkillManager().executeSkill(skillId, caster, target, plugin.getPlayerClassManager().getPlayerData(caster));
+        plugin.getSkillManager().executeSkill(skillId, caster, target);
         caster.sendMessage(getMsg("cast-success").replace("%skill%", skillId).replace("%target%", target.getName()));
-    }
-    
-    private void handleClassCommand(CommandSender sender, String[] args) {
-        if (!(sender instanceof Player)) { sender.sendMessage(getMsg("player-only")); return; }
-        Player player = (Player) sender;
-        if (args.length < 2) { player.sendMessage(getMsg("usage-class")); return; }
-
-        switch (args[1].toLowerCase()) {
-            case "select":
-                if (args.length < 3) { player.sendMessage(getMsg("usage-class")); return; }
-                PlayerClass pClass = plugin.getPlayerClassManager().getClass(args[2]);
-                if (pClass != null) {
-                    plugin.getPlayerClassManager().getPlayerData(player).setPlayerClass(pClass);
-                    player.sendMessage(getMsg("class-select-success").replace("%class%", pClass.getDisplayName()));
-                } else {
-                    player.sendMessage(getMsg("class-select-fail").replace("%class%", args[2]));
-                }
-                break;
-            case "info":
-                PlayerData data = plugin.getPlayerClassManager().getPlayerData(player);
-                if (data.getPlayerClass() != null) {
-                    player.sendMessage(getRawMsg("class-info-header"));
-                    player.sendMessage(getRawMsg("class-info-entry").replace("{label}", "Clase").replace("{value}", data.getPlayerClass().getDisplayName()));
-                    player.sendMessage(getRawMsg("class-info-entry").replace("{label}", "Nivel").replace("{value}", String.valueOf(data.getLevel())));
-                    player.sendMessage(getRawMsg("class-info-entry").replace("{label}", "Experiencia").replace("{value}", (int)data.getExperience() + "/" + (int)data.getNextLevelExp()));
-                } else {
-                    player.sendMessage(getMsg("class-info-none"));
-                }
-                break;
-            case "list":
-                player.sendMessage(getRawMsg("class-list-header"));
-                plugin.getPlayerClassManager().getAllClasses().forEach(c -> player.sendMessage(ChatColor.YELLOW + "- " + c.getDisplayName() + " (" + c.getId() + ")"));
-                break;
-            default:
-                player.sendMessage(getMsg("usage-class"));
-                break;
-        }
-    }
-
-    // --- NUEVOS MÉTODOS PARA /classadmin ---
-    private boolean handleClassAdminCommand(CommandSender sender, String[] args) {
-        if (!sender.hasPermission("infinixmob.admin")) {
-            sender.sendMessage(getMsg("no-permission"));
-            return true;
-        }
-    
-        if (args.length < 4) {
-            sendAdminUsage(sender);
-            return true;
-        }
-    
-        String subCommand = args[0].toLowerCase();
-        String action = args[1].toLowerCase();
-        Player target = Bukkit.getPlayer(args[2]);
-        double amount;
-    
-        if (target == null) {
-            sender.sendMessage(ChatColor.RED + "Jugador no encontrado: " + args[2]);
-            return true;
-        }
-    
-        try {
-            amount = Double.parseDouble(args[3]);
-        } catch (NumberFormatException e) {
-            sender.sendMessage(ChatColor.RED + "La cantidad debe ser un número.");
-            return true;
-        }
-    
-        PlayerData playerData = plugin.getPlayerClassManager().getPlayerData(target);
-        if (playerData.getPlayerClass() == null) {
-            sender.sendMessage(ChatColor.RED + "El jugador '" + target.getName() + "' no tiene una clase seleccionada.");
-            return true;
-        }
-    
-        switch (subCommand) {
-            case "exp":
-                if ("add".equals(action)) {
-                    playerData.addExperience(amount);
-                    sender.sendMessage(ChatColor.GREEN + "Añadidos " + amount + " de EXP a " + target.getName() + ".");
-                } else if ("set".equals(action)) {
-                    playerData.setExperience(amount);
-                    sender.sendMessage(ChatColor.GREEN + "Establecida la EXP de " + target.getName() + " a " + amount + ".");
-                } else {
-                    sendAdminUsage(sender);
-                }
-                // Comprobar si sube de nivel
-                while(playerData.canLevelUp()){
-                    playerData.levelUp();
-                    target.sendMessage(ChatColor.GOLD + "¡Has subido al nivel " + playerData.getLevel() + "!");
-                }
-                break;
-            case "skillpoints":
-                if ("add".equals(action)) {
-                    playerData.setSkillPoints(playerData.getSkillPoints() + (int)amount);
-                    sender.sendMessage(ChatColor.GREEN + "Añadidos " + (int)amount + " puntos de habilidad a " + target.getName() + ".");
-                } else if ("set".equals(action)) {
-                    playerData.setSkillPoints((int)amount);
-                    sender.sendMessage(ChatColor.GREEN + "Establecidos los puntos de habilidad de " + target.getName() + " a " + (int)amount + ".");
-                } else {
-                    sendAdminUsage(sender);
-                }
-                break;
-            default:
-                sendAdminUsage(sender);
-                break;
-        }
-        return true;
-    }
-    
-    private void sendAdminUsage(CommandSender sender) {
-        sender.sendMessage(ChatColor.GOLD + "--- Comandos de Administración de Clases ---");
-        sender.sendMessage(ChatColor.YELLOW + "/classadmin exp <add|set> <jugador> <cantidad>");
-        sender.sendMessage(ChatColor.YELLOW + "/classadmin skillpoints <add|set> <jugador> <cantidad>");
     }
 
     @Override
@@ -451,26 +229,12 @@ public class CommandManager implements CommandExecutor, TabCompleter {
         final List<String> completions = new ArrayList<>();
         if (command.getName().equalsIgnoreCase("infinixmob")) {
              if (args.length == 1) {
-                List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "edit", "skills", "cast", "getspawner", "spawners", "reload", "class"));
+                List<String> subCommands = new ArrayList<>(Arrays.asList("help", "spawn", "item", "edit", "skills", "cast", "getspawner", "spawners", "reload"));
                 StringUtil.copyPartialMatches(args[0], subCommands, completions);
             } else if (args.length == 2) {
                 if (args[0].equalsIgnoreCase("spawn")) { StringUtil.copyPartialMatches(args[1], plugin.getMobManager().getLoadedMobIds(), completions); }
                 if (args[0].equalsIgnoreCase("item")) { StringUtil.copyPartialMatches(args[1], plugin.getItemManager().getLoadedItemIds(), completions); }
                 if (args[0].equalsIgnoreCase("cast")) { StringUtil.copyPartialMatches(args[1], plugin.getSkillManager().getLoadedSkillNames(), completions); }
-                if (args[0].equalsIgnoreCase("class")) { StringUtil.copyPartialMatches(args[1], Arrays.asList("select", "info", "list"), completions); }
-            } else if (args.length == 3) {
-                if (args[0].equalsIgnoreCase("class") && args[1].equalsIgnoreCase("select")) {
-                    List<String> classNames = plugin.getPlayerClassManager().getAllClasses().stream().map(PlayerClass::getId).collect(Collectors.toList());
-                    StringUtil.copyPartialMatches(args[2], classNames, completions);
-                }
-            }
-        } else if (command.getName().equalsIgnoreCase("classadmin")) { // <-- AUTOCOMPLETADO PARA EL NUEVO COMANDO
-            if (args.length == 1) {
-                StringUtil.copyPartialMatches(args[0], Arrays.asList("exp", "skillpoints"), completions);
-            } else if (args.length == 2) {
-                StringUtil.copyPartialMatches(args[1], Arrays.asList("add", "set"), completions);
-            } else if (args.length == 3) {
-                return null; // Deja que Bukkit autocomplete los nombres de jugadores
             }
         }
         return completions;

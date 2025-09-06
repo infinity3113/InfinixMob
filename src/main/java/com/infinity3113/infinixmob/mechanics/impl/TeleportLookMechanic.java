@@ -1,7 +1,6 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -16,14 +15,10 @@ import org.bukkit.block.BlockFace;
 
 public class TeleportLookMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         double maxDistance;
         if (params.get("max_distance") instanceof ConfigurationSection) {
             int skillLevel = 1;
-            if (caster instanceof Player && playerData != null) {
-                String skillId = (String) params.get("skillId");
-                skillLevel = playerData.getSkillLevel(skillId);
-            }
             maxDistance = SkillValueCalculator.calculate((ConfigurationSection) params.get("max_distance"), skillLevel);
         } else {
             maxDistance = ((Number) params.getOrDefault("max_distance", 4.0)).doubleValue();

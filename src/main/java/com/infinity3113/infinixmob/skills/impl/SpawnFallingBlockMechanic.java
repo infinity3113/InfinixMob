@@ -1,7 +1,6 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Entity;
@@ -13,7 +12,7 @@ public class SpawnFallingBlockMechanic implements Mechanic {
     private final InfinixMob plugin;
     public SpawnFallingBlockMechanic(InfinixMob plugin) { this.plugin = plugin; }
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         if (target == null) return;
         Material material = Material.matchMaterial(((String) params.getOrDefault("block_type", "STONE")).toUpperCase());
         if (material == null) return;

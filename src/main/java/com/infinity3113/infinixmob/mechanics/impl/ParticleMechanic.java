@@ -1,13 +1,12 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.Particle;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import java.util.Map;
 public class ParticleMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         try {
             Particle particle = Particle.valueOf(((String) params.getOrDefault("particle", "HEART")).toUpperCase());
             int amount = ((Number) params.getOrDefault("amount", 10)).intValue();

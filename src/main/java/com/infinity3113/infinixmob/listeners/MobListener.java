@@ -73,10 +73,10 @@ public class MobListener implements Listener {
                 try {
                     int interval = Integer.parseInt(entry.getKey());
                     if (currentTick % interval == 0) {
-                        plugin.getSkillManager().executeSkill(entry.getValue(), mob, target, null);
+                        plugin.getSkillManager().executeSkill(entry.getValue(), mob, target);
                     }
                 } catch (NumberFormatException e) {
-                    plugin.getLogger().warning("Intervalo inválido en skills_on_timer para un mob invocado: " + entry.getKey());
+                    plugin.getLogger().warning("Intervalo invÃ¡lido en skills_on_timer para un mob invocado: " + entry.getKey());
                 }
             }
         }
@@ -141,7 +141,7 @@ public class MobListener implements Listener {
 
         String skillId = (String) rule.get("skill");
         if (skillId != null) {
-            plugin.getSkillManager().executeSkill(skillId, caster, target, null);
+            plugin.getSkillManager().executeSkill(skillId, caster, target);
         }
     }
 
@@ -177,7 +177,7 @@ public class MobListener implements Listener {
         targetDummy.setGravity(false);
         targetDummy.setMarker(true);
 
-        plugin.getSkillManager().executeSkill(skillOnHitId, parentSkillId, owner, targetDummy, null);
+        plugin.getSkillManager().executeSkill(skillOnHitId, parentSkillId, owner, targetDummy);
 
         plugin.getServer().getScheduler().runTaskLater(plugin, targetDummy::remove, 20L);
     }

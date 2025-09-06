@@ -83,8 +83,7 @@ public class BlockManager implements Listener {
 
         if (tempBlocks.containsKey(loc) && tempBlocks.get(loc) instanceof Trap) {
             Trap trap = (Trap) tempBlocks.remove(loc);
-            // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
-            plugin.getSkillManager().executeSkill(trap.getSkillOnTrigger(), null, player, null);
+            plugin.getSkillManager().executeSkill(trap.getSkillOnTrigger(), null, player);
         }
     }
 

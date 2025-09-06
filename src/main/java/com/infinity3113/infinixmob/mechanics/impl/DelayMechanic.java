@@ -2,7 +2,6 @@ package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -20,7 +19,7 @@ public class DelayMechanic implements Mechanic {
     }
 
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         int duration = ((Number) params.getOrDefault("duration", 1)).intValue();
         List<Map<?, ?>> mechanics = (List<Map<?, ?>>) params.get("mechanics");
         String skillId = (String) params.get("skillId");
@@ -43,7 +42,7 @@ public class DelayMechanic implements Mechanic {
                             parametersMap = new HashMap<>();
                         }
                         parametersMap.put("skillId", skillId);
-                        plugin.getMechanicManager().executeMechanic(mechanicType, caster, finalTarget, parametersMap, playerData);
+                        plugin.getMechanicManager().executeMechanic(mechanicType, caster, finalTarget, parametersMap);
                     }
                 }
             }

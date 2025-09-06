@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.infinity3113.infinixmob.commands.CommandManager;
 import com.infinity3113.infinixmob.core.*;
 import com.infinity3113.infinixmob.listeners.*;
-import com.infinity3113.infinixmob.playerclass.PlayerClassManager;
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
 import org.bukkit.entity.LivingEntity;
@@ -37,7 +36,6 @@ public final class InfinixMob extends JavaPlugin {
     private BlockManager blockManager;
     private CommandManager commandManager;
     private RecipeManager recipeManager;
-    private PlayerClassManager playerClassManager;
     private CooldownManager cooldownManager;
 
     private MobListener mobListener;
@@ -71,10 +69,6 @@ public final class InfinixMob extends JavaPlugin {
 
         saveResource("StatusEffects/effects.yml", false);
 
-        saveResource("classes/mage.yml", false);
-        saveResource("classes/paladin.yml", false);
-        saveResource("classes/archer.yml", false);
-
         // Asegurarse de que los archivos de habilidades por defecto se copien
         saveResource("Skills/mage-skills.yml", false);
         saveResource("Skills/archer-skills.yml", false);
@@ -97,17 +91,11 @@ public final class InfinixMob extends JavaPlugin {
         this.weakPointManager = new WeakPointManager(this);
         this.blockManager = new BlockManager(this);
         this.recipeManager = new RecipeManager(this);
-        this.playerClassManager = new PlayerClassManager(this);
         this.cooldownManager = new CooldownManager();
 
         this.commandManager = new CommandManager(this);
         getCommand("infinixmob").setExecutor(commandManager);
         getCommand("infinixmob").setTabCompleter(commandManager);
-        getCommand("cast").setExecutor(commandManager);
-        getCommand("skills").setExecutor(commandManager);
-        // --- Registro del nuevo comando ---
-        getCommand("classadmin").setExecutor(commandManager);
-        getCommand("classadmin").setTabCompleter(commandManager);
         
         // Registrar todos los listeners
         this.mobListener = new MobListener(this);
@@ -118,7 +106,6 @@ public final class InfinixMob extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new ItemListener(this), this);
         getServer().getPluginManager().registerEvents(new ItemUpdaterListener(this), this);
         getServer().getPluginManager().registerEvents(new SmithingListener(this), this);
-        getServer().getPluginManager().registerEvents(new ClassListener(this), this);
         getServer().getPluginManager().registerEvents(new PlayerConnectionListener(), this);
 
         reload();
@@ -132,15 +119,10 @@ public final class InfinixMob extends JavaPlugin {
         @EventHandler
         public void onPlayerJoin(PlayerJoinEvent event) {
             Player player = event.getPlayer();
-            Bukkit.getScheduler().runTaskLater(plugin, () -> {
-                playerClassManager.loadPlayerData(player);
-            }, 1L);
         }
 
         @EventHandler
         public void onPlayerQuit(PlayerQuitEvent event) {
-            playerClassManager.savePlayerData(event.getPlayer());
-            playerClassManager.removePlayerData(event.getPlayer());
         }
     }
 
@@ -165,9 +147,6 @@ public final class InfinixMob extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        if (playerClassManager != null) {
-            playerClassManager.saveAllPlayerData();
-        }
         getLogger().info("InfinixMob ha sido deshabilitado.");
     }
     
@@ -182,10 +161,6 @@ public final class InfinixMob extends JavaPlugin {
         this.itemManager.loadItems();
         this.mobManager.loadMobs();
         this.skillManager.loadSkills();
-        
-        if (this.playerClassManager != null) {
-            this.playerClassManager.loadClasses();
-        }
 
         this.spawnerManager.startSpawnerTask();
         this.statusEffectManager.startEffectTicker();
@@ -212,7 +187,6 @@ public final class InfinixMob extends JavaPlugin {
     public WeakPointManager getWeakPointManager() { return weakPointManager; }
     public BlockManager getBlockManager() { return blockManager; }
     public MobListener getMobListener() { return mobListener; }
-    public PlayerClassManager getPlayerClassManager() { return playerClassManager; }
     public CooldownManager getCooldownManager() { return cooldownManager; }
     public Gson getGson() {
         return gson;

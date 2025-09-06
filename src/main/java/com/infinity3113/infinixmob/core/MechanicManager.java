@@ -3,7 +3,6 @@ package com.infinity3113.infinixmob.core;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
 import com.infinity3113.infinixmob.mechanics.impl.*;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.LivingEntity;
 
@@ -73,10 +72,10 @@ public class MechanicManager {
         registeredMechanics.put("DELAY", new DelayMechanic(plugin)); // <-- MECÁNICA NUEVA
     }
 
-    public void executeMechanic(String type, LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void executeMechanic(String type, LivingEntity caster, Entity target, Map<String, Object> params) {
         Mechanic mechanic = registeredMechanics.get(type.toUpperCase());
         if (mechanic != null) {
-            mechanic.execute(caster, target, params, playerData);
+            mechanic.execute(caster, target, params);
         } else {
             plugin.getLogger().warning("Unknown mechanic type: " + type);
         }

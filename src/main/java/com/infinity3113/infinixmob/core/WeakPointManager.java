@@ -66,8 +66,7 @@ public class WeakPointManager implements Listener {
                 wp.getOwner().damage(finalDamage, event.getDamager());
 
                 if (wp.getSkillOnDamage() != null && !wp.getSkillOnDamage().isEmpty()) {
-                    // CORRECCIÓN: Se añade 'null' como último argumento para PlayerData
-                    plugin.getSkillManager().executeSkill(wp.getSkillOnDamage(), wp.getOwner(), event.getDamager(), null);
+                    plugin.getSkillManager().executeSkill(wp.getSkillOnDamage(), wp.getOwner(), event.getDamager());
                 }
                 
                 wp.getArmorStand().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, wp.getArmorStand().getLocation(), 1);

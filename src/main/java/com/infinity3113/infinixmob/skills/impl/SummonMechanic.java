@@ -3,7 +3,6 @@ package com.infinity3113.infinixmob.mechanics.impl;
 import com.google.gson.Gson;
 import com.infinity3113.infinixmob.InfinixMob;
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -23,7 +22,7 @@ public class SummonMechanic implements Mechanic {
     public SummonMechanic(InfinixMob plugin) { this.plugin = plugin; }
 
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         String mobId = (String) params.get("mobId");
         int amount = ((Number) params.getOrDefault("amount", 1)).intValue();
         int radius = ((Number) params.getOrDefault("radius", 0)).intValue();

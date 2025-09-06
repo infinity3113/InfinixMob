@@ -1,7 +1,6 @@
 package com.infinity3113.infinixmob.mechanics.impl;
 
 import com.infinity3113.infinixmob.mechanics.Mechanic;
-import com.infinity3113.infinixmob.playerclass.PlayerData;
 import com.infinity3113.infinixmob.utils.SkillValueCalculator;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -16,17 +15,13 @@ import java.util.Map;
 
 public class PotionMechanic implements Mechanic {
     @Override
-    public void execute(LivingEntity caster, Entity target, Map<String, Object> params, PlayerData playerData) {
+    public void execute(LivingEntity caster, Entity target, Map<String, Object> params) {
         if (target instanceof LivingEntity) {
             PotionEffectType effect = PotionEffectType.getByName(((String) params.getOrDefault("effect", "SLOW")).toUpperCase());
             if (effect == null) return;
 
             int skillLevel = 1;
-            if (caster instanceof Player && playerData != null) {
-                String skillId = (String) params.get("skillId");
-                skillLevel = playerData.getSkillLevel(skillId);
-            }
-
+            
             double durationSeconds;
             Object durationObj = params.get("duration");
             if (durationObj instanceof Map) {
