@@ -16,6 +16,7 @@ com\infinity3113\infinixmob\gui\SpawnerGUI.class
 com\infinity3113\infinixmob\core\MechanicManager.class
 com\infinity3113\infinixmob\core\BlockManager$1.class
 com\infinity3113\infinixmob\mechanics\impl\RemovePotionMechanic.class
+com\infinity3113\infinixmob\rpg\util\ActionBarSkillBarTask.class
 com\infinity3113\infinixmob\core\BehaviourManager$1.class
 com\infinity3113\infinixmob\rpg\util\SkillCaster$1.class
 com\infinity3113\infinixmob\core\SoulLinkManager$1.class

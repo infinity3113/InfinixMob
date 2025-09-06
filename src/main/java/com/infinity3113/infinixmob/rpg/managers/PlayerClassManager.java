@@ -1,6 +1,7 @@
 package com.infinity3113.infinixmob.rpg.managers;
 
 import com.infinity3113.infinixmob.InfinixMob;
+import com.infinity3113.infinixmob.rpg.util.ActionBarSkillBarTask;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
@@ -11,6 +12,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.io.File;
 import java.io.IOException;
@@ -24,6 +26,7 @@ public class PlayerClassManager {
     private final InfinixMob plugin;
     private final Map<UUID, PlayerData> playerDataMap = new HashMap<>();
     private final Map<UUID, Map<String, Long>> cooldowns = new HashMap<>();
+    private final Map<UUID, BukkitTask> skillBarTasks = new HashMap<>();
 
     public PlayerClassManager(InfinixMob plugin) {
         this.plugin = plugin;
@@ -172,6 +175,22 @@ public class PlayerClassManager {
     public boolean isOnCooldown(Player player, String abilityName) {
         return cooldowns.getOrDefault(player.getUniqueId(), new HashMap<>()).getOrDefault(abilityName, 0L) > System.currentTimeMillis();
     }
+
+    public void startSkillBarTask(Player player) {
+        if (skillBarTasks.containsKey(player.getUniqueId())) {
+            skillBarTasks.get(player.getUniqueId()).cancel();
+        }
+        ActionBarSkillBarTask task = new ActionBarSkillBarTask(player, this, plugin.getRpgSkillManager());
+        skillBarTasks.put(player.getUniqueId(), task.runTaskTimer(plugin, 0L, 10L));
+    }
+
+    public void stopSkillBarTask(Player player) {
+        if (skillBarTasks.containsKey(player.getUniqueId())) {
+            skillBarTasks.get(player.getUniqueId()).cancel();
+            skillBarTasks.remove(player.getUniqueId());
+        }
+    }
+    
     private void startManaRegenTask() {
         new BukkitRunnable() {
             @Override

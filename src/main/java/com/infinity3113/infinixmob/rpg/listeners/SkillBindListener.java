@@ -5,13 +5,12 @@ import com.infinity3113.infinixmob.rpg.managers.PlayerClassManager;
 import com.infinity3113.infinixmob.rpg.managers.PlayerClassManager.PlayerData;
 import com.infinity3113.infinixmob.rpg.managers.RpgSkillManager;
 import com.infinity3113.infinixmob.rpg.util.SkillCaster;
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
 import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerItemHeldEvent;
+import org.bukkit.event.player.PlayerAnimationEvent;
+import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
 
 public class SkillBindListener implements Listener {
@@ -35,24 +34,23 @@ public class SkillBindListener implements Listener {
         event.setCancelled(true);
         data.setCastingMode(!data.isInCastingMode());
 
-        String message = data.isInCastingMode() ?
-                ChatColor.AQUA + "" + ChatColor.BOLD + "Modo Lanzamiento: ACTIVADO" :
-                ChatColor.GRAY + "" + ChatColor.BOLD + "Modo Lanzamiento: DESACTIVADO";
-
-        player.spigot().sendMessage(ChatMessageType.ACTION_BAR, TextComponent.fromLegacyText(message));
+        if (data.isInCastingMode()) {
+            playerManager.startSkillBarTask(player);
+        } else {
+            playerManager.stopSkillBarTask(player);
+        }
     }
 
     @EventHandler
-    public void onSlotChange(PlayerItemHeldEvent event) {
+    public void onPlayerAnimation(PlayerAnimationEvent event) {
+        if (event.getAnimationType() != PlayerAnimationType.ARM_SWING) return;
+
         Player player = event.getPlayer();
         PlayerData data = playerManager.getPlayerData(player);
         if (data == null || !data.isInCastingMode()) return;
 
-        int slot = event.getNewSlot();
-
+        int slot = player.getInventory().getHeldItemSlot();
         if (slot > 3) return;
-
-        event.setCancelled(true);
 
         String skillId = data.getSkillBind(slot);
         if (skillId == null) return;
@@ -74,7 +72,7 @@ public class SkillBindListener implements Listener {
         data.removeMana(manaCost);
         double cooldown = skillManager.getSkillStat(skillId, skillLevel, "cooldown");
         playerManager.setCooldown(player, skillId, (int) cooldown);
-        
+
         SkillCaster.executeSkill(player, skillId, skillLevel, plugin, skillManager);
     }
 }
