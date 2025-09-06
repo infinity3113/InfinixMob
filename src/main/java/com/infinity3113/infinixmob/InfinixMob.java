@@ -147,7 +147,7 @@ public final class InfinixMob extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new MobKillListener(playerClassManager, classConfigManager), this);
         getServer().getPluginManager().registerEvents(classSelectionGUI, this);
         getServer().getPluginManager().registerEvents(skillsGUI, this);
-        getServer().getPluginManager().registerEvents(new MageListener(playerClassManager, classConfigManager, this), this);
+        // getServer().getPluginManager().registerEvents(new MageListener(playerClassManager, classConfigManager, this), this); // LÍNEA COMENTADA/ELIMINADA
         getServer().getPluginManager().registerEvents(new ProjectileDamageListener(rpgSkillManager), this);
         getServer().getPluginManager().registerEvents(new SkillBindListener(this, playerClassManager, rpgSkillManager), this);
 

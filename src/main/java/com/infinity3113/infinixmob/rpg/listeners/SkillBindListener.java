@@ -9,15 +9,22 @@ import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerAnimationEvent;
-import org.bukkit.event.player.PlayerAnimationType;
 import org.bukkit.event.player.PlayerSwapHandItemsEvent;
+import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.UUID;
 
 public class SkillBindListener implements Listener {
 
     private final InfinixMob plugin;
     private final PlayerClassManager playerManager;
     private final RpgSkillManager skillManager;
+
+    // Mapa para gestionar la tarea de casteo de cada jugador
+    private final Map<UUID, BukkitTask> castingTasks = new HashMap<>();
 
     public SkillBindListener(InfinixMob plugin, PlayerClassManager playerManager, RpgSkillManager skillManager) {
         this.plugin = plugin;
@@ -32,26 +39,60 @@ public class SkillBindListener implements Listener {
         if (data == null) return;
 
         event.setCancelled(true);
-        data.setCastingMode(!data.isInCastingMode());
+        boolean newCastingMode = !data.isInCastingMode();
+        data.setCastingMode(newCastingMode);
 
-        if (data.isInCastingMode()) {
+        if (newCastingMode) {
             playerManager.startSkillBarTask(player);
+            startCastingTask(player); // Inicia nuestra nueva tarea de monitoreo
         } else {
             playerManager.stopSkillBarTask(player);
+            stopCastingTask(player); // Detiene la tarea de monitoreo
         }
     }
 
-    @EventHandler
-    public void onPlayerAnimation(PlayerAnimationEvent event) {
-        if (event.getAnimationType() != PlayerAnimationType.ARM_SWING) return;
+    private void startCastingTask(Player player) {
+        // Nos aseguramos de que no haya tareas duplicadas
+        stopCastingTask(player);
 
-        Player player = event.getPlayer();
-        PlayerData data = playerManager.getPlayerData(player);
-        if (data == null || !data.isInCastingMode()) return;
+        BukkitTask task = new BukkitRunnable() {
+            int previousSlot = player.getInventory().getHeldItemSlot();
 
-        int slot = player.getInventory().getHeldItemSlot();
-        if (slot > 3) return;
+            @Override
+            public void run() {
+                PlayerData data = playerManager.getPlayerData(player);
+                // Si el jugador se desconecta o sale del modo casteo, la tarea se cancela
+                if (!player.isOnline() || data == null || !data.isInCastingMode()) {
+                    this.cancel();
+                    castingTasks.remove(player.getUniqueId());
+                    return;
+                }
 
+                int currentSlot = player.getInventory().getHeldItemSlot();
+
+                // Detectamos si el jugador ha cambiado de slot (ha presionado una tecla numérica)
+                if (currentSlot != previousSlot) {
+                    // Solo nos interesan los slots 1-4 (índices 0-3)
+                    if (currentSlot <= 3) {
+                        castSkillFromSlot(player, data, currentSlot);
+                    }
+                    // Inmediatamente después de detectar el cambio, forzamos al jugador a volver al slot anterior
+                    player.getInventory().setHeldItemSlot(previousSlot);
+                }
+            }
+        }.runTaskTimer(plugin, 0L, 1L); // Se ejecuta cada tick para una respuesta inmediata
+
+        castingTasks.put(player.getUniqueId(), task);
+    }
+
+    private void stopCastingTask(Player player) {
+        BukkitTask task = castingTasks.remove(player.getUniqueId());
+        if (task != null) {
+            task.cancel();
+        }
+    }
+
+    private void castSkillFromSlot(Player player, PlayerData data, int slot) {
         String skillId = data.getSkillBind(slot);
         if (skillId == null) return;
 
