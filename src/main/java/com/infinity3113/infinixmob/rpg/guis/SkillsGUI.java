@@ -44,10 +44,9 @@ public class SkillsGUI implements Listener {
         Inventory gui = Bukkit.createInventory(null, 54, guiTitle);
         FileConfiguration classConfig = classManager.getClassConfig(data.getClassName());
 
+        // Bucle corregido para mostrar todas las habilidades disponibles
         for (String skillId : classConfig.getStringList("available_skills")) {
-            if(data.getSkillLevel(skillId) > 0) {
-                gui.addItem(createSkillItem(skillId, data));
-            }
+            gui.addItem(createSkillItem(skillId, data));
         }
 
         ItemStack placeholder = new ItemStack(Material.BLACK_STAINED_GLASS_PANE);
